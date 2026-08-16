@@ -47,9 +47,9 @@ Dependencies form a directed acyclic graph from prerequisite → dependent. Miss
 
 ## 7. Recovery
 
-Recovery planning is pure with respect to supplied graph/invalidations/verification results. `reusable` means an unaffected checkpoint with a supplied `ALLOW` verification result. Unaffected checkpoints without an `ALLOW` result are reported separately as `requires_verification`; they are not silently trusted. `recompute` contains affected checkpoints only.
+Recovery planning is pure with respect to supplied graph/invalidations/verification results. `reusable` means an unaffected checkpoint with a supplied `ALLOW` verification result whose verification receipt is bound to the exact checkpoint payload currently present in the graph. Unaffected checkpoints without such a bound `ALLOW` result are reported separately as `requires_verification`; they are not silently trusted. `recompute` contains affected checkpoints only.
 
-For a non-reusable checkpoint, `reverification_requirements` contains only the non-reusable ancestors on its dependency path plus itself. This prevents an invalidation in an unrelated branch from becoming a false prerequisite. Consequential actions remain blocked until their path-specific requirements have `ALLOW` re-verification results.
+For a non-reusable checkpoint, `reverification_requirements` contains only the non-reusable ancestors on its dependency path plus itself. This prevents an invalidation in an unrelated branch from becoming a false prerequisite. Consequential actions remain blocked until their path-specific requirements have matching checkpoint IDs and `ALLOW` re-verification results.
 
 ## 8. Replay
 
