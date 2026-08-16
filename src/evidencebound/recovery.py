@@ -7,6 +7,7 @@ from typing import Any
 
 from .graph import DependencyGraph
 from .models import ActionDecision, InvalidationReason, VerificationResult
+from .verification import verify_verification_receipt
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,13 +24,27 @@ class RecoveryPlan:
         return asdict(self)
 
 
+def _bound_result(
+    graph: DependencyGraph,
+    verification: Mapping[str, VerificationResult] | None,
+    checkpoint_id: str,
+) -> VerificationResult | None:
+    if verification is None:
+        return None
+    result = verification.get(checkpoint_id)
+    if result is None or result.checkpoint_id != checkpoint_id:
+        return None
+    if not verify_verification_receipt(result, graph.get(checkpoint_id)):
+        return None
+    return result
+
+
 def _is_allowed(
+    graph: DependencyGraph,
     verification: Mapping[str, VerificationResult] | None,
     checkpoint_id: str,
 ) -> bool:
-    if verification is None:
-        return False
-    result = verification.get(checkpoint_id)
+    result = _bound_result(graph, verification, checkpoint_id)
     return result is not None and result.action is ActionDecision.ALLOW
 
 
@@ -43,16 +58,15 @@ def plan_recovery(
     """Return a deterministic fail-closed recovery plan.
 
     ``reusable`` means both unaffected by the invalidation blast radius and
-    backed by a supplied ``ALLOW`` verification result. Unaffected checkpoints
-    without such a result are separated into ``requires_verification`` rather
-    than being silently promoted to reusable state.
+    backed by a supplied ``ALLOW`` verification result cryptographically bound
+    to the exact checkpoint currently present in the graph.
     """
     order = graph.topological_order()
     affected = graph.blast_radius(invalidations) if invalidations else ()
     affected_set = set(affected)
     unaffected = tuple(node for node in order if node not in affected_set)
 
-    reusable = tuple(node for node in unaffected if _is_allowed(verification, node))
+    reusable = tuple(node for node in unaffected if _is_allowed(graph, verification, node))
     reusable_set = set(reusable)
     requires_verification = tuple(node for node in unaffected if node not in reusable_set)
     non_reusable = affected_set | set(requires_verification)
@@ -68,8 +82,12 @@ def plan_recovery(
     for node in requires_verification:
         if verification is None or node not in verification:
             reasons[node] = "verification_missing"
+            continue
+        result = verification[node]
+        if _bound_result(graph, verification, node) is None:
+            reasons[node] = "verification_binding_invalid"
         else:
-            reasons[node] = f"verification_{verification[node].action.value.lower()}"
+            reasons[node] = f"verification_{result.action.value.lower()}"
 
     reverification_requirements: dict[str, tuple[str, ...]] = {}
     for node in order:
@@ -110,6 +128,10 @@ def action_after_recovery(
 
     for required_id in required:
         result = reverified.get(required_id)
-        if result is None or result.action is not ActionDecision.ALLOW:
+        if (
+            result is None
+            or result.checkpoint_id != required_id
+            or result.action is not ActionDecision.ALLOW
+        ):
             return ActionDecision.BLOCK
     return ActionDecision.ALLOW
