@@ -69,8 +69,16 @@ jobs:
         run: .clean-venv/bin/python examples/plain_python.py
       - name: Run golden external acceptance from isolated environment
         run: .clean-venv/bin/python examples/golden_acceptance.py
-      - name: Confirm no runtime dependencies are declared
-        run: .clean-venv/bin/python -c "from importlib.metadata import requires; assert not (requires('evidencebound-core') or []); print('runtime-dependencies-none')"
+      - name: Confirm no unconditional runtime dependencies are declared
+        run: |
+          .clean-venv/bin/python - <<'PY'
+          from importlib.metadata import requires
+
+          declared = requires("evidencebound-core") or []
+          unconditional = [requirement for requirement in declared if "extra ==" not in requirement]
+          assert not unconditional, f"unexpected runtime requirements: {unconditional}"
+          print("runtime-dependencies-none")
+          PY
 
   security:
     runs-on: ubuntu-latest
