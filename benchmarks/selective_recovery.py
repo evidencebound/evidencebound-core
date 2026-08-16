@@ -38,6 +38,12 @@ full_elapsed = time.perf_counter() - t0
 t1 = time.perf_counter()
 plan = eb.invalidate(checkpoint_id=failed, reason=InvalidationReason.WORKER_FAILED)
 selective_elapsed = time.perf_counter() - t1
+
+assert len(plan.recompute) == 25
+assert len(plan.reusable) == 75
+assert len(plan.requires_verification) == 0
+assert len(full_restart) - len(plan.recompute) == 75
+
 print(
     {
         "scenario": "100-node verified linear synthetic workflow; invalidate n075",
