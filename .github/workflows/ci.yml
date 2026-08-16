@@ -22,7 +22,7 @@ jobs:
       - run: python examples/golden_acceptance.py
       - run: python -m compileall -q src examples benchmarks
       - if: matrix.python-version == '3.13'
-        run: ruff check .
+        run: ruff check . --output-format=github
       - if: matrix.python-version == '3.13'
         run: mypy src/evidencebound
       - if: matrix.python-version == '3.13'
