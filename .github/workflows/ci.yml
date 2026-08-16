@@ -54,6 +54,32 @@ jobs:
       - if: matrix.python-version == '3.13'
         run: python -c "from evidencebound import EvidenceBound; print('clean-install-import-ok')"
 
+  clean-room:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Create isolated environment
+        run: python -m venv .clean-venv
+      - name: Install only the runtime package from this checkout
+        run: .clean-venv/bin/python -m pip install .
+      - name: Run plain Python integration from isolated environment
+        run: .clean-venv/bin/python examples/plain_python.py
+      - name: Run golden external acceptance from isolated environment
+        run: .clean-venv/bin/python examples/golden_acceptance.py
+      - name: Confirm no unconditional runtime dependencies are declared
+        run: |
+          .clean-venv/bin/python - <<'PY'
+          from importlib.metadata import requires
+
+          declared = requires("evidencebound-core") or []
+          unconditional = [requirement for requirement in declared if "extra ==" not in requirement]
+          assert not unconditional, f"unexpected runtime requirements: {unconditional}"
+          print("runtime-dependencies-none")
+          PY
+
   security:
     runs-on: ubuntu-latest
     steps:
