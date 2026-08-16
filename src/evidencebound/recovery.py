@@ -7,6 +7,7 @@ from typing import Any
 
 from .graph import DependencyGraph
 from .models import ActionDecision, InvalidationReason, VerificationResult
+from .verification import verify_verification_receipt
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,11 +15,37 @@ class RecoveryPlan:
     invalidated: tuple[str, ...]
     recompute: tuple[str, ...]
     reusable: tuple[str, ...]
+    requires_verification: tuple[str, ...]
     blocked: tuple[str, ...]
     reasons: dict[str, str]
+    reverification_requirements: dict[str, tuple[str, ...]]
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+def _bound_result(
+    graph: DependencyGraph,
+    verification: Mapping[str, VerificationResult] | None,
+    checkpoint_id: str,
+) -> VerificationResult | None:
+    if verification is None:
+        return None
+    result = verification.get(checkpoint_id)
+    if result is None or result.checkpoint_id != checkpoint_id:
+        return None
+    if not verify_verification_receipt(result, graph.get(checkpoint_id)):
+        return None
+    return result
+
+
+def _is_allowed(
+    graph: DependencyGraph,
+    verification: Mapping[str, VerificationResult] | None,
+    checkpoint_id: str,
+) -> bool:
+    result = _bound_result(graph, verification, checkpoint_id)
+    return result is not None and result.action is ActionDecision.ALLOW
 
 
 def plan_recovery(
@@ -28,11 +55,22 @@ def plan_recovery(
     verification: Mapping[str, VerificationResult] | None = None,
     consequential: set[str] | None = None,
 ) -> RecoveryPlan:
-    if not invalidations:
-        return RecoveryPlan((), (), graph.topological_order(), (), {})
-    affected = graph.blast_radius(invalidations)
+    """Return a deterministic fail-closed recovery plan.
+
+    ``reusable`` means both unaffected by the invalidation blast radius and
+    backed by a supplied ``ALLOW`` verification result cryptographically bound
+    to the exact checkpoint currently present in the graph.
+    """
+    order = graph.topological_order()
+    affected = graph.blast_radius(invalidations) if invalidations else ()
     affected_set = set(affected)
-    reusable = tuple(node for node in graph.topological_order() if node not in affected_set)
+    unaffected = tuple(node for node in order if node not in affected_set)
+
+    reusable = tuple(node for node in unaffected if _is_allowed(graph, verification, node))
+    reusable_set = set(reusable)
+    requires_verification = tuple(node for node in unaffected if node not in reusable_set)
+    non_reusable = affected_set | set(requires_verification)
+
     reasons: dict[str, str] = {}
     for node in affected:
         if node in invalidations:
@@ -41,20 +79,37 @@ def plan_recovery(
             roots = [root for root in invalidations if node in graph.descendants(root)]
             reasons[node] = "depends_on_invalidated:" + ",".join(sorted(roots))
 
-    consequential = consequential or set()
-    blocked: list[str] = []
-    for node in graph.topological_order():
-        if node not in consequential:
-            continue
-        if node in affected_set:
-            blocked.append(node)
-            continue
+    for node in requires_verification:
         if verification is None or node not in verification:
-            blocked.append(node)
+            reasons[node] = "verification_missing"
             continue
-        if verification[node].action is not ActionDecision.ALLOW:
-            blocked.append(node)
-    return RecoveryPlan(affected, affected, reusable, tuple(blocked), reasons)
+        result = verification[node]
+        if _bound_result(graph, verification, node) is None:
+            reasons[node] = "verification_binding_invalid"
+        else:
+            reasons[node] = f"verification_{result.action.value.lower()}"
+
+    reverification_requirements: dict[str, tuple[str, ...]] = {}
+    for node in order:
+        if node not in non_reusable:
+            continue
+        required = set(graph.ancestors(node)) | {node}
+        reverification_requirements[node] = tuple(
+            candidate for candidate in order if candidate in required and candidate in non_reusable
+        )
+
+    consequential = consequential or set()
+    blocked = tuple(node for node in order if node in consequential and node not in reusable_set)
+
+    return RecoveryPlan(
+        invalidated=affected,
+        recompute=affected,
+        reusable=reusable,
+        requires_verification=requires_verification,
+        blocked=blocked,
+        reasons=reasons,
+        reverification_requirements=reverification_requirements,
+    )
 
 
 def action_after_recovery(
@@ -63,15 +118,20 @@ def action_after_recovery(
     *,
     reverified: Mapping[str, VerificationResult],
 ) -> ActionDecision:
-    """Fail closed until affected consequential work has been re-verified successfully."""
-    if checkpoint_id not in plan.blocked:
-        result = reverified.get(checkpoint_id)
-        return result.action if result is not None else ActionDecision.BLOCK
+    """Allow only trusted reusable state or successfully re-verified prerequisites."""
+    if checkpoint_id in plan.reusable:
+        return ActionDecision.ALLOW
 
-    required = set(plan.recompute)
-    required.add(checkpoint_id)
+    required = plan.reverification_requirements.get(checkpoint_id)
+    if required is None:
+        return ActionDecision.BLOCK
+
     for required_id in required:
         result = reverified.get(required_id)
-        if result is None or result.action is not ActionDecision.ALLOW:
+        if (
+            result is None
+            or result.checkpoint_id != required_id
+            or result.action is not ActionDecision.ALLOW
+        ):
             return ActionDecision.BLOCK
     return ActionDecision.ALLOW

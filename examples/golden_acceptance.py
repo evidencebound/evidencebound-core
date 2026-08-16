@@ -30,14 +30,18 @@ c = eb.checkpoint(
     depends_on=["B"],
     checkpoint_id="C",
 )
-verified = eb.verify(c)
-assert verified.action is ActionDecision.ALLOW
+verified_a = eb.verify(a)
+verified_b = eb.verify(b)
+verified_c = eb.verify(c)
+assert verified_a.action is ActionDecision.ALLOW
+assert verified_b.action is ActionDecision.ALLOW
+assert verified_c.action is ActionDecision.ALLOW
 
 tampered = replace(c, output={"step": "tampered"})
-assert eb.verify(tampered, prior_receipt=verified.receipt).action is ActionDecision.BLOCK
+assert eb.verify(tampered, prior_receipt=verified_c.receipt).action is ActionDecision.BLOCK
 
 changed = EvidenceRecord("e1", {"value": 2}, p)
-review = eb.verify(c, current_evidence={"e1": changed}, prior_receipt=verified.receipt)
+review = eb.verify(c, current_evidence={"e1": changed}, prior_receipt=verified_c.receipt)
 assert review.integrity is IntegrityStatus.VERIFIED
 assert review.applicability is ApplicabilityStatus.REVIEW_REQUIRED
 
@@ -48,5 +52,6 @@ plan = eb.invalidate(
 )
 assert plan.recompute == ("B", "C")
 assert plan.reusable == ("A",)
+assert plan.requires_verification == ()
 assert plan.blocked == ("C",)
 print("GOLDEN_ACCEPTANCE_PASS")

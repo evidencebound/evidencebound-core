@@ -20,13 +20,14 @@ previous = None
 for i in range(N):
     cid = f"n{i:03}"
     deps = [] if previous is None else [previous]
-    eb.checkpoint(
+    checkpoint = eb.checkpoint(
         agent="bench",
         evidence=e,
         output={"node": i},
         depends_on=deps,
         checkpoint_id=cid,
     )
+    eb.verify(checkpoint)
     previous = cid
 
 failed = "n075"
@@ -39,10 +40,11 @@ plan = eb.invalidate(checkpoint_id=failed, reason=InvalidationReason.WORKER_FAIL
 selective_elapsed = time.perf_counter() - t1
 print(
     {
-        "scenario": "100-node linear synthetic workflow; invalidate n075",
+        "scenario": "100-node verified linear synthetic workflow; invalidate n075",
         "full_restart_nodes": len(full_restart),
         "selective_recompute_nodes": len(plan.recompute),
         "reused_nodes": len(plan.reusable),
+        "requires_verification_nodes": len(plan.requires_verification),
         "recomputations_avoided": len(full_restart) - len(plan.recompute),
         "planning_elapsed_seconds": selective_elapsed,
         "baseline_list_elapsed_seconds": full_elapsed,

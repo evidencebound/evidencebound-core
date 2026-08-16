@@ -28,6 +28,10 @@ def _parse_time(value: str | None) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
+def _is_sha256_hex(value: str) -> bool:
+    return len(value) == 64 and all(character in "0123456789abcdef" for character in value)
+
+
 def evidence_digest(record: EvidenceRecord) -> str | None:
     if record.payload is None:
         return None
@@ -223,9 +227,33 @@ def verify_checkpoint(
 
 
 def verify_receipt(receipt: ProofReceipt, checkpoint: Checkpoint) -> bool:
-    """Verify the receipt-to-checkpoint integrity binding; not source authenticity."""
+    """Verify receipt metadata and its binding to a protected checkpoint."""
     return (
-        receipt.checkpoint_id == checkpoint.checkpoint_id
+        receipt.receipt_version == "1"
+        and receipt.checkpoint_id == checkpoint.checkpoint_id
         and receipt.checkpoint_digest == checkpoint_digest(checkpoint)
+        and _is_sha256_hex(receipt.checkpoint_digest)
+        and _is_sha256_hex(receipt.verification_digest)
+        and receipt.policy_id == checkpoint.policy.policy_id
+        and receipt.policy_version == checkpoint.policy.version
         and receipt.canonicalization_version == CANONICALIZATION_VERSION
     )
+
+
+def verify_verification_receipt(result: VerificationResult, checkpoint: Checkpoint) -> bool:
+    """Verify the receipt also binds the supplied historical verification result."""
+    if result.checkpoint_id != checkpoint.checkpoint_id:
+        return False
+    if not verify_receipt(result.receipt, checkpoint):
+        return False
+    payload = _verification_payload(
+        checkpoint,
+        result.integrity,
+        result.applicability,
+        result.action,
+        result.provenance_complete,
+        result.policy_compatible,
+        result.evidence,
+        result.reasons,
+    )
+    return result.receipt.verification_digest == digest(payload, domain="verification")

@@ -18,6 +18,7 @@ from evidencebound import (
     canonical_bytes,
     verify_checkpoint,
     verify_receipt,
+    verify_verification_receipt,
 )
 
 
@@ -57,6 +58,25 @@ def test_tamper_fails_closed():
     assert result.integrity is IntegrityStatus.FAILED
     assert result.action is ActionDecision.BLOCK
     assert not verify_receipt(original.receipt, tampered)
+
+
+def test_receipt_metadata_and_verification_result_are_bound():
+    cp = Checkpoint("cp", "a", (ev(),), {"ok": True}, policy())
+    result = verify_checkpoint(cp)
+    assert verify_receipt(result.receipt, cp)
+    assert verify_verification_receipt(result, cp)
+
+    wrong_policy = replace(result.receipt, policy_version="2")
+    assert not verify_receipt(wrong_policy, cp)
+
+    wrong_receipt_version = replace(result.receipt, receipt_version="2")
+    assert not verify_receipt(wrong_receipt_version, cp)
+
+    changed_result = replace(result, action=ActionDecision.BLOCK)
+    assert not verify_verification_receipt(changed_result, cp)
+
+    changed_digest = replace(result.receipt, verification_digest="0" * 64)
+    assert not verify_verification_receipt(replace(result, receipt=changed_digest), cp)
 
 
 def test_historical_integrity_can_coexist_with_review_required():
