@@ -24,7 +24,29 @@ jobs:
       - if: matrix.python-version == '3.13'
         run: ruff check . --output-format=github
       - if: matrix.python-version == '3.13'
-        run: mypy src/evidencebound
+        name: Run strict mypy with annotations
+        run: |
+          python - <<'PY'
+          import re
+          import subprocess
+          import sys
+
+          process = subprocess.run(
+              ["mypy", "src/evidencebound", "--show-error-codes"],
+              capture_output=True,
+              text=True,
+          )
+          output = process.stdout + process.stderr
+          print(output, end="")
+          pattern = re.compile(r"^([^:]+):(\d+): error: (.*)$")
+          for raw in output.splitlines():
+              match = pattern.match(raw)
+              if match:
+                  path, line, message = match.groups()
+                  message = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                  print(f"::error file={path},line={line}::{message}")
+          sys.exit(process.returncode)
+          PY
       - if: matrix.python-version == '3.13'
         run: python -m build
       - if: matrix.python-version == '3.13'
