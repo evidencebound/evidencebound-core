@@ -4,7 +4,7 @@
 
 Created and maintained by Ruslan Vrublevskyi.
 
-> Status: `0.3.0` alpha candidate. The API is intentionally small, but pre-1.0 compatibility is not guaranteed. Release claims require the repository CI/release gate to pass at the exact tagged commit.
+> Status: `0.3.0` release candidate. v0.1/v0.2/v0.3 technical acceptance has passed on `main`, including clean-room installation and security gates. No `v0.3.0` GitHub tag/release or PyPI publication is claimed until those publication actions are independently verified. Pre-1.0 API compatibility is not guaranteed.
 
 ## Why EvidenceBound?
 
@@ -35,7 +35,7 @@ From a checkout:
 python -m pip install .
 ```
 
-No runtime dependency is required beyond Python 3.10+.
+No unconditional runtime dependency is required beyond Python 3.10+.
 
 ## 5-minute quickstart
 
@@ -69,6 +69,7 @@ plan = eb.invalidate(
     reason=InvalidationReason.EVIDENCE_CHANGED,
 )
 print(plan.reusable)
+print(plan.requires_verification)
 print(plan.recompute)
 ```
 
@@ -78,27 +79,32 @@ Run the complete external acceptance scenario:
 python examples/golden_acceptance.py
 ```
 
-It proves the intended sequence: checkpoint → receipt → tamper detection → historical integrity retained while applicability requires review → exact invalidation → consequential action blocked until successful re-verification.
+It proves the intended sequence: checkpoint → receipt → tamper detection → historical integrity retained while applicability requires review → exact invalidation → consequential action blocked until successful path-specific re-verification.
 
 ## Trust semantics
 
 Evidence state and record integrity are separate dimensions.
 
-- `UNCHANGED`: current evidence digest equals the protected snapshot.
+- `UNCHANGED`: current evidence identity and digest match the protected snapshot.
+- `NEW`: a supplied current evidence ID was absent from the protected snapshot.
 - `CHANGED`: the digest differs. **This does not mean REFUTED.**
-- `STALE`: validity horizon has elapsed.
-- `MISSING`: required current evidence is absent.
+- `STALE`: validity horizon has elapsed when an explicit current time is supplied.
+- `MISSING`: required current evidence is absent or its supplied identity does not match the protected record.
 - `REFUTED`: an upstream verifier explicitly marks evidence refuted.
+
+Current evidence mapping keys must match the contained `EvidenceRecord.evidence_id`; an identity mismatch fails closed rather than being accepted because payload bytes happen to match.
 
 Possible outcomes:
 
 - historical integrity `VERIFIED` + current applicability `VERIFIED` → `ALLOW`;
-- historical integrity `VERIFIED` + changed/stale/policy-drift applicability → `REVIEW_REQUIRED`;
-- integrity failure, missing/refuted evidence, or required provenance loss → `BLOCK`.
+- historical integrity `VERIFIED` + changed/stale/new/policy-drift applicability → `REVIEW_REQUIRED`;
+- integrity failure, missing/refuted evidence, identity mismatch, or required provenance loss → `BLOCK`.
 
 ## What a receipt proves
 
-The default receipt binds a checkpoint to a deterministic SHA-256 digest under the versioned `EBCJ-1` canonicalization domain. It is tamper-evident **when the receipt/digest is retained or anchored independently of the mutable checkpoint**. It does not prove upstream truth or author identity and does not resist an attacker able to replace both record and trusted receipt anchor. Signed receipts/key management are roadmap work.
+The default receipt binds a checkpoint to a deterministic SHA-256 digest under the versioned `EBCJ-1` canonicalization domain. `verify_receipt()` validates receipt metadata and checkpoint binding; `verify_verification_receipt()` additionally binds the supplied historical verification result. Receipts are tamper-evident **when retained or anchored independently of mutable checkpoint state**.
+
+This does not prove upstream truth or author identity and does not resist an attacker able to replace both record and trusted receipt anchor. Signed receipts/key management remain roadmap work.
 
 ## Canonicalization
 
@@ -106,7 +112,16 @@ The default receipt binds a checkpoint to a deterministic SHA-256 digest under t
 
 ## Recovery
 
-`DependencyGraph` validates IDs/dependencies, rejects cycles, provides deterministic topological ordering, and computes exact descendants. `plan_recovery()` separates reusable checkpoints from affected/recompute work. `ReplayGuard` provides idempotent duplicate detection; it does **not** claim exactly-once execution.
+`DependencyGraph` validates IDs/dependencies, rejects cycles, provides deterministic topological ordering, and computes exact descendants.
+
+`plan_recovery()` distinguishes:
+
+- `recompute`: checkpoints in the exact invalidation blast radius;
+- `reusable`: unaffected checkpoints with an `ALLOW` verification result cryptographically bound to the exact checkpoint currently in the graph;
+- `requires_verification`: unaffected state that cannot yet be trusted for reuse;
+- `blocked`: consequential actions that may not proceed.
+
+Re-verification requirements are dependency-path-specific, so an unrelated invalidation does not contaminate an independent branch. `ReplayGuard` provides idempotent duplicate detection; it does **not** claim exactly-once execution.
 
 ## Adapters
 
@@ -120,14 +135,17 @@ See [`docs/INTEGRATION.md`](docs/INTEGRATION.md).
 ## Verify this checkout
 
 ```bash
-python -m pip install -e .
+python -m pip install -e '.[dev]'
 pytest
 python examples/golden_acceptance.py
 python benchmarks/selective_recovery.py
 python -m compileall -q src examples benchmarks
+ruff check .
+mypy src/evidencebound
+python -m build
 ```
 
-For release CI, lint/type/build/security/clean-install gates are also run. See `.github/workflows/ci.yml`.
+CI additionally performs an isolated clean-room installation, runtime-dependency assertion, pip-audit, Bandit scan, wheel reinstall/import, and the benchmark acceptance scenario. See `.github/workflows/ci.yml` and [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
 
 ## Security and non-goals
 
@@ -141,6 +159,7 @@ Read [`THREAT_MODEL.md`](THREAT_MODEL.md) before using EvidenceBound for consequ
 - [`SECURITY.md`](SECURITY.md)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - [`ROADMAP.md`](ROADMAP.md)
+- [`RELEASE_READINESS.md`](RELEASE_READINESS.md)
 - [`FUNDING_READINESS.md`](FUNDING_READINESS.md)
 - [`PREEXISTING_WORK.md`](PREEXISTING_WORK.md)
 - [`LICENSE_DECISION.md`](LICENSE_DECISION.md)
