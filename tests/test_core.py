@@ -1,18 +1,44 @@
+import json
 from dataclasses import replace
 from datetime import datetime, timezone
-import json
+
 import pytest
-from evidencebound import *
+
+from evidencebound import (
+    ActionDecision,
+    ApplicabilityStatus,
+    CanonicalizationError,
+    Checkpoint,
+    EvidenceBound,
+    EvidenceRecord,
+    EvidenceState,
+    IntegrityStatus,
+    PolicyBinding,
+    ProvenanceRecord,
+    canonical_bytes,
+    verify_checkpoint,
+    verify_receipt,
+)
 
 
-def prov(): return ProvenanceRecord("source", "urn:test")
-def ev(value=1, **kwargs): return EvidenceRecord("e1", {"value": value}, prov(), **kwargs)
-def policy(version="1"): return PolicyBinding("p", version)
+def prov() -> ProvenanceRecord:
+    return ProvenanceRecord("source", "urn:test")
+
+
+def ev(value=1, **kwargs) -> EvidenceRecord:
+    return EvidenceRecord("e1", {"value": value}, prov(), **kwargs)
+
+
+def policy(version="1") -> PolicyBinding:
+    return PolicyBinding("p", version)
 
 
 def test_canonicalization_is_deterministic_and_rejects_float():
-    assert canonical_bytes({"b": 2, "a": [1, "x"]}) == canonical_bytes({"a": [1, "x"], "b": 2})
-    with pytest.raises(CanonicalizationError): canonical_bytes({"x": 1.1})
+    left = canonical_bytes({"b": 2, "a": [1, "x"]})
+    right = canonical_bytes({"a": [1, "x"], "b": 2})
+    assert left == right
+    with pytest.raises(CanonicalizationError):
+        canonical_bytes({"x": 1.1})
 
 
 def test_serialization_round_trip_is_json_safe():
@@ -57,11 +83,18 @@ def test_missing_provenance_and_missing_evidence_fail_closed():
 
 def test_stale_and_refuted_semantics():
     cp = Checkpoint("cp", "a", (ev(),), {"ok": True}, policy())
-    stale = EvidenceRecord("e1", {"value": 1}, prov(), valid_until="2026-01-01T00:00:00Z")
+    stale = EvidenceRecord(
+        "e1",
+        {"value": 1},
+        prov(),
+        valid_until="2026-01-01T00:00:00Z",
+    )
     now = datetime(2026, 2, 1, tzinfo=timezone.utc)
-    assert verify_checkpoint(cp, current_evidence={"e1": stale}, now=now).evidence[0].state is EvidenceState.STALE
+    stale_result = verify_checkpoint(cp, current_evidence={"e1": stale}, now=now)
+    assert stale_result.evidence[0].state is EvidenceState.STALE
     refuted = EvidenceRecord("e1", {"value": 2}, prov(), explicitly_refuted=True)
-    assert verify_checkpoint(cp, current_evidence={"e1": refuted}).evidence[0].state is EvidenceState.REFUTED
+    refuted_result = verify_checkpoint(cp, current_evidence={"e1": refuted})
+    assert refuted_result.evidence[0].state is EvidenceState.REFUTED
 
 
 def test_policy_version_change_requires_review_not_history_rewrite():

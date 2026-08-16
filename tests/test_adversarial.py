@@ -1,12 +1,26 @@
 from dataclasses import replace
 from datetime import datetime, timezone
+
 import pytest
-from evidencebound import *
+
+from evidencebound import (
+    ActionDecision,
+    Checkpoint,
+    EvidenceRecord,
+    EvidenceState,
+    IntegrityStatus,
+    PolicyBinding,
+    ProvenanceRecord,
+    ReplayGuard,
+    ReplayStatus,
+    verify_checkpoint,
+)
 
 P = PolicyBinding("policy", "1")
 PROV = ProvenanceRecord("trusted-adapter", "urn:source:1")
 
-def record(evidence_id="e1", value=1, provenance=PROV, **kw):
+
+def record(evidence_id="e1", value=1, provenance=PROV, **kw) -> EvidenceRecord:
     return EvidenceRecord(evidence_id, {"value": value}, provenance, **kw)
 
 
@@ -23,7 +37,7 @@ def test_partial_current_state_loss_blocks():
     cp = Checkpoint("c", "a", (record("e1"), record("e2")), {"ok": True}, P)
     result = verify_checkpoint(cp, current_evidence={"e1": record("e1")})
     assert result.action is ActionDecision.BLOCK
-    states = {x.evidence_id: x.state for x in result.evidence}
+    states = {item.evidence_id: item.state for item in result.evidence}
     assert states["e2"] is EvidenceState.MISSING
 
 
@@ -57,7 +71,12 @@ def test_refutation_is_explicit_not_inferred_from_hash_change():
 
 def test_staleness_requires_explicit_time_input():
     cp = Checkpoint("c", "a", (record(),), {"answer": 1}, P)
-    current = EvidenceRecord("e1", {"value": 1}, PROV, valid_until="2026-08-15T00:00:00Z")
+    current = EvidenceRecord(
+        "e1",
+        {"value": 1},
+        PROV,
+        valid_until="2026-08-15T00:00:00Z",
+    )
     no_clock = verify_checkpoint(cp, current_evidence={"e1": current})
     assert no_clock.evidence[0].state is EvidenceState.UNCHANGED
     with_clock = verify_checkpoint(
