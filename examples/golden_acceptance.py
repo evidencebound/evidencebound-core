@@ -1,13 +1,35 @@
 from dataclasses import replace
-from evidencebound import *
+
+from evidencebound import (
+    ActionDecision,
+    ApplicabilityStatus,
+    EvidenceBound,
+    EvidenceRecord,
+    IntegrityStatus,
+    InvalidationReason,
+    PolicyBinding,
+    ProvenanceRecord,
+)
 
 policy = PolicyBinding("safety", "1")
 eb = EvidenceBound(policy=policy)
 p = ProvenanceRecord("tool", "urn:example:source")
 e = EvidenceRecord("e1", {"value": 1}, p)
 a = eb.checkpoint(agent="A", evidence=[e], output={"step": "A"}, checkpoint_id="A")
-b = eb.checkpoint(agent="B", evidence=[e], output={"step": "B"}, depends_on=["A"], checkpoint_id="B")
-c = eb.checkpoint(agent="C", evidence=[e], output={"step": "C"}, depends_on=["B"], checkpoint_id="C")
+b = eb.checkpoint(
+    agent="B",
+    evidence=[e],
+    output={"step": "B"},
+    depends_on=["A"],
+    checkpoint_id="B",
+)
+c = eb.checkpoint(
+    agent="C",
+    evidence=[e],
+    output={"step": "C"},
+    depends_on=["B"],
+    checkpoint_id="C",
+)
 verified = eb.verify(c)
 assert verified.action is ActionDecision.ALLOW
 
