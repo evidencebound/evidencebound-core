@@ -74,8 +74,17 @@ def test_consequential_action_blocked_until_reverification_succeeds():
         action_after_recovery("B", plan, reverified={"B": blocked_result})
         is ActionDecision.BLOCK
     )
-    allowed_result = verify_checkpoint(cp("B", ["A"]))
+    allowed_a = verify_checkpoint(cp("A"))
+    allowed_b = verify_checkpoint(cp("B", ["A"]))
     assert (
-        action_after_recovery("B", plan, reverified={"B": allowed_result})
+        action_after_recovery("B", plan, reverified={"B": allowed_b})
+        is ActionDecision.BLOCK
+    )
+    assert (
+        action_after_recovery(
+            "B",
+            plan,
+            reverified={"A": allowed_a, "B": allowed_b},
+        )
         is ActionDecision.ALLOW
     )

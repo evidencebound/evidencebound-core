@@ -109,6 +109,10 @@ def verify_checkpoint(
     computed_checkpoint_digest = checkpoint_digest(checkpoint)
     integrity = IntegrityStatus.VERIFIED
     reasons: list[str] = []
+    snapshot_ids = [record.evidence_id for record in checkpoint.evidence]
+    duplicate_evidence_ids = len(snapshot_ids) != len(set(snapshot_ids))
+    if duplicate_evidence_ids:
+        reasons.append("checkpoint contains duplicate evidence ids")
     if prior_receipt is not None and prior_receipt.checkpoint_digest != computed_checkpoint_digest:
         integrity = IntegrityStatus.FAILED
         reasons.append("protected checkpoint payload does not match prior receipt")
@@ -145,13 +149,29 @@ def verify_checkpoint(
     if not policy_compatible:
         reasons.append("checkpoint policy binding does not match expected policy")
 
-    assessments = tuple(
+    assessment_list = [
         assess_evidence(record, current.get(record.evidence_id), now=now)
         for record in checkpoint.evidence
-    )
+    ]
+    if current_evidence is not None:
+        snapshot_id_set = set(snapshot_ids)
+        for evidence_id in sorted(set(current) - snapshot_id_set):
+            record = current[evidence_id]
+            assessment_list.append(
+                EvidenceAssessment(
+                    evidence_id,
+                    EvidenceState.NEW,
+                    None,
+                    evidence_digest(record),
+                    "current evidence was not present in the protected snapshot",
+                )
+            )
+    assessments = tuple(assessment_list)
     states = {item.state for item in assessments}
 
-    blocked_evidence = bool(states & {EvidenceState.MISSING, EvidenceState.REFUTED})
+    blocked_evidence = duplicate_evidence_ids or bool(
+        states & {EvidenceState.MISSING, EvidenceState.REFUTED}
+    )
     review_evidence = bool(states & {EvidenceState.CHANGED, EvidenceState.STALE, EvidenceState.NEW})
 
     if integrity is IntegrityStatus.FAILED or blocked_evidence or (

@@ -67,7 +67,11 @@ def action_after_recovery(
     if checkpoint_id not in plan.blocked:
         result = reverified.get(checkpoint_id)
         return result.action if result is not None else ActionDecision.BLOCK
-    result = reverified.get(checkpoint_id)
-    if result is None or result.action is not ActionDecision.ALLOW:
-        return ActionDecision.BLOCK
+
+    required = set(plan.recompute)
+    required.add(checkpoint_id)
+    for required_id in required:
+        result = reverified.get(required_id)
+        if result is None or result.action is not ActionDecision.ALLOW:
+            return ActionDecision.BLOCK
     return ActionDecision.ALLOW

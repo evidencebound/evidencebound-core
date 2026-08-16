@@ -51,6 +51,9 @@ class EvidenceBound:
             )[:24]
         if checkpoint_id in self._checkpoints:
             raise ValueError(f"duplicate checkpoint id: {checkpoint_id}")
+        evidence_ids = [record.evidence_id for record in evidence]
+        if len(evidence_ids) != len(set(evidence_ids)):
+            raise ValueError("duplicate evidence ids are not allowed")
         missing = sorted(set(depends_on) - set(self._checkpoints))
         if missing:
             raise ValueError(f"unknown dependencies: {missing}")

@@ -110,3 +110,23 @@ def test_empty_evidence_fails_closed():
     result = verify_checkpoint(cp)
     assert result.action is ActionDecision.BLOCK
     assert not result.provenance_complete
+
+
+def test_new_current_evidence_requires_review():
+    cp = Checkpoint("cp-new", "a", (ev(),), {"ok": True}, policy())
+    extra = EvidenceRecord("e2", {"value": 2}, prov())
+    result = verify_checkpoint(cp, current_evidence={"e1": ev(), "e2": extra})
+    states = {item.evidence_id: item.state for item in result.evidence}
+    assert states["e1"] is EvidenceState.UNCHANGED
+    assert states["e2"] is EvidenceState.NEW
+    assert result.action is ActionDecision.REVIEW_REQUIRED
+
+
+def test_duplicate_evidence_ids_fail_closed_and_high_level_rejects():
+    duplicate = (ev(1), ev(2))
+    cp = Checkpoint("cp-duplicate", "a", duplicate, {"ok": True}, policy())
+    assert verify_checkpoint(cp).action is ActionDecision.BLOCK
+
+    eb = EvidenceBound(policy=policy())
+    with pytest.raises(ValueError, match="duplicate evidence ids"):
+        eb.checkpoint(agent="a", evidence=list(duplicate), output={"ok": True})
