@@ -45,13 +45,16 @@ def assess_evidence(
     now: datetime | None,
 ) -> EvidenceAssessment:
     snapshot_hash = evidence_digest(snapshot)
-    if current is None or current.payload is None:
+    if current is None or current.evidence_id != snapshot.evidence_id or current.payload is None:
+        reason = "current evidence is missing"
+        if current is not None and current.evidence_id != snapshot.evidence_id:
+            reason = "current evidence identity does not match the protected snapshot"
         return EvidenceAssessment(
             snapshot.evidence_id,
             EvidenceState.MISSING,
             snapshot_hash,
             None,
-            "current evidence is missing",
+            reason,
         )
     current_hash = evidence_digest(current)
     valid_until = _parse_time(current.valid_until)
@@ -126,6 +129,12 @@ def verify_checkpoint(
         if current_evidence is None
         else current_evidence
     )
+    current_identity_mismatch = any(
+        evidence_id != record.evidence_id for evidence_id, record in current.items()
+    )
+    if current_identity_mismatch:
+        reasons.append("current evidence mapping key does not match record evidence_id")
+
     if not checkpoint.evidence:
         provenance_complete = False
         reasons.append("checkpoint has no evidence")
@@ -173,7 +182,7 @@ def verify_checkpoint(
     assessments = tuple(assessment_list)
     states = {item.state for item in assessments}
 
-    blocked_evidence = duplicate_evidence_ids or bool(
+    blocked_evidence = duplicate_evidence_ids or current_identity_mismatch or bool(
         states & {EvidenceState.MISSING, EvidenceState.REFUTED}
     )
     review_evidence = bool(states & {EvidenceState.CHANGED, EvidenceState.STALE, EvidenceState.NEW})
