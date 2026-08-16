@@ -64,7 +64,9 @@ class EvidenceBound:
             operation_id,
         )
         self._checkpoints[checkpoint_id] = checkpoint
-        self.events.emit(Event("checkpoint_created", {"checkpoint_id": checkpoint_id, "agent": agent}))
+        self.events.emit(
+            Event("checkpoint_created", {"checkpoint_id": checkpoint_id, "agent": agent})
+        )
         return checkpoint
 
     def verify(

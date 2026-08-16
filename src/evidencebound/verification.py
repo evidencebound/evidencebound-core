@@ -1,8 +1,8 @@
 """Deterministic integrity, evidence, policy, and applicability verification."""
 from __future__ import annotations
 
+from collections.abc import Mapping
 from datetime import datetime, timezone
-from typing import Mapping
 
 from .canonical import CANONICALIZATION_VERSION, digest
 from .models import (
@@ -53,7 +53,11 @@ def assess_evidence(
     if current.explicitly_refuted:
         state = EvidenceState.REFUTED
         reason = "current evidence explicitly refutes the snapshot"
-    elif now is not None and current.valid_until is not None and _parse_time(current.valid_until) < now:
+    elif (
+        now is not None
+        and current.valid_until is not None
+        and _parse_time(current.valid_until) < now
+    ):
         state = EvidenceState.STALE
         reason = "current evidence is past valid_until"
     elif current_hash == snapshot_hash:

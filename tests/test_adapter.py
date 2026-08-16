@@ -1,4 +1,10 @@
-from evidencebound import ActionDecision, EvidenceBound, EvidenceRecord, PolicyBinding, ProvenanceRecord
+from evidencebound import (
+    ActionDecision,
+    EvidenceBound,
+    EvidenceRecord,
+    PolicyBinding,
+    ProvenanceRecord,
+)
 from evidencebound.adapters import run_guarded
 
 

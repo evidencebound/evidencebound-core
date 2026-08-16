@@ -1,8 +1,9 @@
 """Pure selective recovery planning."""
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from typing import Any, Mapping
+from typing import Any
 
 from .graph import DependencyGraph
 from .models import ActionDecision, InvalidationReason, VerificationResult

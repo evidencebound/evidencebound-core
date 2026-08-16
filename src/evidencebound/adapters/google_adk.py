@@ -7,8 +7,9 @@ that context (commonly from ADK state populated through ``output_key``).
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from ..api import EvidenceBound
 from ..models import EvidenceRecord, VerificationResult

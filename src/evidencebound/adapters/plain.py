@@ -1,8 +1,9 @@
 """Thin framework-neutral hook adapter."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from ..api import EvidenceBound
 from ..models import Checkpoint, EvidenceRecord, VerificationResult
