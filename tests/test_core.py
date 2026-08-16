@@ -101,6 +101,15 @@ def test_missing_provenance_and_missing_evidence_fail_closed():
     assert verify_checkpoint(cp2, current_evidence={"other": ev()}).action is ActionDecision.BLOCK
 
 
+def test_current_evidence_mapping_key_must_match_record_identity():
+    cp = Checkpoint("cp-identity", "a", (ev(),), {"ok": True}, policy())
+    mismatched = EvidenceRecord("other", {"value": 1}, prov())
+    result = verify_checkpoint(cp, current_evidence={"e1": mismatched})
+    assert result.action is ActionDecision.BLOCK
+    assert result.evidence[0].state is EvidenceState.MISSING
+    assert "current evidence mapping key does not match record evidence_id" in result.reasons
+
+
 def test_stale_and_refuted_semantics():
     cp = Checkpoint("cp", "a", (ev(),), {"ok": True}, policy())
     stale = EvidenceRecord(
