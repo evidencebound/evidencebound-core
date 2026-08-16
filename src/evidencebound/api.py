@@ -132,6 +132,7 @@ class EvidenceBound:
         self.events.emit(Event("recovery_planned", {
             "recompute": list(plan.recompute),
             "reusable": list(plan.reusable),
+            "requires_verification": list(plan.requires_verification),
             "blocked": list(plan.blocked),
         }))
         return plan

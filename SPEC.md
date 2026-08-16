@@ -19,7 +19,8 @@ For a protected snapshot and a supplied current record:
 - explicit refutation marker → `REFUTED`;
 - expired `valid_until` at caller-supplied `now` → `STALE`;
 - equal evidence payload digest → `UNCHANGED`;
-- unequal digest → `CHANGED`.
+- unequal digest → `CHANGED`;
+- a supplied current evidence ID absent from the protected snapshot → `NEW`.
 
 A digest mismatch MUST NOT by itself yield `REFUTED`.
 
@@ -28,16 +29,17 @@ A digest mismatch MUST NOT by itself yield `REFUTED`.
 Default fail-closed rules:
 - receipt/checkpoint mismatch → integrity `FAILED`, action `BLOCK`;
 - no evidence → `BLOCK`;
+- duplicate evidence IDs → `BLOCK` (and high-level checkpoint creation rejects them);
 - required provenance incomplete → `BLOCK`;
 - evidence `MISSING` or `REFUTED` → `BLOCK`;
-- evidence `CHANGED`/`STALE` or policy mismatch → `REVIEW_REQUIRED`;
+- evidence `CHANGED`/`STALE`/`NEW` or policy mismatch → `REVIEW_REQUIRED`;
 - otherwise → applicability `VERIFIED`, action `ALLOW`.
 
 Historical integrity may remain `VERIFIED` while applicability is `REVIEW_REQUIRED` or `BLOCKED`.
 
 ## 5. Receipts
 
-A receipt stores checkpoint digest, verification digest, policy ID/version, canonicalization version, checkpoint ID and receipt version. The built-in receipt is an integrity binding, not a signature or source-authenticity proof.
+A receipt stores checkpoint digest, verification digest, policy ID/version, canonicalization version, checkpoint ID and receipt version. `verify_receipt()` validates receipt metadata and the checkpoint binding. `verify_verification_receipt()` additionally recomputes the historical verification payload digest and checks the supplied `VerificationResult` binding. The built-in receipt is an integrity binding, not a signature or source-authenticity proof.
 
 ## 6. Graph
 
@@ -45,7 +47,9 @@ Dependencies form a directed acyclic graph from prerequisite → dependent. Miss
 
 ## 7. Recovery
 
-Recovery planning is pure with respect to supplied graph/invalidations/verification results. Unaffected nodes are reusable; affected nodes are recompute candidates. Consequential affected nodes remain blocked until an `ALLOW` re-verification result is supplied to the action-after-recovery gate.
+Recovery planning is pure with respect to supplied graph/invalidations/verification results. `reusable` means an unaffected checkpoint with a supplied `ALLOW` verification result. Unaffected checkpoints without an `ALLOW` result are reported separately as `requires_verification`; they are not silently trusted. `recompute` contains affected checkpoints only.
+
+For a non-reusable checkpoint, `reverification_requirements` contains only the non-reusable ancestors on its dependency path plus itself. This prevents an invalidation in an unrelated branch from becoming a false prerequisite. Consequential actions remain blocked until their path-specific requirements have `ALLOW` re-verification results.
 
 ## 8. Replay
 
