@@ -1,0 +1,22 @@
+name: Trust or correctness bug
+description: Report an incorrect verification, invalidation, recovery, or replay outcome.
+title: "[bug] "
+body:
+  - type: textarea
+    id: invariant
+    attributes:
+      label: Broken invariant / unexpected outcome
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+    validations:
+      required: true

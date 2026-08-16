@@ -1,0 +1,22 @@
+name: Interoperability proposal
+description: Propose a narrowly scoped adapter, verifier, persistence, or observability extension.
+title: "[proposal] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: External integration problem
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Why this belongs in core or an optional adapter
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Executable acceptance criteria
+    validations:
+      required: true
