@@ -30,7 +30,7 @@ def run_guarded(
     checkpoint = eb.checkpoint(
         agent=agent,
         evidence=evidence,
-        output=value,  # type: ignore[arg-type]
+        output=value,
         depends_on=depends_on,
     )
     verification = eb.verify(checkpoint)

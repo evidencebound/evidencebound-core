@@ -50,14 +50,11 @@ def assess_evidence(
             "current evidence is missing",
         )
     current_hash = evidence_digest(current)
+    valid_until = _parse_time(current.valid_until)
     if current.explicitly_refuted:
         state = EvidenceState.REFUTED
         reason = "current evidence explicitly refutes the snapshot"
-    elif (
-        now is not None
-        and current.valid_until is not None
-        and _parse_time(current.valid_until) < now
-    ):
+    elif now is not None and valid_until is not None and valid_until < now:
         state = EvidenceState.STALE
         reason = "current evidence is past valid_until"
     elif current_hash == snapshot_hash:
