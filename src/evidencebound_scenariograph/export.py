@@ -11,7 +11,6 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 
 from .model import FieldDecision, ScenarioGraph
 
-
 XOSC_CONFORMANCE = "ASAM_OPENSCENARIO_XML_1_4_XSD_VALIDATED_IN_CI"
 
 
