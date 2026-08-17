@@ -12,6 +12,7 @@ from google.adk.agents.base_agent import BaseAgent
 from google.adk.events.event import Event
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
+from google.genai import types
 
 from evidencebound import (
     ActionDecision,
@@ -40,6 +41,11 @@ class SyntheticAgent(BaseAgent):
             author=self.name,
             output={"synthetic": True},
         )
+
+
+def new_message() -> types.Content:
+    """Return the minimal user message required to start a fresh ADK invocation."""
+    return types.Content(role="user", parts=[types.Part(text="run")])
 
 
 def make_adapter() -> AdkCallbackAdapter:
@@ -89,6 +95,7 @@ async def wrong_callback_name_fails_real_lifecycle() -> None:
         async for _event in runner.run_async(
             user_id=USER_ID,
             session_id="wrong-callback-name",
+            new_message=new_message(),
         ):
             pass
     except TypeError as exc:
@@ -135,6 +142,7 @@ async def completed_lifecycle_is_allowed() -> None:
         async for event in runner.run_async(
             user_id=USER_ID,
             session_id="completed",
+            new_message=new_message(),
         )
     ]
     assert events, "real ADK runner produced no events"
@@ -165,6 +173,7 @@ async def completed_lifecycle_emits_verification_state_event() -> None:
         async for event in runner.run_async(
             user_id=USER_ID,
             session_id="state-event",
+            new_message=new_message(),
         )
     ]
     assert any(
@@ -177,6 +186,7 @@ async def early_stopped_lifecycle_is_blocked() -> None:
     stream = runner.run_async(
         user_id=USER_ID,
         session_id="early-stop",
+        new_message=new_message(),
     )
     first_event = await anext(stream)
     assert first_event.author == "synthetic_agent"
