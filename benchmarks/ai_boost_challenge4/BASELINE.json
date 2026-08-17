@@ -3,22 +3,38 @@
     "cases": [
       {
         "case_id": "NHTSA-VICIS-991",
+        "excluded_data_categories": [
+          "demographics",
+          "medical",
+          "injuries",
+          "alcohol",
+          "drugs",
+          "other_sensitive_person_data"
+        ],
         "expected_catalog_id": "pedestrian_nearside_obstruction_intersection",
         "expected_functional_label": "pedestrian_dart_out_visual_obstruction",
         "observed_catalog_top1": "pedestrian_nearside_obstruction_intersection",
         "observed_functional_label": "pedestrian_dart_out_visual_obstruction",
         "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
-        "pipeline_receipt_sha256": "48a5291ec4b49d1e709d13c8e7cb5b4f030bec9d9b184b9657c1e49a096d7be0",
+        "pipeline_receipt_sha256": "22bca307898e8c1dfc9dc6607115ca56c2f0737b69f3ee99e10535f373730fda",
         "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=991&Study=CIRENVICIS"
       },
       {
         "case_id": "NHTSA-VICIS-1027",
+        "excluded_data_categories": [
+          "demographics",
+          "medical",
+          "injuries",
+          "alcohol",
+          "drugs",
+          "other_sensitive_person_data"
+        ],
         "expected_catalog_id": "pedestrian_midblock_crossing_nonturning",
         "expected_functional_label": "pedestrian_crossing_vehicle_not_turning",
         "observed_catalog_top1": "pedestrian_midblock_crossing_nonturning",
         "observed_functional_label": "pedestrian_crossing_vehicle_not_turning",
         "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
-        "pipeline_receipt_sha256": "488b9c85216795a857a8b0ba98306fd7232bda4b36f83b5f91053b8ec41ddb6c",
+        "pipeline_receipt_sha256": "00c7884d04d398c0748092a8c912d7c53cb6ff2aeb03a2a48366b878b9a29df8",
         "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=1027&Study=CIRENVICIS"
       }
     ],
@@ -27,20 +43,192 @@
       "catalog_recall_at_1_milli": 1000,
       "evidence_coverage_milli": 1000,
       "functional_label_accuracy_milli": 1000,
-      "invalidation_precision_milli": 1000,
-      "invalidation_recall_milli": 1000,
       "missing_evidence_no_completion_milli": 1000,
       "missing_evidence_review_required_milli": 1000,
+      "mutation_change_detection_milli": 1000,
+      "mutation_recovery_precision_milli": 1000,
+      "mutation_recovery_recall_milli": 1000,
+      "mutation_unrelated_preservation_milli": 1000,
       "receipt_reproduction_rate_milli": 1000,
       "unknown_fields_with_explicit_uncertainty_milli": 1000,
       "unsupported_assertion_rate_milli": 0
     },
-    "schema": "evidencebound-ai-boost-challenge4-benchmark/0.1",
+    "mutations": [
+      {
+        "detected_changed_evidence": [
+          "visibility"
+        ],
+        "expected_changed_evidence": [
+          "visibility"
+        ],
+        "expected_recompute_fields": [
+          "catalog_match_top1",
+          "obstruction_context"
+        ],
+        "label": "991_visibility_obstruction_removed",
+        "mutated_pipeline_receipt_sha256": "5b2d67795390bebc2911959fb939cfe1deec747c8dbb64162fcaabac7d923bc6",
+        "observed_recompute_fields": [
+          "catalog_match_top1",
+          "obstruction_context"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "kinematics"
+        ],
+        "expected_changed_evidence": [
+          "kinematics"
+        ],
+        "expected_recompute_fields": [
+          "detection_distance_m",
+          "reveal_time_millis",
+          "vehicle_speed_kph"
+        ],
+        "label": "991_speed_increase",
+        "mutated_pipeline_receipt_sha256": "11e7c3ab636aa1d5279e45d7ad388f238c7bcf473593039c6e18e50bfac2fadb",
+        "observed_recompute_fields": [
+          "detection_distance_m",
+          "reveal_time_millis",
+          "vehicle_speed_kph"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "movement"
+        ],
+        "expected_changed_evidence": [
+          "movement"
+        ],
+        "expected_recompute_fields": [
+          "pedestrian_direction",
+          "vehicle_maneuver"
+        ],
+        "label": "991_maneuver_change",
+        "mutated_pipeline_receipt_sha256": "a6194d22f1adef43c3c09f180e196d4d813e7d2512dd861299fc88fcca5086c6",
+        "observed_recompute_fields": [
+          "pedestrian_direction",
+          "vehicle_maneuver"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "visibility"
+        ],
+        "expected_changed_evidence": [
+          "visibility"
+        ],
+        "expected_recompute_fields": [
+          "catalog_match_top1",
+          "obstruction_context"
+        ],
+        "label": "991_visibility_removed",
+        "mutated_pipeline_receipt_sha256": "b333e9bd9e85e86cd11c9ef9b02c0d79f88e892603865ebc64a91060f670b67f",
+        "observed_recompute_fields": [
+          "catalog_match_top1",
+          "obstruction_context"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "environment"
+        ],
+        "expected_changed_evidence": [
+          "environment"
+        ],
+        "expected_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ],
+        "label": "1027_day_to_night",
+        "mutated_pipeline_receipt_sha256": "4154edea17f520db483872f666d7a2bab4c575ab7dafe1e09b6bb5865a57e8b1",
+        "observed_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "environment"
+        ],
+        "expected_changed_evidence": [
+          "environment"
+        ],
+        "expected_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ],
+        "label": "1027_clear_to_rain",
+        "mutated_pipeline_receipt_sha256": "572adf3334a87a33e96ad4af49efabfc1306c379c94e29c541bd90205e8ba4dd",
+        "observed_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "roadway"
+        ],
+        "expected_changed_evidence": [
+          "roadway"
+        ],
+        "expected_recompute_fields": [
+          "crosswalk_context",
+          "roadway_alignment",
+          "surface_condition"
+        ],
+        "label": "1027_dry_to_wet",
+        "mutated_pipeline_receipt_sha256": "d9530336d1afa3c35b5ad242e29a857848da686ced10ce2ce9f8073e1af1a683",
+        "observed_recompute_fields": [
+          "crosswalk_context",
+          "roadway_alignment",
+          "surface_condition"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "kinematics"
+        ],
+        "expected_changed_evidence": [
+          "kinematics"
+        ],
+        "expected_recompute_fields": [
+          "detection_distance_m",
+          "reveal_time_millis",
+          "vehicle_speed_kph"
+        ],
+        "label": "1027_speed_increase",
+        "mutated_pipeline_receipt_sha256": "78d69c365cbfab2067fcb1f567f2c9aed4cc0e465f58caae71667c45a2139c9d",
+        "observed_recompute_fields": [
+          "detection_distance_m",
+          "reveal_time_millis",
+          "vehicle_speed_kph"
+        ]
+      },
+      {
+        "detected_changed_evidence": [
+          "environment"
+        ],
+        "expected_changed_evidence": [
+          "environment"
+        ],
+        "expected_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ],
+        "label": "1027_environment_removed",
+        "mutated_pipeline_receipt_sha256": "d2a45d1fed53d7522beddcf8ad268dbabfcfc5b8e39a7d8c23ee2805c3dcd346",
+        "observed_recompute_fields": [
+          "atmospheric_condition",
+          "light_condition"
+        ]
+      }
+    ],
+    "schema": "evidencebound-ai-boost-challenge4-benchmark/0.2",
     "scope": {
       "claim_boundary": "SPARK controlled-fixture baseline; not automotive production accuracy, homologation evidence, or full OpenSCENARIO XSD conformance",
-      "controlled_adversarial_mutations": 2,
+      "controlled_adversarial_mutations": 9,
       "public_cases": 2
     }
   },
-  "sha256": "f751a951ba5d1c97a46528e378ec9a9089e8b5581cfea5a81b38578826f18ed0"
+  "sha256": "8320136341aeadf43ce4cecd69182f5d09898c33360d2f48aea292e0ed8f5805"
 }
