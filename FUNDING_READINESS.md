@@ -8,7 +8,9 @@ EvidenceBound targets a reusable gap between agent memory/tracing and consequent
 
 ## Existing engineering evidence in this repository
 
-Only executable/public artifacts should be cited as evidence: package source, tests, golden acceptance example, graph/recovery adversarial cases, benchmark script, threat model/spec and CI results at an exact commit. Reference hackathon/application repositories demonstrate prior exploration but are not evidence of independent external adoption.
+The project now has a public, independently verified GitHub source release: `v0.3.0`, tagged at exact accepted commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The release source passed Python 3.10–3.13 CI, golden acceptance, clean-room installation, package/type checks, the scenario-specific recovery benchmark, pip-audit and Bandit before publication.
+
+Only executable/public artifacts should be cited as technical evidence: package source, tests, golden acceptance example, graph/recovery adversarial cases, benchmark script, threat model/spec, exact CI runs and the verified release. Reference hackathon/application repositories demonstrate prior exploration but are not evidence of independent external adoption.
 
 ## Missing maturity
 
@@ -48,4 +50,4 @@ Only executable/public artifacts should be cited as evidence: package source, te
 
 ## Application timing
 
-The next credible funding milestone is not a marketing application. It is: exact-head public release candidate + clean-install acceptance + signed/persistence design issue + at least one integration outside the maintainer’s own products. Funding target status must be rechecked from official program sources at application time.
+The public-release prerequisite is now met for `v0.3.0`. The next credibility milestone for stronger OSS funding applications is independent integration/adoption evidence plus measurable progress on signed receipts, crash-consistent persistence and interoperability/security review. Funding target status and eligibility must still be rechecked from official program sources at application time.

@@ -1,6 +1,7 @@
 # EvidenceBound Core
 
 [![CI](https://github.com/moneyparking/evidencebound-core/actions/workflows/ci.yml/badge.svg)](https://github.com/moneyparking/evidencebound-core/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/moneyparking/evidencebound-core)](https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/github/license/moneyparking/evidencebound-core)](LICENSE)
 
@@ -8,7 +9,7 @@
 
 Created and maintained by Ruslan Vrublevskyi.
 
-> Status: `0.3.0` release candidate. v0.1/v0.2/v0.3 technical acceptance has passed on `main`, including clean-room installation and security gates. No `v0.3.0` GitHub tag/release or PyPI publication is claimed until those publication actions are independently verified. Pre-1.0 API compatibility is not guaranteed.
+> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
 
 ## Why EvidenceBound?
 
