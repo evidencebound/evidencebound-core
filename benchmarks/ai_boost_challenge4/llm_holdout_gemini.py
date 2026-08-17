@@ -312,7 +312,9 @@ def _extract_output_text(interaction: Any) -> str:
     raise RuntimeError("Gemini interaction returned no model text")
 
 
-def _candidate_fields(candidate: Mapping[str, Any]) -> tuple[dict[str, Mapping[str, Any]], list[str]]:
+def _candidate_fields(
+    candidate: Mapping[str, Any],
+) -> tuple[dict[str, Mapping[str, Any]], list[str]]:
     raw_fields = candidate.get("fields")
     issues: list[str] = []
     if not isinstance(raw_fields, list):
