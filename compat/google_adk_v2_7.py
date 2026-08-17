@@ -1,0 +1,246 @@
+"""Credential-free compatibility acceptance against real Google ADK v2.7.0."""
+from __future__ import annotations
+
+import asyncio
+import inspect
+import traceback
+from collections.abc import AsyncGenerator
+from importlib.metadata import version
+from typing import Any
+
+from google.adk.agents.base_agent import BaseAgent
+from google.adk.events.event import Event
+from google.adk.runners import Runner
+from google.adk.sessions.in_memory_session_service import InMemorySessionService
+from google.genai import types
+
+from evidencebound import (
+    ActionDecision,
+    EvidenceBound,
+    EvidenceRecord,
+    PolicyBinding,
+    ProvenanceRecord,
+)
+from evidencebound.adapters.google_adk import (
+    AdkCallbackAdapter,
+    adk_consequential_action_allowed,
+)
+
+EXPECTED_ADK_VERSION = "2.7.0"
+APP_NAME = "evidencebound_adk_compat"
+USER_ID = "compat-user"
+OUTPUT_KEY = "synthetic.output"
+
+
+class SyntheticAgent(BaseAgent):
+    """Real ADK BaseAgent subclass with no model/provider/network dependency."""
+
+    async def _run_async_impl(self, ctx: Any) -> AsyncGenerator[Event, None]:
+        yield Event(
+            invocation_id=ctx.invocation_id,
+            author=self.name,
+            output={"synthetic": True},
+        )
+
+
+def new_message() -> types.Content:
+    """Return the minimal user message required to start a fresh ADK invocation."""
+    return types.Content(role="user", parts=[types.Part(text="run")])
+
+
+def make_adapter() -> AdkCallbackAdapter:
+    eb = EvidenceBound(policy=PolicyBinding("adk-compat-policy", "1"))
+    return AdkCallbackAdapter(
+        evidencebound=eb,
+        evidence_factory=lambda _ctx: [
+            EvidenceRecord(
+                "adk-compat-evidence",
+                {"source": "synthetic"},
+                ProvenanceRecord("compat-test", "urn:evidencebound:adk:v2.7.0"),
+            )
+        ],
+        output_factory=lambda ctx: ctx.state[OUTPUT_KEY],
+        agent_name="synthetic_agent",
+    )
+
+
+def make_agent(adapter: AdkCallbackAdapter) -> SyntheticAgent:
+    parameters = tuple(inspect.signature(adapter.after_agent).parameters)
+    assert parameters == ("callback_context",), parameters
+    return SyntheticAgent(
+        name="synthetic_agent",
+        after_agent_callback=adapter.after_agent,
+    )
+
+
+async def wrong_callback_name_fails_real_lifecycle() -> None:
+    def wrong_name(context: Any) -> None:
+        del context
+
+    sessions = InMemorySessionService()
+    await sessions.create_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="wrong-callback-name",
+    )
+    runner = Runner(
+        app_name=APP_NAME,
+        agent=SyntheticAgent(
+            name="invalid_callback_agent",
+            after_agent_callback=wrong_name,
+        ),
+        session_service=sessions,
+    )
+    try:
+        async for _event in runner.run_async(
+            user_id=USER_ID,
+            session_id="wrong-callback-name",
+            new_message=new_message(),
+        ):
+            pass
+    except TypeError as exc:
+        assert "callback_context" in str(exc), str(exc)
+        return
+    raise AssertionError(
+        "Google ADK lifecycle accepted an after_agent_callback without callback_context"
+    )
+
+
+async def make_runner(
+    *,
+    session_id: str,
+) -> tuple[Runner, InMemorySessionService, AdkCallbackAdapter]:
+    adapter = make_adapter()
+    agent = make_agent(adapter)
+    sessions = InMemorySessionService()
+    await sessions.create_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id=session_id,
+        state={OUTPUT_KEY: {"answer": 42}},
+    )
+    runner = Runner(
+        app_name=APP_NAME,
+        agent=agent,
+        session_service=sessions,
+    )
+    return runner, sessions, adapter
+
+
+async def completed_lifecycle_is_allowed() -> None:
+    runner, sessions, adapter = await make_runner(session_id="completed")
+    before = await sessions.get_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="completed",
+    )
+    assert before is not None
+    assert not adk_consequential_action_allowed(before.state)
+
+    events = [
+        event
+        async for event in runner.run_async(
+            user_id=USER_ID,
+            session_id="completed",
+            new_message=new_message(),
+        )
+    ]
+    assert events, "real ADK runner produced no events"
+    assert adapter.last_verification is not None
+    assert adapter.last_verification.action is ActionDecision.ALLOW
+
+    after = await sessions.get_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="completed",
+    )
+    assert after is not None
+    serialized = after.state.get(adapter.state_key)
+    assert isinstance(serialized, dict)
+    assert serialized["action"] == ActionDecision.ALLOW.value
+    assert adk_consequential_action_allowed(after.state)
+
+
+def _state_delta_contains_verification(event: Event, state_key: str) -> bool:
+    state_delta = event.actions.state_delta if event.actions else None
+    return bool(state_delta and state_key in state_delta)
+
+
+async def completed_lifecycle_emits_verification_state_event() -> None:
+    runner, _sessions, adapter = await make_runner(session_id="state-event")
+    events = [
+        event
+        async for event in runner.run_async(
+            user_id=USER_ID,
+            session_id="state-event",
+            new_message=new_message(),
+        )
+    ]
+    assert any(
+        _state_delta_contains_verification(event, adapter.state_key) for event in events
+    ), "ADK completed lifecycle did not emit the EvidenceBound callback state delta"
+
+
+async def early_stopped_lifecycle_is_blocked() -> None:
+    runner, sessions, adapter = await make_runner(session_id="early-stop")
+    stream = runner.run_async(
+        user_id=USER_ID,
+        session_id="early-stop",
+        new_message=new_message(),
+    )
+    first_event = await anext(stream)
+    assert first_event.author == "synthetic_agent"
+
+    during = await sessions.get_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="early-stop",
+    )
+    assert during is not None
+    assert adapter.last_verification is None
+    assert not adk_consequential_action_allowed(during.state)
+
+    await stream.aclose()
+
+    after_close = await sessions.get_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="early-stop",
+    )
+    assert after_close is not None
+    assert adapter.last_verification is None
+    assert adapter.state_key not in after_close.state
+    assert not adk_consequential_action_allowed(after_close.state)
+
+
+async def main() -> None:
+    installed = version("google-adk")
+    assert installed == EXPECTED_ADK_VERSION, (
+        f"compatibility lane expected google-adk {EXPECTED_ADK_VERSION}, got {installed}"
+    )
+    print(f"GOOGLE_ADK_VERSION={installed}")
+    await wrong_callback_name_fails_real_lifecycle()
+    print("ADK_CALLBACK_NAME_ENFORCEMENT_PASS")
+    await completed_lifecycle_is_allowed()
+    print("ADK_COMPLETED_LIFECYCLE_PASS")
+    await completed_lifecycle_emits_verification_state_event()
+    print("ADK_STATE_DELTA_PASS")
+    await early_stopped_lifecycle_is_blocked()
+    print("ADK_EARLY_STOP_BLOCK_PASS")
+    print("GOOGLE_ADK_COMPAT_PASS")
+
+
+def _github_error_annotation(detail: str) -> str:
+    return detail.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception:
+        detail = traceback.format_exc()
+        print(
+            "::error title=Google ADK compatibility failure::"
+            + _github_error_annotation(detail)
+        )
+        raise
