@@ -20,7 +20,7 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: pytest
       - run: python examples/golden_acceptance.py
-      - run: python -m compileall -q src examples benchmarks
+      - run: python -m compileall -q src examples benchmarks compat
       - if: matrix.python-version == '3.13'
         name: Run selective-recovery benchmark acceptance
         run: python benchmarks/selective_recovery.py
@@ -116,3 +116,40 @@ jobs:
         run: python -m pip_audit --progress-spinner=off .
       - name: Scan core Python source
         run: bandit -r src/evidencebound -q
+
+  google-adk-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - name: Install EvidenceBound without integration dependencies
+        run: python -m pip install .
+      - name: Confirm ADK is not an EvidenceBound runtime dependency
+        run: |
+          python - <<'PY'
+          from importlib.metadata import requires
+
+          declared = requires("evidencebound-core") or []
+          unconditional = [requirement for requirement in declared if "extra ==" not in requirement]
+          assert not unconditional, f"unexpected runtime requirements: {unconditional}"
+          assert not any("google-adk" in requirement.lower() for requirement in declared), declared
+          print("google-adk-not-declared-by-evidencebound")
+          PY
+      - name: Install exact tested Google ADK version
+        run: python -m pip install 'google-adk==2.7.0'
+      - name: Report exact Google ADK version and validate environment
+        run: |
+          python - <<'PY'
+          from importlib.metadata import version
+
+          installed = version("google-adk")
+          assert installed == "2.7.0", installed
+          print(f"GOOGLE_ADK_VERSION={installed}")
+          PY
+          python -m pip check
+      - name: Run real Google ADK lifecycle compatibility acceptance
+        run: python compat/google_adk_v2_7.py
