@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+from collections.abc import AsyncGenerator
 from importlib.metadata import version
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from google.adk.agents.base_agent import BaseAgent
 from google.adk.events.event import Event
