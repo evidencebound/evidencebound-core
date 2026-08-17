@@ -6,25 +6,27 @@
 - URL: https://github.com/moneyparking/evidencebound-core
 - Visibility: public
 - Canonical branch: `main`
-- Latest fully verified `main` before this rename-consistency commit: `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`
-- Exact-main CI: run `31990950455` — SUCCESS
-- Active branch for this consistency wave: `agent/repo-rename-consistency`
+- Published release: `v0.3.0`
+- Release source SHA: `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`
+- Release-source exact-main CI: run `31991997448` — SUCCESS
+- Release publisher: run `31992021940` — SUCCESS
+- Release URL: https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0
+- Active post-release branch: `agent/post-v0.3-release-sync`
 
-The SHA embedded here is historical acceptance evidence, not a permanent release target. Before creating a tag or release, fetch the current `main` ref again and verify CI for that exact SHA.
+The release tag is fixed historical evidence. Never move `v0.3.0` to a later `main` commit to make documentation catch up.
 
 ## Milestone state
 
-- v0.1 independent core: PASS on accepted `main`.
-- v0.2 trust graph/selective recovery: PASS on accepted `main`.
-- v0.3 technical feature/adoption/security acceptance: PASS on accepted `main`.
-- v0.3 package metadata: `0.3.0` release candidate.
-- GitHub `v0.3.0` tag/release: NOT CREATED / NOT VERIFIED.
+- v0.1 independent core: PASS.
+- v0.2 trust graph/selective recovery: PASS.
+- v0.3 technical/adoption/security acceptance: PASS.
+- GitHub `v0.3.0` source release: PUBLISHED / VERIFIED.
 - PyPI: NOT PUBLISHED.
 - Independent external adopter: NOT YET VERIFIED.
 
-## Latest proven gates
+## Latest proven release gates
 
-At accepted `main` `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`, GitHub Actions run `31990950455` is SUCCESS.
+At tagged commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`:
 
 - Python 3.10 / 3.11 / 3.12 / 3.13 jobs: SUCCESS.
 - Python 3.13 pytest: **32 passed**.
@@ -40,38 +42,32 @@ At accepted `main` `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`, GitHub Actions ru
 - Replay duplicate/conflict semantics.
 - Plain Python and dependency-free Google ADK integration seams.
 - Golden external acceptance: SUCCESS.
-- Selective-recovery benchmark acceptance: 100 full restart / 25 recompute / 75 reusable / 0 requires-verification / 75 avoided in the synthetic scenario.
-- Ruff: SUCCESS.
-- strict mypy: SUCCESS across 12 source files.
-- sdist/wheel build and wheel reinstall/import: SUCCESS.
-- PEP 561 `py.typed` marker verified in the built wheel and clean-room installation.
-- Clean-room fresh-venv runtime-only install/plain/golden/no-unconditional-runtime-dependency gate: SUCCESS.
+- Synthetic selective-recovery benchmark: 100 full restart / 25 recompute / 75 reusable / 0 requires-verification / 75 avoided.
+- Ruff and strict mypy: SUCCESS.
+- sdist/wheel build, reinstall/import and PEP 561 marker: SUCCESS.
+- Clean-room runtime-only install/plain/golden/no-unconditional-runtime-dependency gate: SUCCESS.
 - pip-audit and Bandit: SUCCESS.
 
-## Adoption/release hardening merged
+## Release history
 
-PR #5 prepared v0.3 release metadata and made the benchmark an executable CI gate.
-
-PR #6 added PEP 561 package typing, project metadata URLs, maintainer-led governance, citation metadata and explicit fail-closed Google ADK lifecycle guidance. It changed no trust-engine semantics and passed full exact-head plus exact-main acceptance.
-
-PR #10 synchronized final pre-rename v0.3 acceptance evidence and merged as `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`; exact-main CI `31990950455` succeeded.
-
-The repository was then renamed from legacy slug `moneyparking/EvidenceBound-OSS-Core-Funding-Adoption` to canonical `moneyparking/evidencebound-core`; repository identity/history were preserved by GitHub.
+- PR #11 synchronized the repository rename to `moneyparking/evidencebound-core`; exact-main run `31991814352` succeeded.
+- PR #12 added a guarded one-time publisher; exact-head CI succeeded.
+- `main` `2477164acfbdca6a843bf7b2eac5fa21ce9901b2` passed exact-main run `31991997448`.
+- Publisher run `31992021940` created `refs/tags/v0.3.0` and the GitHub Release, then re-read both objects and succeeded.
+- Independent API verification confirmed the tag target and public Release metadata.
 
 ## Grounded post-v0.3 work packages
-
-Open issues describe unfinished work rather than claimed capabilities:
 
 - #7 — signed receipt provider protocol with algorithm agility;
 - #8 — crash-consistent SQLite persistence adapter and restart/recovery tests;
 - #9 — maintained Google ADK end-to-end callback lifecycle compatibility CI.
 
-Additional real gaps remain: cross-runtime canonicalization/conformance fixtures, property/fuzz and formal state-machine testing, external security review, SBOM/release provenance, and at least one integration by a project not owned by the maintainer.
+Additional gaps remain: cross-runtime canonicalization/conformance fixtures, property/fuzz/formal state-machine testing, external security review, SBOM/release provenance, and independent external adoption.
 
-## Next exact actions
+## Next autonomous focus
 
-1. Merge the rename-consistency PR only after its exact-head CI is fully green.
-2. Verify the resulting exact `main` push CI under `moneyparking/evidencebound-core`.
-3. Fetch the resulting current `main` SHA; that SHA is the only valid candidate target for `v0.3.0`.
-4. Create and independently fetch/verify the GitHub `v0.3.0` tag and release at that exact accepted SHA.
-5. Do not claim PyPI publication until namespace/account ownership and a post-upload clean installation are verified.
+1. Keep release `v0.3.0` immutable at its verified SHA.
+2. Remove the one-time publisher from post-release `main` and keep CI green.
+3. Pursue external-style integration evidence and the real work packages above rather than inflating release claims.
+4. Re-evaluate funding targets against current official calls when an application is being prepared.
+5. Treat PyPI as a separate distribution decision requiring namespace/account verification and a post-upload clean install.

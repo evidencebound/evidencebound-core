@@ -2,7 +2,11 @@
 
 All notable changes are documented here. The project follows Semantic Versioning for published releases, with pre-1.0 APIs allowed to change when documented.
 
-## [0.3.0] - Unreleased
+## [Unreleased]
+
+No user-facing changes recorded yet.
+
+## [0.3.0] - 2026-08-17
 
 ### Added
 - independent stdlib-only Python core and typed contracts;
@@ -28,4 +32,4 @@ All notable changes are documented here. The project follows Semantic Versioning
 - receipt policy/version/result/digest tampering fails verification;
 - package licensing metadata uses an SPDX expression rather than deprecated setuptools metadata.
 
-`0.3.0` remains **Unreleased** until a `v0.3.0` tag/release is actually created and verified at an accepted exact commit. PyPI publication is a separate distribution action and is not implied by this changelog.
+GitHub source release `v0.3.0` was published from exact accepted commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2` after CI run `31991997448` completed successfully. PyPI publication is a separate distribution action and is **not** implied by this changelog.

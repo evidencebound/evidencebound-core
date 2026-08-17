@@ -1,34 +1,42 @@
-# v0.3.0 Release Readiness
+# v0.3.0 Release Evidence
 
 ## Status
 
-EvidenceBound Core is technically at a **v0.3.0 release-candidate** boundary. The source package version is `0.3.0`, but `CHANGELOG.md` remains `Unreleased` until a GitHub `v0.3.0` tag/release is actually created and independently verified.
+**EvidenceBound Core v0.3.0 is published as a GitHub source release and independently verified.**
 
-Technical acceptance and distribution/publication are separate states. A green source tree is not itself a published release.
+Technical acceptance and publication remain separate evidence layers; both are recorded below. PyPI publication is a separate distribution action and has not occurred.
 
-## Latest accepted main before rename-consistency update
+## Verified release source
 
 - Repository: `moneyparking/evidencebound-core`
 - URL: https://github.com/moneyparking/evidencebound-core
 - Visibility: public
-- Branch: `main`
-- SHA: `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`
-- GitHub Actions run: `31990950455` — SUCCESS
-- Python matrix: 3.10 / 3.11 / 3.12 / 3.13 — SUCCESS
-- Python 3.13 pytest: **32 passed**
-- Golden acceptance: SUCCESS
-- Selective-recovery benchmark acceptance: SUCCESS
-- Ruff: SUCCESS
-- strict mypy: SUCCESS across 12 source files
-- package sdist/wheel build: SUCCESS
-- wheel reinstall/import: SUCCESS
-- built-wheel PEP 561 `py.typed` marker: VERIFIED
-- clean-room fresh-venv runtime-only install + typing marker + plain example + golden acceptance: SUCCESS
-- no unconditional runtime dependency assertion: SUCCESS
-- pip-audit: SUCCESS
-- Bandit core-source scan: SUCCESS
+- Tag: `v0.3.0`
+- Tag target SHA: `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`
+- Exact-main CI before publication: run `31991997448` — SUCCESS
+- Release publisher run: `31992021940` — SUCCESS
+- GitHub Release: https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0
+- Release title: `EvidenceBound Core v0.3.0`
+- Published: 2026-08-17
+- Draft: false
+- Prerelease: false
 
-This SHA is acceptance evidence only. The rename-consistency merge creates a later `main` SHA, which must itself pass CI before it can become the release target.
+The `v0.3.0` tag is intentionally fixed to the accepted release source. Later documentation or development commits on `main` do not move this tag.
+
+## Acceptance evidence at tagged source
+
+- Python 3.10 / 3.11 / 3.12 / 3.13: SUCCESS.
+- Python 3.13 pytest: **32 passed**.
+- Golden acceptance: SUCCESS.
+- Selective-recovery benchmark acceptance: SUCCESS.
+- Ruff: SUCCESS.
+- strict mypy: SUCCESS across 12 source files.
+- sdist/wheel build and reinstall/import: SUCCESS.
+- built-wheel PEP 561 `py.typed`: VERIFIED.
+- clean-room runtime-only install + typing marker + plain example + golden acceptance: SUCCESS.
+- no unconditional runtime dependency assertion: SUCCESS.
+- pip-audit: SUCCESS.
+- Bandit core-source scan: SUCCESS.
 
 ## Acceptance invariants represented in tests
 
@@ -47,7 +55,7 @@ This SHA is acceptance evidence only. The rename-consistency merge creates a lat
 
 `benchmarks/selective_recovery.py` constructs a verified synthetic 100-node linear workflow and invalidates node `n075`.
 
-Expected and asserted scenario-specific result:
+Asserted scenario-specific result:
 
 - full restart nodes: 100;
 - selective recompute: 25;
@@ -64,17 +72,15 @@ Elapsed time is scenario telemetry only, not a universal performance claim.
 - Build backend: setuptools.
 - License metadata: SPDX `Apache-2.0`, with `LICENSE` included in built artifacts.
 - PEP 561 typed-package marker is included and verified after wheel installation.
-- Repository/issues/changelog/documentation URLs in package metadata point to `moneyparking/evidencebound-core`.
-- License rationale: `LICENSE_DECISION.md`.
-- Pre-existing/reference implementation boundary: `PREEXISTING_WORK.md`.
+- Repository/issues/changelog/documentation URLs point to `moneyparking/evidencebound-core`.
 - GitHub Actions dependencies are pinned by commit SHA.
 - Dependency and static-security scans are explicit CI jobs.
-- Maintainer-led governance is documented in `GOVERNANCE.md`; no external governance body is claimed.
-- `CITATION.cff` provides software citation metadata for the canonical repository.
+- Maintainer-led governance is documented; no external governance body is claimed.
+- `CITATION.cff` identifies version `0.3.0` and the release date.
 
 ## Adapter boundary
 
-The Google ADK seam remains dependency-free. `docs/INTEGRATION.md` explicitly requires consequential integrations to wait for callback completion and a present EvidenceBound `ALLOW` result; a missing callback result or prematurely stopped lifecycle is unverified/blocked. Real upstream ADK compatibility CI is unfinished work tracked in issue #9.
+The Google ADK seam remains dependency-free. Consequential integrations must wait for callback completion and a present EvidenceBound `ALLOW` result; a missing callback result or prematurely stopped lifecycle is unverified/blocked. Real upstream ADK compatibility CI remains unfinished work tracked in issue #9.
 
 ## Publication audit
 
@@ -84,32 +90,19 @@ Apache-2.0 is the project license. This is an engineering OSS-license decision, 
 
 ## Grounded unfinished work
 
-Public issues make important post-v0.3 gaps explicit rather than implying completion:
-
 - #7 — signed receipts/key-provider protocol;
 - #8 — crash-consistent persistence and restart/recovery tests;
-- #9 — maintained Google ADK compatibility lifecycle CI.
-
-Independent external adoption, external security review, cross-runtime conformance, formal/property testing and release provenance/SBOM remain unverified gaps.
+- #9 — maintained Google ADK compatibility lifecycle CI;
+- cross-runtime conformance/property/formal testing;
+- external security review and SBOM/release provenance;
+- at least one independently verified external adopter/integration.
 
 ## Distribution state
 
-### GitHub tag/release
+### GitHub
 
-Not created or verified as of this rename-consistency update. Do not describe `v0.3.0` as released until a tag is fetched and verified to point to the final accepted `main` SHA and the GitHub Release is visible.
+`v0.3.0`: **PUBLISHED / VERIFIED** at `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`.
 
 ### PyPI
 
-Not published. PyPI namespace/account ownership and exact package-name availability have not been established strongly enough for autonomous publication. PyPI is optional for technical v0.3 acceptance and is a separate distribution action.
-
-## Release stop rule
-
-Create or announce `v0.3.0` only after:
-
-1. the rename-consistency PR is merged;
-2. exact resulting `main` CI is SUCCESS under `moneyparking/evidencebound-core`;
-3. the current `main` SHA is fetched after that success;
-4. a `v0.3.0` tag is created at exactly that accepted SHA;
-5. the tag and GitHub Release are independently fetched and verified.
-
-If tag/release mutation is unavailable to the execution environment, that is a publication-tooling blocker, not a reason to weaken or fabricate release evidence.
+**NOT PUBLISHED.** No registry availability/install claim is made.
