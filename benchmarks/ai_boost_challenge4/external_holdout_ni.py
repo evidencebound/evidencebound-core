@@ -12,8 +12,9 @@ import json
 import sys
 import urllib.parse
 import urllib.request
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 from evidencebound_scenariograph.adapters.ni_stats20 import (
     DATA_GUIDE_URL,
