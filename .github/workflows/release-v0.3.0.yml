@@ -1,0 +1,140 @@
+name: Release v0.3.0
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Publish and verify v0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          ACCEPTED_SHA: ${{ github.event.workflow_run.head_sha }}
+          TAG: v0.3.0
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import textwrap
+          import urllib.error
+          import urllib.request
+
+          token = os.environ["GITHUB_TOKEN"]
+          repository = os.environ["REPOSITORY"]
+          accepted_sha = os.environ["ACCEPTED_SHA"]
+          tag = os.environ["TAG"]
+          api_root = f"https://api.github.com/repos/{repository}"
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "evidencebound-release-workflow",
+          }
+
+          def request(path, *, method="GET", payload=None):
+              data = None if payload is None else json.dumps(payload).encode("utf-8")
+              req = urllib.request.Request(
+                  api_root + path,
+                  data=data,
+                  headers=headers,
+                  method=method,
+              )
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  body = response.read()
+                  return json.loads(body) if body else None
+
+          def optional(path):
+              try:
+                  return request(path)
+              except urllib.error.HTTPError as exc:
+                  if exc.code == 404:
+                      return None
+                  raise
+
+          current_main = request("/git/ref/heads/main")["object"]["sha"]
+          if current_main != accepted_sha:
+              raise SystemExit(
+                  f"refusing release: accepted CI SHA {accepted_sha} != current main {current_main}"
+              )
+
+          tag_ref = optional(f"/git/ref/tags/{tag}")
+          release = optional(f"/releases/tags/{tag}")
+
+          if tag_ref is not None and tag_ref["object"]["sha"] != accepted_sha:
+              raise SystemExit(
+                  f"refusing release: existing {tag} points to {tag_ref['object']['sha']}, "
+                  f"expected {accepted_sha}"
+              )
+          if release is not None and tag_ref is None:
+              raise SystemExit(f"refusing release: GitHub Release exists for {tag} but tag ref is missing")
+
+          if tag_ref is None:
+              request(
+                  "/git/refs",
+                  method="POST",
+                  payload={"ref": f"refs/tags/{tag}", "sha": accepted_sha},
+              )
+
+          if release is None:
+              notes = textwrap.dedent(
+                  """
+                  EvidenceBound Core v0.3.0 is the first independently installable alpha release of the framework-agnostic EvidenceBound trust, provenance, deterministic verification, and selective-recovery runtime for autonomous AI systems.
+
+                  Included in this release:
+                  - deterministic EBCJ-1 canonicalization and evidence/provenance/policy binding;
+                  - historical-integrity/current-applicability separation;
+                  - tamper-evident proof receipts with explicit security limits;
+                  - fail-closed ALLOW / REVIEW_REQUIRED / BLOCK outcomes;
+                  - exact dependency-graph blast-radius invalidation and selective recovery;
+                  - replay/idempotency guards and provider-neutral structured events;
+                  - plain Python integration and a dependency-free Google ADK adapter seam;
+                  - Python 3.10-3.13 CI, clean-room install, strict typing/linting, build/wheel checks, pip-audit and Bandit security gates.
+
+                  Acceptance evidence for the tagged commit includes 32 tests, golden acceptance, and the reproducible synthetic selective-recovery scenario: 100 full-restart nodes versus 25 recompute / 75 reusable / 75 recomputations avoided. These benchmark counts are scenario-specific, not a universal performance claim.
+
+                  EvidenceBound does not claim that a digest makes an upstream source truthful, does not treat changed evidence as automatically refuted, and does not trust persisted historical state merely because it was previously stored. Signed receipts, crash-consistent persistence, maintained real-framework compatibility CI, external security review, and independent external adoption remain explicit follow-on work.
+
+                  License: Apache-2.0. Unconditional runtime dependencies: none.
+                  """
+              ).strip()
+              request(
+                  "/releases",
+                  method="POST",
+                  payload={
+                      "tag_name": tag,
+                      "target_commitish": accepted_sha,
+                      "name": "EvidenceBound Core v0.3.0",
+                      "body": notes,
+                      "draft": False,
+                      "prerelease": False,
+                  },
+              )
+
+          verified_tag = request(f"/git/ref/tags/{tag}")
+          verified_release = request(f"/releases/tags/{tag}")
+          if verified_tag["object"]["sha"] != accepted_sha:
+              raise SystemExit("release verification failed: tag SHA mismatch")
+          if verified_release["tag_name"] != tag or verified_release["draft"]:
+              raise SystemExit("release verification failed: release metadata mismatch")
+
+          print(
+              json.dumps(
+                  {
+                      "release": tag,
+                      "sha": accepted_sha,
+                      "release_url": verified_release["html_url"],
+                      "verified": True,
+                  },
+                  sort_keys=True,
+              )
+          )
+          PY
