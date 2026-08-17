@@ -2,11 +2,13 @@
 
 ## 1. Canonical representation
 
-`EBCJ-1` supports: `null`, boolean, integer, Unicode string, array, and string-keyed object. Floats and unsupported Python types MUST fail canonicalization. Object keys are lexicographically sorted; separators are compact; output is UTF-8 JSON. Domain digests are SHA-256 over:
+`EBCJ-1` supports: `null`, boolean, integer, Unicode string, array, and string-keyed object. Floats and unsupported Python types MUST fail canonicalization. Object keys are lexicographically sorted; separators are compact; output is UTF-8 JSON. EBCJ-1 does **not** normalize Unicode: canonically equivalent Unicode strings with different code-point sequences remain different bytes.
+
+Domain digests are SHA-256 over:
 
 `evidencebound:<domain>:EBCJ-1\0 || canonical_bytes(payload)`
 
-Changing canonicalization semantics requires a new version identifier.
+The versioned, language-neutral conformance corpus is under `conformance/EBCJ-1/`. `vectors.json` fixes expected canonical UTF-8 text/hex plus representative domain digests; Python-specific non-JSON invalid inputs are documented in `invalid-python.json`. Changing canonicalization semantics requires a new version identifier rather than silently changing EBCJ-1 vectors. EBCJ-1 is an EvidenceBound format and is **not** a claim of RFC 8785/JCS compliance.
 
 ## 2. Checkpoint binding
 
