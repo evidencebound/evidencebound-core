@@ -4,7 +4,17 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
-No user-facing changes recorded yet.
+### Added
+- provider-neutral `ReceiptSigner` / `ReceiptVerifier` protocols and detached `SignedProofReceipt` envelopes;
+- explicit ACTIVE / RETIRED / REVOKED / UNKNOWN signing-key lifecycle semantics;
+- fail-closed signed-receipt verification statuses for malformed signatures, unknown/revoked keys, unsupported algorithms, provider errors and receipt/checkpoint binding failures;
+- optional `crypto` extra with an Ed25519 reference provider while preserving zero unconditional runtime dependencies;
+- signed-receipt migration/security documentation and adversarial tests.
+
+### Hardened
+- legacy unsigned receipts remain distinguishable as `UNSIGNED` and are never silently upgraded to authenticated trust;
+- retired keys may verify historical receipts but cannot create new signatures through core;
+- algorithm, key ID, receipt/version/canonicalization metadata are covered by the detached signed payload.
 
 ## [0.3.0] - 2026-08-17
 
