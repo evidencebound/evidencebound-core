@@ -21,6 +21,10 @@ def test_ai_boost_challenge4_benchmark_acceptance() -> None:
     generated = json.loads(completed.stdout)
     retained = json.loads(BASELINE.read_text(encoding="utf-8"))
     assert generated == retained
-    assert generated["body"]["metrics"]["evidence_coverage_milli"] == 1000
-    assert generated["body"]["metrics"]["invalidation_recall_milli"] == 1000
-    assert generated["body"]["metrics"]["receipt_reproduction_rate_milli"] == 1000
+    metrics = generated["body"]["metrics"]
+    assert metrics["evidence_coverage_milli"] == 1000
+    assert metrics["mutation_change_detection_milli"] == 1000
+    assert metrics["mutation_recovery_precision_milli"] == 1000
+    assert metrics["mutation_recovery_recall_milli"] == 1000
+    assert metrics["mutation_unrelated_preservation_milli"] == 1000
+    assert metrics["receipt_reproduction_rate_milli"] == 1000
