@@ -30,6 +30,7 @@ class MutationCase:
     mutated: CrashFixture
     expected_changed_evidence: tuple[str, ...]
     expected_recompute_fields: tuple[str, ...]
+    expected_kinematic_decision: FieldDecision | None = None
 
 
 def ratio_milli(numerator: int, denominator: int) -> int:
@@ -43,12 +44,25 @@ def _mutation_cases(fixtures: list[CrashFixture]) -> tuple[MutationCase, ...]:
     visibility_recompute = ("catalog_match_top1", "obstruction_context")
     kinematics_recompute = (
         "detection_distance_m",
+        "kinematic_coherence",
         "reveal_time_millis",
         "vehicle_speed_kph",
     )
     movement_recompute = ("pedestrian_direction", "vehicle_maneuver")
     environment_recompute = ("atmospheric_condition", "light_condition")
     roadway_recompute = ("crosswalk_context", "roadway_alignment", "surface_condition")
+
+    coherent_991 = case_991.with_value(
+        "kinematics",
+        "vehicle_speed_kph",
+        36,
+        label="coherent-speed",
+    ).with_value(
+        "kinematics",
+        "calculated_reveal_time_millis",
+        2700,
+        label="coherent-reveal-time",
+    )
 
     return (
         MutationCase(
@@ -74,6 +88,41 @@ def _mutation_cases(fixtures: list[CrashFixture]) -> tuple[MutationCase, ...]:
             ),
             ("kinematics",),
             kinematics_recompute,
+            FieldDecision.BLOCKED,
+        ),
+        MutationCase(
+            "991_coherent_speed_and_reveal_time",
+            case_991,
+            coherent_991,
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.VERIFIED,
+        ),
+        MutationCase(
+            "991_reveal_time_review_zone",
+            case_991,
+            case_991.with_value(
+                "kinematics",
+                "calculated_reveal_time_millis",
+                4300,
+                label="reveal-time-review-zone",
+            ),
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.REVIEW_REQUIRED,
+        ),
+        MutationCase(
+            "991_reveal_time_collapse",
+            case_991,
+            case_991.with_value(
+                "kinematics",
+                "calculated_reveal_time_millis",
+                500,
+                label="reveal-time-collapse",
+            ),
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.BLOCKED,
         ),
         MutationCase(
             "991_maneuver_change",
@@ -141,6 +190,41 @@ def _mutation_cases(fixtures: list[CrashFixture]) -> tuple[MutationCase, ...]:
             ),
             ("kinematics",),
             kinematics_recompute,
+            FieldDecision.BLOCKED,
+        ),
+        MutationCase(
+            "1027_reveal_time_inflate",
+            case_1027,
+            case_1027.with_value(
+                "kinematics",
+                "calculated_reveal_time_millis",
+                12000,
+                label="reveal-time-inflate",
+            ),
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.BLOCKED,
+        ),
+        MutationCase(
+            "1027_zero_speed",
+            case_1027,
+            case_1027.with_value(
+                "kinematics",
+                "pre_event_speed_kph",
+                0,
+                label="zero-speed",
+            ),
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.BLOCKED,
+        ),
+        MutationCase(
+            "1027_kinematics_removed",
+            case_1027,
+            case_1027.without_evidence("kinematics"),
+            ("kinematics",),
+            kinematics_recompute,
+            FieldDecision.REVIEW_REQUIRED,
         ),
         MutationCase(
             "1027_environment_removed",
@@ -204,6 +288,11 @@ def build_report() -> dict[str, Any]:
         for fixture, result in zip(fixtures, results, strict=True)
     )
 
+    baseline_kinematic_verified = sum(
+        result.graph.assess_field("kinematic_coherence").decision is FieldDecision.VERIFIED
+        for result in results
+    )
+
     mutation_cases = _mutation_cases(fixtures)
     detected_exact = 0
     recovery_true_positive = 0
@@ -211,6 +300,10 @@ def build_report() -> dict[str, Any]:
     recovery_expected = 0
     preservation_true_positive = 0
     preservation_expected = 0
+    kinematic_expectations = 0
+    kinematic_expectations_correct = 0
+    kinematic_block_expected = 0
+    kinematic_block_observed = 0
     mutation_rows: list[dict[str, Any]] = []
     baseline_results = {result.fixture.case_id: result for result in results}
 
@@ -233,6 +326,18 @@ def build_report() -> dict[str, Any]:
         preservation_expected += len(expected_preserve)
 
         mutated_result = run_pipeline(mutation.mutated)
+        kinematic_decision = mutated_result.graph.assess_field(
+            "kinematic_coherence"
+        ).decision
+        if mutation.expected_kinematic_decision is not None:
+            kinematic_expectations += 1
+            if kinematic_decision is mutation.expected_kinematic_decision:
+                kinematic_expectations_correct += 1
+            if mutation.expected_kinematic_decision is FieldDecision.BLOCKED:
+                kinematic_block_expected += 1
+                if kinematic_decision is FieldDecision.BLOCKED:
+                    kinematic_block_observed += 1
+
         mutation_rows.append(
             {
                 "label": mutation.label,
@@ -240,6 +345,13 @@ def build_report() -> dict[str, Any]:
                 "detected_changed_evidence": list(detected),
                 "expected_recompute_fields": list(mutation.expected_recompute_fields),
                 "observed_recompute_fields": list(recovery.recompute_fields),
+                "expected_kinematic_decision": (
+                    None
+                    if mutation.expected_kinematic_decision is None
+                    else mutation.expected_kinematic_decision.value
+                ),
+                "observed_kinematic_decision": kinematic_decision.value,
+                "kinematic_gate_details": mutated_result.receipt["body"]["kinematic_gate"],
                 "mutated_pipeline_receipt_sha256": mutated_result.receipt["sha256"],
             }
         )
@@ -288,6 +400,18 @@ def build_report() -> dict[str, Any]:
             review_required,
             len(missing_fields),
         ),
+        "kinematic_baseline_verified_milli": ratio_milli(
+            baseline_kinematic_verified,
+            len(results),
+        ),
+        "kinematic_controlled_expectation_milli": ratio_milli(
+            kinematic_expectations_correct,
+            kinematic_expectations,
+        ),
+        "kinematic_adversarial_block_milli": ratio_milli(
+            kinematic_block_observed,
+            kinematic_block_expected,
+        ),
     }
     cases = [
         {
@@ -299,17 +423,20 @@ def build_report() -> dict[str, Any]:
             "observed_catalog_top1": result.matches[0].catalog_id,
             "pipeline_receipt_sha256": result.receipt["sha256"],
             "openscenario_conformance": result.openscenario.conformance,
+            "kinematic_gate": result.receipt["body"]["kinematic_gate"],
             "excluded_data_categories": list(fixture.excluded_data_categories),
         }
         for fixture, result in zip(fixtures, results, strict=True)
     ]
     body: dict[str, Any] = {
-        "schema": "evidencebound-ai-boost-challenge4-benchmark/0.3",
+        "schema": "evidencebound-ai-boost-challenge4-benchmark/0.4",
         "scope": {
             "public_cases": len(fixtures),
             "controlled_adversarial_mutations": len(mutation_cases),
+            "kinematic_gate_expectation_cases": kinematic_expectations,
             "claim_boundary": (
-                "SPARK controlled-fixture baseline; not automotive production accuracy "
+                "SPARK controlled-fixture baseline; kinematic gate is a versioned "
+                "sanity check, not simulator validation, automotive production accuracy "
                 "or homologation evidence"
             ),
         },
@@ -342,6 +469,9 @@ def assert_targets(report: dict[str, Any]) -> None:
     assert metrics["mutation_unrelated_preservation_milli"] == 1000
     assert metrics["missing_evidence_no_completion_milli"] == 1000
     assert metrics["missing_evidence_review_required_milli"] == 1000
+    assert metrics["kinematic_baseline_verified_milli"] == 1000
+    assert metrics["kinematic_controlled_expectation_milli"] == 1000
+    assert metrics["kinematic_adversarial_block_milli"] == 1000
     assert report["body"]["standards_acceptance"]["openscenario_version"] == "1.4.0"
 
 
