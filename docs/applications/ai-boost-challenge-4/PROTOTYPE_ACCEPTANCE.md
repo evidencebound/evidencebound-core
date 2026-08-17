@@ -2,12 +2,12 @@
 
 ## Purpose
 
-Build a narrow, reproducible Challenge 4 vertical slice before F6S submission. The prototype must prove the proposed trust mechanism on public/synthetic crash evidence; it must not pretend to solve the complete automotive benchmark before Challenge Owner data access.
+Maintain a narrow, reproducible Challenge 4 vertical slice that proves the proposed trust mechanism on public crash evidence without pretending to solve the complete automotive benchmark before Challenge Owner data access.
 
-## Judge journey
+## Current judge journey
 
 ```text
-public crash record / standards excerpt
+public crash record / standards evidence
         ↓
 source-addressed Evidence Pack
         ↓
@@ -17,77 +17,123 @@ evidence-linked ScenarioGraph fields
         ↓
 Logical Scenario enrichment + explicit uncertainty
         ↓
-deterministic provenance / consistency gate
-        ↓
-reference-scenario matching
+deterministic evidence + kinematic coherence gates
         ↓
 VERIFIED | REVIEW_REQUIRED | BLOCKED
         ↓
-reproducible scenario receipt
+reference-scenario matching
+        ↓
+exact dependency blast radius
+        ↓
+preserve / recompute selective recovery
+        ↓
+OpenSCENARIO XML 1.4 export + official XSD validation
+        ↓
+reproducible content-addressed receipts
 ```
 
 ## P0 acceptance gates
 
-1. **Evidence binding**
-   - every material generated field contains one or more source IDs, or an explicit `unsupported` / `unknown` state;
+1. **Evidence binding — PASS**
+   - material generated fields are bound to source evidence or derived only from bound fields;
    - source payloads are content-addressed;
-   - no unreferenced material field may receive VERIFIED status.
+   - an invented GenAI evidence reference is deterministically `BLOCKED`;
+   - unsupported material assertions cannot receive VERIFIED status.
 
-2. **Missing-data safety**
-   - a fixture with intentionally removed weather/road/context evidence must not cause fabricated completion;
-   - missing material attributes produce explicit uncertainty and `REVIEW_REQUIRED` or `BLOCKED` according to policy.
+2. **Missing-data safety — PASS**
+   - removed environment or kinematic evidence is not silently completed;
+   - missing attributes remain explicit;
+   - missing material kinematics requires `REVIEW_REQUIRED` rather than fabricated certainty.
 
-3. **Conflicting evidence**
-   - conflicting source values are retained rather than silently collapsed;
-   - the field records conflict provenance and cannot be VERIFIED until policy resolves the conflict.
+3. **Deterministic consistency gate — PASS**
+   - policy `spark-kinematic-coherence/0.1` uses integer-only constant-speed traversal sanity checking;
+   - controlled coherent data can remain `VERIFIED`;
+   - review-zone inconsistency becomes `REVIEW_REQUIRED`;
+   - strong inconsistency and non-positive required measurements become `BLOCKED`;
+   - a BLOCKED gate propagates to the export verification marker.
 
-4. **Dependency invalidation**
-   - change one source evidence item;
-   - compute exact affected ScenarioGraph descendants;
-   - unaffected nodes remain reusable only after applicability checks;
-   - affected nodes are selectively regenerated/revalidated.
+4. **Dependency invalidation — PASS**
+   - source evidence changes are detected by content hash;
+   - exact transitive affected ScenarioGraph descendants are computed;
+   - unrelated nodes remain in the preserve set;
+   - affected nodes are selectively recomputed/revalidated.
 
-5. **Scenario structure**
-   - output a typed Functional Scenario and Logical Scenario representation;
-   - include actors, road/context, maneuver/event relationships and parameter ranges where evidence permits;
-   - support an initial OpenSCENARIO-compatible export seam without claiming full standard coverage.
+5. **Scenario structure — PASS for SPARK scope**
+   - typed Functional and Logical Scenario fields are produced from retained evidence;
+   - actors/context, movement, roadway, environment, visibility and kinematic fields are represented where evidence permits;
+   - minimal ASAM OpenSCENARIO XML 1.4.0 documents are generated;
+   - both retained exports pass the official ASAM 1.4.0 XSD in dedicated CI.
 
-6. **Catalog matching**
-   - match the generated scenario against a small versioned reference catalog;
-   - retain top-k scores plus structured reasons/evidence links;
-   - expose unmatched/coverage-gap state explicitly.
+6. **Catalog matching — PASS for controlled catalog**
+   - generated scenarios are matched against a small versioned validation catalog;
+   - top-k score and structured reasons are retained;
+   - controlled Recall@1 and MRR are measured, not advertised as general automotive accuracy.
 
-7. **Reproducibility**
-   - same normalized inputs + same model fixture/pinned output + same policy produce byte-stable deterministic validation receipt;
-   - runtime/model-generated content is separately versioned so probabilistic generation is never misrepresented as deterministic.
+7. **Reproducibility — PASS**
+   - same normalized inputs + same pinned extractor output + same policy produce byte-stable receipts;
+   - model-generated content remains separately versioned;
+   - retained benchmark JSON is compared exactly in pytest.
 
-8. **Privacy boundary**
-   - public prototype uses non-sensitive/public or synthetic fixture data;
-   - no PII is transmitted to model APIs;
-   - external model/provider use is declared in generated metadata.
+8. **Privacy/data-minimisation boundary — PASS for retained fixtures**
+   - retained fixtures exclude demographics, medical/injury, alcohol/drug and other sensitive person-level categories;
+   - only scenario-relevant evidence is retained;
+   - this is described as data-minimisation by design, not blanket GDPR compliance.
 
-## Initial benchmark metrics
+## Measured retained benchmark
 
-Report measured values only after running the benchmark:
+Scope: **2 public NHTSA VICIS cases + 15 controlled mutations**, including **8 explicit kinematic-gate expectation cases**.
 
-- evidence coverage: material fields with explicit evidence refs / all material generated fields;
-- unsupported assertion rate;
-- explicit uncertainty coverage for incomplete/conflicting fields;
-- Functional Scenario taxonomy precision/recall/F1 on labelled fixture;
-- Logical Scenario attribute completeness/correctness;
-- scenario matching Recall@K and MRR;
-- evidence-change invalidation precision/recall;
-- deterministic receipt reproduction rate;
-- runtime, model calls/tokens where available, and cost per record / 1,000 records.
+Measured controlled-suite results:
+
+- evidence coverage: `1000/1000`;
+- unsupported assertion rate: `0/1000`;
+- explicit uncertainty for unknown fields: `1000/1000`;
+- Functional Scenario label accuracy: `1000/1000`;
+- controlled catalog Recall@1: `1000/1000`;
+- controlled catalog MRR: `1000/1000`;
+- deterministic receipt reproduction: `1000/1000`;
+- exact changed-evidence detection: `1000/1000`;
+- selective-recovery precision: `1000/1000`;
+- selective-recovery recall: `1000/1000`;
+- unrelated-field preservation: `1000/1000`;
+- missing-evidence no-completion: `1000/1000`;
+- missing-evidence review behavior: `1000/1000`;
+- clean-case kinematic verification: `1000/1000`;
+- expected kinematic decision across controlled expectation cases: `1000/1000`;
+- expected adversarial kinematic BLOCKED behavior: `1000/1000`.
+
+Retained benchmark receipt:
+
+`90d21220e6cd1ca488fdb57e08b6cab0567821f5a6986ae246efbb56026f844a`
+
+## Verified automation evidence
+
+On head `9a14646645a7a9ee527612d35cb9fbdcc48d549e`:
+
+- full repository CI `32036316364` — **PASS**;
+- dedicated SPARK benchmark + judge demo + official ASAM 1.4.0 XSD `32036316372` — **PASS**.
 
 ## Submission gate
 
-Do not submit the F6S concept note until:
+- [x] at least one public crash fixture runs end-to-end — two retained cases do;
+- [x] missing-evidence adversarial acceptance passes fail-closed/review-required behavior;
+- [x] evidence-change invalidation/recovery acceptance passes;
+- [x] deterministic kinematic coherence acceptance passes;
+- [x] README includes one-command reproduction;
+- [x] measured baseline receipt is retained;
+- [x] OpenSCENARIO XML 1.4.0 artifacts pass the official ASAM XSD in CI;
+- [x] background/foreground IP boundary remains explicit;
+- [ ] final application answers rechecked against the live F6S form immediately before submission;
+- [ ] any Challenge Owner dataset/catalog access incorporated if provided before the final gate.
 
-- [ ] at least one public/synthetic crash fixture runs end-to-end;
-- [ ] missing-evidence adversarial fixture passes fail-closed acceptance;
-- [ ] evidence-change invalidation/recovery fixture passes;
-- [ ] README includes one-command reproduction;
-- [ ] measured baseline receipt is retained and linked from the application;
-- [ ] application answers are rechecked against the live F6S form;
-- [ ] background/foreground IP boundary remains explicit.
+## Explicit non-claims / Advance gaps
+
+The current prototype remains **TRL 3**. It does not claim:
+
+- automotive production accuracy or homologation;
+- simulator-level behavioral validity;
+- generalization from two public cases to NHTSA CISS, GIDAS, CARE, STRADA or Challenge Owner data;
+- live LLM/VLM extraction quality not yet measured on a representative labelled set;
+- that the constant-speed kinematic gate is a vehicle-dynamics model.
+
+Advance work should therefore prioritize Challenge Owner data/catalog integration, representative LLM/VLM extraction evaluation, stronger physical/kinematic constraints and simulator-level behavioral validation rather than inflating the current controlled-suite claims.
