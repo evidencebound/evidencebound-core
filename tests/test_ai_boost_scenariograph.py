@@ -34,9 +34,8 @@ def _graph() -> ScenarioGraph:
         ScenarioField(
             "validation_priority",
             "elevated",
-            evidence_ids=("crash",),
-            uncertainty_milli=180,
             depends_on_fields=("road_type", "weather_state"),
+            uncertainty_milli=180,
         )
     )
     return graph
@@ -50,6 +49,14 @@ def test_material_claim_without_evidence_fails_closed() -> None:
 
     assert assessment.decision is FieldDecision.BLOCKED
     assert "material_claim_has_no_evidence" in assessment.reasons
+
+
+def test_derived_claim_can_inherit_trust_from_dependencies() -> None:
+    graph = _graph()
+
+    assessment = graph.assess_field("validation_priority")
+
+    assert assessment.decision is FieldDecision.VERIFIED
 
 
 def test_unknown_value_requires_review_instead_of_hallucinated_completion() -> None:
@@ -74,12 +81,14 @@ def test_evidence_change_has_exact_transitive_blast_radius() -> None:
     graph = _graph()
 
     affected = graph.affected_fields({"weather"})
+    recovery = graph.plan_recovery({"weather"})
 
     assert affected == ("validation_priority", "weather_state")
-    assert "road_type" not in affected
+    assert recovery.recompute_fields == affected
+    assert recovery.preserve_fields == ("road_type",)
 
 
-def test_receipt_is_stable_and_binds_changed_evidence() -> None:
+def test_receipt_is_stable_and_binds_selective_recovery() -> None:
     graph = _graph()
 
     first = graph.receipt(changed_evidence_ids={"weather"})
@@ -87,7 +96,11 @@ def test_receipt_is_stable_and_binds_changed_evidence() -> None:
 
     assert first == second
     assert len(first["sha256"]) == 64
-    assert first["body"]["affected_fields"] == ["validation_priority", "weather_state"]
+    assert first["body"]["recovery"]["recompute_fields"] == [
+        "validation_priority",
+        "weather_state",
+    ]
+    assert first["body"]["recovery"]["preserve_fields"] == ["road_type"]
     assert all(field["decision"] == "VERIFIED" for field in first["body"]["fields"])
 
 
