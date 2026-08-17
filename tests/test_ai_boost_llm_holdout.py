@@ -1,8 +1,16 @@
-from benchmarks.ai_boost_challenge4.llm_holdout_gemini import (
-    EVALUATED_FIELDS,
-    score_candidate,
-)
+import importlib.util
+from pathlib import Path
+
 from evidencebound_scenariograph.adapters.ni_stats20 import normalize_ni_stats20_case
+
+ROOT = Path(__file__).resolve().parents[1]
+BENCHMARK_PATH = ROOT / "benchmarks" / "ai_boost_challenge4" / "llm_holdout_gemini.py"
+SPEC = importlib.util.spec_from_file_location("ai_boost_llm_holdout_gemini", BENCHMARK_PATH)
+assert SPEC is not None and SPEC.loader is not None
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+EVALUATED_FIELDS = MODULE.EVALUATED_FIELDS
+score_candidate = MODULE.score_candidate
 
 
 def _expected():
