@@ -1,0 +1,87 @@
+{
+  "schema": "evidencebound-ai-boost-crash-fixture/0.1",
+  "case_id": "NHTSA-VICIS-1027",
+  "dataset": "NHTSA VICIS / CIREN Crash Viewer",
+  "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=1027&Study=CIRENVICIS",
+  "source_accessed": "2026-08-17",
+  "privacy": "Scenario-only extract. Demographics, medical/injury, substance-use and other sensitive person data are intentionally excluded.",
+  "evidence": [
+    {
+      "id": "crash_classification",
+      "kind": "coded_crash_record",
+      "payload": {
+        "crash_type": "Pedestrian Failed to Yield",
+        "crash_group": "Crossing Roadway - Vehicle Not Turning",
+        "crash_location": "Not at Intersection",
+        "pedestrian_position": "Paved Shoulder / Bicycle Lane / Parking Lane"
+      }
+    },
+    {
+      "id": "roadway",
+      "kind": "coded_road_record",
+      "payload": {
+        "travel_lanes": 3,
+        "roadway_alignment": "Curve Right",
+        "roadway_profile": "Level",
+        "surface_type": "Bituminous (asphalt)",
+        "surface_condition": "Dry",
+        "crosswalk": "No crosswalk present",
+        "pedestrian_warning_sign": "No pedestrian warning sign"
+      }
+    },
+    {
+      "id": "environment",
+      "kind": "coded_environment_record",
+      "payload": {
+        "light": "Daylight",
+        "atmospheric": "Clear"
+      }
+    },
+    {
+      "id": "movement",
+      "kind": "crash_summary",
+      "payload": {
+        "vehicle_direction": "Southbound",
+        "pedestrian_direction": "Westbound",
+        "vehicle_pre_event_movement": "Negotiating a curve",
+        "critical_pre_crash_event": "Pedestrian in road",
+        "pedestrian_action": "Crossing Roadway",
+        "pedestrian_motion": "Falling/Stumbling/Rising"
+      }
+    },
+    {
+      "id": "visibility",
+      "kind": "crash_avoidance_assessment",
+      "payload": {
+        "reported_obstruction": "Roadway geometry (curve)",
+        "driver_vision_obscured": "No Obstruction Noted"
+      }
+    },
+    {
+      "id": "kinematics",
+      "kind": "crash_analysis",
+      "payload": {
+        "pre_event_speed_kph": 48,
+        "impact_speed_kph": 26,
+        "detection_distance_m": 47,
+        "calculated_reveal_time_millis": 4100,
+        "vehicle_final_rest_distance_m": 15,
+        "pedestrian_final_rest_distance_m": 5
+      }
+    },
+    {
+      "id": "vehicle",
+      "kind": "coded_vehicle_record",
+      "payload": {
+        "model_year": 2019,
+        "make": "Kia",
+        "model": "Optima",
+        "first_contact_plane": "Front"
+      }
+    }
+  ],
+  "expected": {
+    "functional_label": "pedestrian_crossing_vehicle_not_turning",
+    "catalog_id": "pedestrian_midblock_crossing_nonturning"
+  }
+}
