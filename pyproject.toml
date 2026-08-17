@@ -22,11 +22,20 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Repository = "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption"
+Issues = "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption/issues"
+Changelog = "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption/blob/main/docs/INTEGRATION.md"
+
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.10", "build>=1.2"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+evidencebound = ["py.typed"]
 
 [tool.ruff]
 line-length = 100

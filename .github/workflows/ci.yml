@@ -56,6 +56,16 @@ jobs:
         run: python -m pip install --force-reinstall --no-deps dist/*.whl
       - if: matrix.python-version == '3.13'
         run: python -c "from evidencebound import EvidenceBound; print('clean-install-import-ok')"
+      - if: matrix.python-version == '3.13'
+        name: Verify built wheel exposes PEP 561 typing marker
+        run: |
+          python - <<'PY'
+          from importlib.resources import files
+
+          marker = files("evidencebound").joinpath("py.typed")
+          assert marker.is_file(), f"missing PEP 561 marker: {marker}"
+          print("pep561-marker-present")
+          PY
 
   clean-room:
     runs-on: ubuntu-latest
@@ -68,6 +78,15 @@ jobs:
         run: python -m venv .clean-venv
       - name: Install only the runtime package from this checkout
         run: .clean-venv/bin/python -m pip install .
+      - name: Verify runtime package exposes PEP 561 typing marker
+        run: |
+          .clean-venv/bin/python - <<'PY'
+          from importlib.resources import files
+
+          marker = files("evidencebound").joinpath("py.typed")
+          assert marker.is_file(), f"missing PEP 561 marker: {marker}"
+          print("pep561-marker-present-clean-room")
+          PY
       - name: Run plain Python integration from isolated environment
         run: .clean-venv/bin/python examples/plain_python.py
       - name: Run golden external acceptance from isolated environment

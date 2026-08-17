@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use EvidenceBound Core in research or engineering work, please cite the software repository."
+title: "EvidenceBound Core"
+type: software
+authors:
+  - family-names: "Vrublevskyi"
+    given-names: "Ruslan"
+repository-code: "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption"
+url: "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption"
+license: "Apache-2.0"
+keywords:
+  - autonomous agents
+  - provenance
+  - verification
+  - selective recovery
+  - AI safety
