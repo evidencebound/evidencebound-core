@@ -41,7 +41,13 @@ def enrich_logical_scenario(fixture: CrashFixture) -> tuple[ScenarioField, ...]:
         _field(fixture, "roadway_alignment", "roadway", "roadway_alignment"),
         _field(fixture, "surface_condition", "roadway", "surface_condition"),
         _field(fixture, "crosswalk_context", "roadway", "crosswalk"),
-        _field(fixture, "pedestrian_direction", "movement", "pedestrian_direction", uncertainty_milli=100),
+        _field(
+            fixture,
+            "pedestrian_direction",
+            "movement",
+            "pedestrian_direction",
+            uncertainty_milli=100,
+        ),
         speed_field,
         _field(
             fixture,
