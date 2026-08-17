@@ -9,7 +9,7 @@
 
 Created and maintained by Ruslan Vrublevskyi.
 
-> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. Current `main` contains additional **Unreleased** hardening, including provider-neutral signed receipts and durable persistence/restart support. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
+> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. Current `main` contains additional **Unreleased** hardening, including provider-neutral signed receipts, durable persistence/restart support, and a real Google ADK 2.7.0 lifecycle compatibility lane. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
 
 ## Why EvidenceBound?
 
@@ -162,7 +162,9 @@ Re-verification requirements are dependency-path-specific, so an unrelated inval
 Core never imports an agent framework. Included integration seams:
 
 - `evidencebound.adapters.run_guarded` — plain Python callable hook.
-- `evidencebound.adapters.google_adk.AdkCallbackAdapter` — dependency-free seam matching ADK's single-`callback_context` `after_agent_callback` contract; applications provide evidence/output extractors (for example from ADK state populated via `output_key`). It is intentionally not a hard Google ADK dependency.
+- `evidencebound.adapters.google_adk.AdkCallbackAdapter` — dependency-free Google ADK seam. Current Unreleased `main` also includes `adk_consequential_action_allowed()`, a fail-closed application gate that requires explicit serialized EvidenceBound `ALLOW` callback state.
+
+The maintained compatibility CI currently installs **exactly `google-adk==2.7.0` on Python 3.13** in an isolated job after installing EvidenceBound without integration dependencies. A credential-free synthetic real ADK `BaseAgent`/`Runner` scenario proves runtime `callback_context` keyword invocation, persisted callback state on completed lifecycle, emitted state delta, and blocked consequential state when the async event stream is closed before `after_agent_callback`. This is evidence for the exact tested ADK version, not a blanket compatibility claim for other releases.
 
 See [`docs/INTEGRATION.md`](docs/INTEGRATION.md).
 
@@ -173,13 +175,13 @@ python -m pip install -e '.[dev]'
 pytest
 python examples/golden_acceptance.py
 python benchmarks/selective_recovery.py
-python -m compileall -q src examples benchmarks
+python -m compileall -q src examples benchmarks compat
 ruff check .
 mypy src/evidencebound
 python -m build
 ```
 
-CI additionally performs an isolated clean-room installation, runtime-dependency assertion, pip-audit, Bandit scan, wheel reinstall/import, and the benchmark acceptance scenario. See `.github/workflows/ci.yml` and [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
+CI additionally performs an isolated clean-room installation, runtime-dependency assertion, pip-audit, Bandit scan, wheel reinstall/import, the benchmark acceptance scenario, and the isolated exact-version Google ADK compatibility lane. See `.github/workflows/ci.yml` and [`RELEASE_READINESS.md`](RELEASE_READINESS.md).
 
 ## Security and non-goals
 
@@ -195,6 +197,7 @@ Read [`THREAT_MODEL.md`](THREAT_MODEL.md) before using EvidenceBound for consequ
 - [`ROADMAP.md`](ROADMAP.md)
 - [`docs/SIGNED_RECEIPTS.md`](docs/SIGNED_RECEIPTS.md)
 - [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md)
+- [`docs/INTEGRATION.md`](docs/INTEGRATION.md)
 - [`RELEASE_READINESS.md`](RELEASE_READINESS.md)
 - [`FUNDING_READINESS.md`](FUNDING_READINESS.md)
 - [`PREEXISTING_WORK.md`](PREEXISTING_WORK.md)
