@@ -1,0 +1,30 @@
+{
+  "format": "EvidenceBound EBCJ-1 Python invalid-input expectations",
+  "canonicalization_version": "EBCJ-1",
+  "cases": [
+    {
+      "id": "float",
+      "python_expression": "1.5",
+      "expected_exception": "CanonicalizationError",
+      "reason_contains": "floats are not supported by EBCJ-1"
+    },
+    {
+      "id": "nested-float",
+      "python_expression": "{'x': [1.5]}",
+      "expected_exception": "CanonicalizationError",
+      "reason_contains": "floats are not supported by EBCJ-1"
+    },
+    {
+      "id": "bytes",
+      "python_expression": "b'raw'",
+      "expected_exception": "CanonicalizationError",
+      "reason_contains": "unsupported type bytes"
+    },
+    {
+      "id": "non-string-key",
+      "python_expression": "{1: 'value'}",
+      "expected_exception": "CanonicalizationError",
+      "reason_contains": "mapping key is not a string"
+    }
+  ]
+}
