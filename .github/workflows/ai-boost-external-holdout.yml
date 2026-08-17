@@ -6,12 +6,14 @@ on:
     paths:
       - "src/evidencebound_scenariograph/adapters/**"
       - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json"
       - "tests/test_ai_boost_external_holdout.py"
       - ".github/workflows/ai-boost-external-holdout.yml"
   pull_request:
     paths:
       - "src/evidencebound_scenariograph/adapters/**"
       - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json"
       - "tests/test_ai_boost_external_holdout.py"
       - ".github/workflows/ai-boost-external-holdout.yml"
   workflow_dispatch:
@@ -50,4 +52,43 @@ jobs:
           leaked = sorted(forbidden & {key for row in summaries for key in row})
           if leaked:
               raise SystemExit(f'forbidden source fields in case summaries: {leaked}')
+          PY
+      - name: Compare live holdout with retained external baseline
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          live = json.loads(Path('/tmp/ni_external_holdout.json').read_text())
+          retained = json.loads(
+              Path('benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json').read_text()
+          )
+          body = live['body']
+          observed = {
+              'source': {
+                  'dataset': body['source']['dataset'],
+                  'licence': body['source']['licence'],
+                  'resource_ids': body['source']['resource_ids'],
+                  'resource_totals': body['source']['resource_totals'],
+                  'source_recordset_sha256': body['source']['source_recordset_sha256'],
+              },
+              'scope': {
+                  key: body['scope'][key]
+                  for key in retained['scope']
+              },
+              'metrics': body['metrics'],
+              'receipt_sha256': live['sha256'],
+          }
+          expected = {
+              'source': retained['source'],
+              'scope': retained['scope'],
+              'metrics': retained['metrics'],
+              'receipt_sha256': retained['receipt_sha256'],
+          }
+          if observed != expected:
+              print('External holdout drift detected.')
+              print('OBSERVED:', json.dumps(observed, indent=2, sort_keys=True))
+              print('EXPECTED:', json.dumps(expected, indent=2, sort_keys=True))
+              raise SystemExit(1)
+          print('EXTERNAL_HOLDOUT_BASELINE_MATCH')
           PY
