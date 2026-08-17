@@ -6,13 +6,14 @@ EvidenceBound Core is technically at a **v0.3.0 release-candidate** boundary. Th
 
 Technical acceptance and distribution/publication are separate states. A green source tree is not itself a published release.
 
-## Latest accepted main before this evidence-sync commit
+## Latest accepted main before rename-consistency update
 
-- Repository: `moneyparking/EvidenceBound-OSS-Core-Funding-Adoption`
+- Repository: `moneyparking/evidencebound-core`
+- URL: https://github.com/moneyparking/evidencebound-core
 - Visibility: public
 - Branch: `main`
-- SHA: `ffb4aa2ed317640b76f2590c859dfc60d533be28`
-- GitHub Actions run: `31990753200` — SUCCESS
+- SHA: `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`
+- GitHub Actions run: `31990950455` — SUCCESS
 - Python matrix: 3.10 / 3.11 / 3.12 / 3.13 — SUCCESS
 - Python 3.13 pytest: **32 passed**
 - Golden acceptance: SUCCESS
@@ -27,7 +28,7 @@ Technical acceptance and distribution/publication are separate states. A green s
 - pip-audit: SUCCESS
 - Bandit core-source scan: SUCCESS
 
-This SHA is acceptance evidence only. A later docs-only merge creates a new `main` SHA, which must itself pass CI before it can become a release target.
+This SHA is acceptance evidence only. The rename-consistency merge creates a later `main` SHA, which must itself pass CI before it can become the release target.
 
 ## Acceptance invariants represented in tests
 
@@ -63,13 +64,13 @@ Elapsed time is scenario telemetry only, not a universal performance claim.
 - Build backend: setuptools.
 - License metadata: SPDX `Apache-2.0`, with `LICENSE` included in built artifacts.
 - PEP 561 typed-package marker is included and verified after wheel installation.
-- Repository/issues/changelog/documentation URLs are present in package metadata.
+- Repository/issues/changelog/documentation URLs in package metadata point to `moneyparking/evidencebound-core`.
 - License rationale: `LICENSE_DECISION.md`.
 - Pre-existing/reference implementation boundary: `PREEXISTING_WORK.md`.
 - GitHub Actions dependencies are pinned by commit SHA.
 - Dependency and static-security scans are explicit CI jobs.
 - Maintainer-led governance is documented in `GOVERNANCE.md`; no external governance body is claimed.
-- `CITATION.cff` provides software citation metadata.
+- `CITATION.cff` provides software citation metadata for the canonical repository.
 
 ## Adapter boundary
 
@@ -95,7 +96,7 @@ Independent external adoption, external security review, cross-runtime conforman
 
 ### GitHub tag/release
 
-Not created or verified as of this evidence sync. Do not describe `v0.3.0` as released until a tag is fetched and verified to point to the final accepted `main` SHA and the GitHub Release is visible.
+Not created or verified as of this rename-consistency update. Do not describe `v0.3.0` as released until a tag is fetched and verified to point to the final accepted `main` SHA and the GitHub Release is visible.
 
 ### PyPI
 
@@ -105,8 +106,8 @@ Not published. PyPI namespace/account ownership and exact package-name availabil
 
 Create or announce `v0.3.0` only after:
 
-1. this final evidence sync is merged;
-2. exact resulting `main` CI is SUCCESS;
+1. the rename-consistency PR is merged;
+2. exact resulting `main` CI is SUCCESS under `moneyparking/evidencebound-core`;
 3. the current `main` SHA is fetched after that success;
 4. a `v0.3.0` tag is created at exactly that accepted SHA;
 5. the tag and GitHub Release are independently fetched and verified.

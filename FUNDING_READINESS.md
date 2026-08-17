@@ -1,5 +1,7 @@
 # Funding Readiness
 
+Canonical repository: https://github.com/moneyparking/evidencebound-core
+
 ## Public-good value
 
 EvidenceBound targets a reusable gap between agent memory/tracing and consequential action: deterministic evidence/provenance/policy binding, explicit applicability, exact dependency invalidation, and fail-closed selective recovery without requiring one model, cloud or agent framework.

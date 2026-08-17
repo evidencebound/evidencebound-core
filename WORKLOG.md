@@ -4,7 +4,8 @@
 
 ### Reality refresh and extraction
 - Reviewed current EvidenceBound reference repositories and the SignalReview boundary before implementation.
-- Chose `moneyparking/EvidenceBound-OSS-Core-Funding-Adoption` as the independent public OSS repository; it initially contained only an initial README.
+- Initialized the independent public OSS repository under legacy slug `moneyparking/EvidenceBound-OSS-Core-Funding-Adoption`; it initially contained only an initial README.
+- Renamed the canonical repository on 2026-08-17 to `moneyparking/evidencebound-core` without changing repository identity/history.
 - Kept cloud/hackathon/product implementations as reference material rather than mechanically merging their code.
 - Locked the core boundary as stdlib-only Python, framework/cloud/LLM independent, with structured deterministic inputs and outputs.
 
@@ -39,11 +40,12 @@
 - PR #4 -> `main` `6317d0701a7873c4711357bd140062aac00965d1`: current evidence identity mismatch fail-closed; exact-main CI `31968785923` SUCCESS.
 - PR #5 -> `main` `f1dace847af3e2073f06e8410dc422a929823941`: release-readiness metadata, benchmark CI acceptance and modern license metadata; exact-main CI `31969049837` SUCCESS.
 - PR #6 -> `main` `ffb4aa2ed317640b76f2590c859dfc60d533be28`: PEP 561 typed distribution, project URLs, governance/citation metadata and fail-closed ADK lifecycle guidance; exact-main CI `31990753200` SUCCESS.
+- PR #10 -> `main` `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`: final pre-rename acceptance evidence sync; exact-main CI `31990950455` SUCCESS.
 
-### Latest accepted main evidence before final docs sync
-At `main` `ffb4aa2ed317640b76f2590c859dfc60d533be28`:
+### Latest accepted main evidence before repository-rename consistency wave
+At `main` `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd` under canonical repository `moneyparking/evidencebound-core`:
 
-- CI run `31990753200`: SUCCESS.
+- CI run `31990950455`: SUCCESS.
 - Python 3.10 / 3.11 / 3.12 / 3.13 jobs: SUCCESS.
 - Python 3.13 pytest: **32 passed in 0.12s**.
 - Golden acceptance: PASS.
@@ -55,6 +57,17 @@ At `main` `ffb4aa2ed317640b76f2590c859dfc60d533be28`:
 - PEP 561 `py.typed` present in built wheel: PASS.
 - clean-room runtime-only install + typing marker + plain/golden + no-unconditional-runtime-dependency gate: PASS.
 - pip-audit and Bandit: PASS.
+
+### Repository rename consistency wave
+Branch: `agent/repo-rename-consistency`.
+
+Scope is metadata/documentation only; runtime source and trust semantics are unchanged:
+- update `[project.urls]` to `https://github.com/moneyparking/evidencebound-core`;
+- add canonical README CI/Python/license badges;
+- update `CITATION.cff`;
+- make SECURITY/funding/release docs point to the canonical repository;
+- preserve the prior long repository name only as explicit historical/legacy context;
+- require exact-head CI and exact-main CI before tagging `v0.3.0`.
 
 ### Grounded funding/adoption backlog
 Created public issues for real unfinished work:
