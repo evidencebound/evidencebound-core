@@ -26,3 +26,31 @@ jobs:
       - run: python -m pip install -e .
       - name: Run retained SPARK benchmark receipt
         run: python benchmarks/ai_boost_challenge4/run.py --assert-targets
+      - name: Generate OpenSCENARIO XML 1.4 artifacts
+        run: python benchmarks/ai_boost_challenge4/export_xosc.py
+      - name: Fetch official ASAM OpenSCENARIO XML 1.4.0 schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          SCHEMA_URL="https://openscenario.asam.net/ASAM_OpenSCENARIO_XML/v1.4.0/_attachments/generated/ASAM_OpenSCENARIO_v1.4.0_Schema.zip"
+          curl --fail --location --retry 3 --retry-delay 2 "$SCHEMA_URL" -o /tmp/osc14-schema.zip
+          rm -rf /tmp/osc14-schema
+          mkdir -p /tmp/osc14-schema
+          unzip -q /tmp/osc14-schema.zip -d /tmp/osc14-schema
+          find /tmp/osc14-schema -type f -name '*.xsd' -print
+      - name: Validate generated .xosc against official ASAM 1.4.0 XSD
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libxml2-utils
+          XSD="$(find /tmp/osc14-schema -type f \( -iname 'OpenSCENARIO.xsd' -o -iname '*OpenSCENARIO*.xsd' \) | head -n 1)"
+          if [ -z "$XSD" ]; then
+            echo "OpenSCENARIO XSD not found in official ASAM schema archive" >&2
+            exit 1
+          fi
+          echo "Validating against $XSD"
+          for file in benchmarks/ai_boost_challenge4/generated_xosc/*.xosc; do
+            echo "Validating $file"
+            xmllint --noout --schema "$XSD" "$file"
+          done
