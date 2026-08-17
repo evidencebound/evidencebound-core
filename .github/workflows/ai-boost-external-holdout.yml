@@ -30,7 +30,7 @@ jobs:
           python-version: "3.13"
           cache: pip
       - run: python -m pip install --upgrade pip
-      - run: python -m pip install -e .
+      - run: python -m pip install -e '.[dev]'
       - name: Verify independent adapter contract
         run: python -m pytest tests/test_ai_boost_external_holdout.py -q
       - name: Run live PSNI Northern Ireland 2024 holdout
