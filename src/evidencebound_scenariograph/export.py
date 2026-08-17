@@ -6,8 +6,8 @@ structure. CI validates generated artifacts against the official ASAM 1.4.0 XSD.
 """
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+import xml.etree.ElementTree as ET
 
 from .model import FieldDecision, ScenarioGraph
 
