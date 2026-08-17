@@ -12,11 +12,14 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from .model import FieldDecision, ScenarioGraph
 
 
+XOSC_CONFORMANCE = "ASAM_OPENSCENARIO_XML_1_4_XSD_VALIDATED_IN_CI"
+
+
 @dataclass(frozen=True)
 class OpenScenarioArtifact:
     xml: str
     standard: str = "ASAM OpenSCENARIO XML 1.4"
-    conformance: str = "XSD_VALIDATION_REQUIRED_IN_CI"
+    conformance: str = XOSC_CONFORMANCE
 
 
 def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenarioArtifact:
@@ -46,7 +49,7 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
         "eb_case_id": case_id,
         "eb_functional_label": str(graph.fields["functional_label"].value),
         "eb_verification": verification,
-        "eb_export_conformance": "XSD_VALIDATION_REQUIRED_IN_CI",
+        "eb_export_conformance": XOSC_CONFORMANCE,
     }
     for name, value in sorted(values.items()):
         SubElement(
