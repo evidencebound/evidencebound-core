@@ -241,7 +241,10 @@ def test_missing_verification_state_cannot_be_reused_or_allowed(tmp_path: Path):
 
     with SQLiteStore(path) as reopened:
         graph = reopened.load_graph()
-        with pytest.raises(PersistenceIntegrityError, match="missing receipt or verification state"):
+        with pytest.raises(
+            PersistenceIntegrityError,
+            match="missing receipt or verification state",
+        ):
             reopened.load_recovery_state()
 
     plan = plan_recovery(graph, {}, verification={}, consequential={"cp"})
