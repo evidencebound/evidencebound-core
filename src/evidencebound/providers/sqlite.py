@@ -471,7 +471,7 @@ def _boolean(value: Any, field: str) -> bool:
 def _list(value: Any, field: str) -> list[Any]:
     if not isinstance(value, list):
         raise PersistenceIntegrityError(f"{field} must be a list")
-    return cast(list[Any], value)
+    return value
 
 
 def _object(value: Any, field: str) -> dict[str, Any]:
