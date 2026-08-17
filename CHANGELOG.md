@@ -13,7 +13,9 @@ All notable changes are documented here. The project follows Semantic Versioning
 - provider-neutral `PersistenceStore` contract for durable checkpoint/receipt/verification/replay state;
 - stdlib `SQLiteStore` and `SQLiteReplayGuard` reference providers with explicit transaction and schema/version semantics;
 - restart, persisted-tamper, transaction crash-injection, replay persistence and graph-reconstruction tests;
-- durable persistence/recovery documentation.
+- durable persistence/recovery documentation;
+- pinned real-framework compatibility CI for `google-adk==2.7.0` on Python 3.13 using real `BaseAgent`, `Runner`, callback validation, event streaming and `InMemorySessionService` without model/cloud credentials;
+- dependency-free `adk_consequential_action_allowed()` application gate that requires explicit serialized EvidenceBound `ALLOW` callback state.
 
 ### Hardened
 - legacy unsigned receipts remain distinguishable as `UNSIGNED` and are never silently upgraded to authenticated trust;
@@ -21,7 +23,9 @@ All notable changes are documented here. The project follows Semantic Versioning
 - algorithm, key ID, receipt/version/canonicalization metadata are covered by the detached signed payload;
 - persisted verification state is re-bound to the exact stored checkpoint/receipt on load rather than trusted because it was previously stored;
 - partial SQLite bundle writes roll back before commit, and unknown/incomplete persistence schemas fail closed rather than being silently repaired;
-- durable replay records preserve duplicate/conflict semantics across restart but do not imply exactly-once execution or authorization to reuse mismatched checkpoint state.
+- durable replay records preserve duplicate/conflict semantics across restart but do not imply exactly-once execution or authorization to reuse mismatched checkpoint state;
+- Google ADK event consumption is fail-closed: a completed v2.7.0 lifecycle persists EvidenceBound verification before the consequential gate allows action, while deliberately closing the real async event stream before the after-agent callback leaves verification missing and the gate blocked;
+- `google-adk` remains isolated from EvidenceBound runtime dependencies and Core imports.
 
 ## [0.3.0] - 2026-08-17
 
