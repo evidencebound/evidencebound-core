@@ -12,8 +12,7 @@ def test_plain_adapter():
     eb = EvidenceBound(policy=PolicyBinding("p", "1"))
     evidence = [EvidenceRecord("e", {"x": 1}, ProvenanceRecord("s", "urn:s"))]
     run = run_guarded(eb, agent="worker", evidence=evidence, worker=lambda: {"answer": 42})
-    assert run.value == {"answer": 42
-    }
+    assert run.value == {"answer": 42}
     assert run.verification.action is ActionDecision.ALLOW
 
 
