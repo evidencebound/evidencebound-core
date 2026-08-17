@@ -1,6 +1,7 @@
 from evidencebound_scenariograph.adapters.ni_stats20 import (
     MATERIAL_FIELDS,
     SENSITIVE_SOURCE_FIELDS_EXCLUDED,
+    VEHICLE_FIELDS,
     normalize_ni_stats20_case,
     select_vulnerable_road_user_cases,
 )
@@ -54,6 +55,7 @@ def test_ni_stats20_adapter_maps_masked_pedestrian_without_sensitive_fields() ->
     provenance = dict(record.provenance)
 
     assert record.case_id == "NI-2024-42"
+    assert record.vehicle_joined is True
     assert fields["actor_class"] == "pedestrian"
     assert fields["harmonized_event_class"] == "pedestrian_crossing_masked_by_static_vehicle"
     assert fields["vehicle_manoeuvre"] == "going_ahead_other"
@@ -88,14 +90,63 @@ def test_ni_stats20_adapter_keeps_missing_codes_explicitly_uncertain() -> None:
     assert "harmonized_event_class" in record.uncertain_fields
 
 
-def test_ni_stats20_selection_is_joined_and_deterministic() -> None:
+def test_ni_stats20_missing_vehicle_is_retained_as_explicit_uncertainty() -> None:
+    casualty = _casualty()
+    casualty["v_id"] = 0
+
+    record = normalize_ni_stats20_case(_collision(), None, casualty)
+    fields = dict(record.fields)
+
+    assert record.vehicle_joined is False
+    assert record.vehicle_id == "0"
+    for field in VEHICLE_FIELDS:
+        assert fields[field] == "unknown_missing_associated_vehicle_row"
+        assert field in record.uncertain_fields
+
+
+def test_ni_stats20_slight_collision_uses_source_policy_missingness() -> None:
+    collision = _collision()
+    collision["a_type"] = 3
+    for field in ("a_jdet", "a_jcont", "a_light", "a_weat", "a_roadsc"):
+        collision[field] = ""
+    casualty = _casualty()
+    casualty["c_sever"] = 3
+    casualty["c_loc"] = ""
+    casualty["c_move"] = ""
+
+    record = normalize_ni_stats20_case(collision, None, casualty)
+    fields = dict(record.fields)
+
+    for field in (
+        "junction_detail",
+        "junction_control",
+        "light_conditions",
+        "weather_conditions",
+        "road_surface",
+        "pedestrian_location",
+        "pedestrian_movement",
+    ):
+        assert fields[field] == "not_recorded_for_slight_collision"
+        assert field in record.uncertain_fields
+    assert (
+        fields["harmonized_event_class"]
+        == "pedestrian_movement_not_recorded_for_slight_collision"
+    )
+    assert "harmonized_event_class" in record.uncertain_fields
+
+
+def test_ni_stats20_selection_keeps_missing_vehicle_and_is_deterministic() -> None:
+    missing_vehicle = _casualty()
+    missing_vehicle["v_id"] = 0
+    missing_vehicle["c_id"] = 2
     collisions = [_collision()]
     vehicles = [_vehicle()]
-    casualties = [_casualty()]
+    casualties = [_casualty(), missing_vehicle]
 
     first = select_vulnerable_road_user_cases(collisions, vehicles, casualties)
     second = select_vulnerable_road_user_cases(collisions, vehicles, casualties)
 
-    assert len(first) == 1
+    assert len(first) == 2
     assert first == second
     assert first[0].as_dict() == second[0].as_dict()
+    assert {record.vehicle_joined for record in first} == {True, False}
