@@ -9,12 +9,19 @@ All notable changes are documented here. The project follows Semantic Versioning
 - explicit ACTIVE / RETIRED / REVOKED / UNKNOWN signing-key lifecycle semantics;
 - fail-closed signed-receipt verification statuses for malformed signatures, unknown/revoked keys, unsupported algorithms, provider errors and receipt/checkpoint binding failures;
 - optional `crypto` extra with an Ed25519 reference provider while preserving zero unconditional runtime dependencies;
-- signed-receipt migration/security documentation and adversarial tests.
+- signed-receipt migration/security documentation and adversarial tests;
+- provider-neutral `PersistenceStore` contract for durable checkpoint/receipt/verification/replay state;
+- stdlib `SQLiteStore` and `SQLiteReplayGuard` reference providers with explicit transaction and schema/version semantics;
+- restart, persisted-tamper, transaction crash-injection, replay persistence and graph-reconstruction tests;
+- durable persistence/recovery documentation.
 
 ### Hardened
 - legacy unsigned receipts remain distinguishable as `UNSIGNED` and are never silently upgraded to authenticated trust;
 - retired keys may verify historical receipts but cannot create new signatures through core;
-- algorithm, key ID, receipt/version/canonicalization metadata are covered by the detached signed payload.
+- algorithm, key ID, receipt/version/canonicalization metadata are covered by the detached signed payload;
+- persisted verification state is re-bound to the exact stored checkpoint/receipt on load rather than trusted because it was previously stored;
+- partial SQLite bundle writes roll back before commit, and unknown/incomplete persistence schemas fail closed rather than being silently repaired;
+- durable replay records preserve duplicate/conflict semantics across restart but do not imply exactly-once execution or authorization to reuse mismatched checkpoint state.
 
 ## [0.3.0] - 2026-08-17
 
