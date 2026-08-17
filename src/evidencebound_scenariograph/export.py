@@ -1,7 +1,8 @@
-"""ASAM OpenSCENARIO XML 1.4 structural export seam.
+"""ASAM OpenSCENARIO XML 1.4 export for the AI-BOOST SPARK vertical slice.
 
-The SPARK prototype deliberately does not claim XSD conformance until schema
-validation is wired into acceptance. The artifact is an inspectable integration seam.
+The export is intentionally minimal: it carries EvidenceBound scenario metadata as
+global parameters while satisfying the OpenSCENARIO scenario-document lifecycle
+structure. CI validates generated artifacts against the official ASAM 1.4.0 XSD.
 """
 from __future__ import annotations
 
@@ -15,11 +16,11 @@ from .model import FieldDecision, ScenarioGraph
 class OpenScenarioArtifact:
     xml: str
     standard: str = "ASAM OpenSCENARIO XML 1.4"
-    conformance: str = "STRUCTURAL_SEAM_NOT_XSD_VALIDATED"
+    conformance: str = "XSD_VALIDATION_REQUIRED_IN_CI"
 
 
 def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenarioArtifact:
-    """Export a deterministic OpenSCENARIO-shaped XML artifact."""
+    """Export a deterministic minimal OpenSCENARIO XML 1.4 scenario document."""
 
     assessments = graph.assessments()
     blocked = any(item.decision is FieldDecision.BLOCKED for item in assessments.values())
@@ -36,7 +37,7 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
             "revMajor": "1",
             "revMinor": "4",
             "date": "1970-01-01T00:00:00",
-            "description": f"EvidenceBound ScenarioGraph structural seam for {case_id}",
+            "description": f"EvidenceBound ScenarioGraph SPARK export for {case_id}",
             "author": "EvidenceBound ScenarioGraph",
         },
     )
@@ -45,7 +46,7 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
         "eb_case_id": case_id,
         "eb_functional_label": str(graph.fields["functional_label"].value),
         "eb_verification": verification,
-        "eb_export_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
+        "eb_export_conformance": "XSD_VALIDATION_REQUIRED_IN_CI",
     }
     for name, value in sorted(values.items()):
         SubElement(
@@ -57,6 +58,9 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
     SubElement(root, "CatalogLocations")
     SubElement(root, "RoadNetwork")
     SubElement(root, "Entities")
-    SubElement(root, "Storyboard")
+    storyboard = SubElement(root, "Storyboard")
+    init = SubElement(storyboard, "Init")
+    SubElement(init, "Actions")
+    SubElement(storyboard, "StopTrigger")
     xml = tostring(root, encoding="unicode", short_empty_elements=True)
     return OpenScenarioArtifact(xml=xml)
