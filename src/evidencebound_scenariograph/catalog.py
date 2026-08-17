@@ -64,7 +64,10 @@ def match_catalog(
         if functional_label == candidate.functional_label:
             score += 700
             reasons.append("functional_label_exact")
-        if candidate.expected_location is not None and crash_location == candidate.expected_location:
+        if (
+            candidate.expected_location is not None
+            and crash_location == candidate.expected_location
+        ):
             score += 180
             reasons.append("location_exact")
         if candidate.obstruction_required and obstruction is not None:
