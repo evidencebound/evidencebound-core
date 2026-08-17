@@ -15,8 +15,8 @@
         "expected_functional_label": "pedestrian_dart_out_visual_obstruction",
         "observed_catalog_top1": "pedestrian_nearside_obstruction_intersection",
         "observed_functional_label": "pedestrian_dart_out_visual_obstruction",
-        "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
-        "pipeline_receipt_sha256": "22bca307898e8c1dfc9dc6607115ca56c2f0737b69f3ee99e10535f373730fda",
+        "openscenario_conformance": "ASAM_OPENSCENARIO_XML_1_4_XSD_VALIDATED_IN_CI",
+        "pipeline_receipt_sha256": "a93271cfe140a42157d104f738017459bc21aaff23d9fa532a5c526b9dfda189",
         "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=991&Study=CIRENVICIS"
       },
       {
@@ -33,8 +33,8 @@
         "expected_functional_label": "pedestrian_crossing_vehicle_not_turning",
         "observed_catalog_top1": "pedestrian_midblock_crossing_nonturning",
         "observed_functional_label": "pedestrian_crossing_vehicle_not_turning",
-        "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
-        "pipeline_receipt_sha256": "00c7884d04d398c0748092a8c912d7c53cb6ff2aeb03a2a48366b878b9a29df8",
+        "openscenario_conformance": "ASAM_OPENSCENARIO_XML_1_4_XSD_VALIDATED_IN_CI",
+        "pipeline_receipt_sha256": "e79e8d57c5b34b7c17a15c0edefe3ddefb044c2218ea52ce09d2baec93314874",
         "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=1027&Study=CIRENVICIS"
       }
     ],
@@ -66,7 +66,7 @@
           "obstruction_context"
         ],
         "label": "991_visibility_obstruction_removed",
-        "mutated_pipeline_receipt_sha256": "5b2d67795390bebc2911959fb939cfe1deec747c8dbb64162fcaabac7d923bc6",
+        "mutated_pipeline_receipt_sha256": "203ad265de326bc06fd4ea5ddbc1b51742176d1064dde9bc2ac998d630c73a34",
         "observed_recompute_fields": [
           "catalog_match_top1",
           "obstruction_context"
@@ -85,7 +85,7 @@
           "vehicle_speed_kph"
         ],
         "label": "991_speed_increase",
-        "mutated_pipeline_receipt_sha256": "11e7c3ab636aa1d5279e45d7ad388f238c7bcf473593039c6e18e50bfac2fadb",
+        "mutated_pipeline_receipt_sha256": "257a1b2d72cd925adedbe693adbe56f3c1bc5dcb6ec348bf6e9d8a012ecf7576",
         "observed_recompute_fields": [
           "detection_distance_m",
           "reveal_time_millis",
@@ -104,7 +104,7 @@
           "vehicle_maneuver"
         ],
         "label": "991_maneuver_change",
-        "mutated_pipeline_receipt_sha256": "a6194d22f1adef43c3c09f180e196d4d813e7d2512dd861299fc88fcca5086c6",
+        "mutated_pipeline_receipt_sha256": "caa373f6af9d4d573ef97b2b5e7e1b70e2a3a3fcb94b77452ad6eae4056463fb",
         "observed_recompute_fields": [
           "pedestrian_direction",
           "vehicle_maneuver"
@@ -122,7 +122,7 @@
           "obstruction_context"
         ],
         "label": "991_visibility_removed",
-        "mutated_pipeline_receipt_sha256": "b333e9bd9e85e86cd11c9ef9b02c0d79f88e892603865ebc64a91060f670b67f",
+        "mutated_pipeline_receipt_sha256": "f8cbb5250c218e8f6372e948c2dec60cc6cc4190ee4a4e7fe7a08a1ec33f7789",
         "observed_recompute_fields": [
           "catalog_match_top1",
           "obstruction_context"
@@ -140,7 +140,7 @@
           "light_condition"
         ],
         "label": "1027_day_to_night",
-        "mutated_pipeline_receipt_sha256": "4154edea17f520db483872f666d7a2bab4c575ab7dafe1e09b6bb5865a57e8b1",
+        "mutated_pipeline_receipt_sha256": "2a947fcccd2f72c676ca6646f6fb1428348ea119c5d36e801bd5306fd5b8c8df",
         "observed_recompute_fields": [
           "atmospheric_condition",
           "light_condition"
@@ -158,7 +158,7 @@
           "light_condition"
         ],
         "label": "1027_clear_to_rain",
-        "mutated_pipeline_receipt_sha256": "572adf3334a87a33e96ad4af49efabfc1306c379c94e29c541bd90205e8ba4dd",
+        "mutated_pipeline_receipt_sha256": "01f5b366a1a5ce735430a880441ded6ad1c4d70f248dea6076b58b128dad98c0",
         "observed_recompute_fields": [
           "atmospheric_condition",
           "light_condition"
@@ -177,7 +177,7 @@
           "surface_condition"
         ],
         "label": "1027_dry_to_wet",
-        "mutated_pipeline_receipt_sha256": "d9530336d1afa3c35b5ad242e29a857848da686ced10ce2ce9f8073e1af1a683",
+        "mutated_pipeline_receipt_sha256": "1351d4cdd570014795357ba29a1f068149645d8f73ef22adc0cb3b032c2df954",
         "observed_recompute_fields": [
           "crosswalk_context",
           "roadway_alignment",
@@ -197,7 +197,7 @@
           "vehicle_speed_kph"
         ],
         "label": "1027_speed_increase",
-        "mutated_pipeline_receipt_sha256": "78d69c365cbfab2067fcb1f567f2c9aed4cc0e465f58caae71667c45a2139c9d",
+        "mutated_pipeline_receipt_sha256": "084702998cd41afc762d12c68cff54b09610210ac81636bdb69979d8da867256",
         "observed_recompute_fields": [
           "detection_distance_m",
           "reveal_time_millis",
@@ -216,19 +216,24 @@
           "light_condition"
         ],
         "label": "1027_environment_removed",
-        "mutated_pipeline_receipt_sha256": "d2a45d1fed53d7522beddcf8ad268dbabfcfc5b8e39a7d8c23ee2805c3dcd346",
+        "mutated_pipeline_receipt_sha256": "997fc9ab57d664fe3355429afb15cf95e9e7f157e5a0ef265af0d1d1eff7f573",
         "observed_recompute_fields": [
           "atmospheric_condition",
           "light_condition"
         ]
       }
     ],
-    "schema": "evidencebound-ai-boost-challenge4-benchmark/0.2",
+    "schema": "evidencebound-ai-boost-challenge4-benchmark/0.3",
     "scope": {
-      "claim_boundary": "SPARK controlled-fixture baseline; not automotive production accuracy, homologation evidence, or full OpenSCENARIO XSD conformance",
+      "claim_boundary": "SPARK controlled-fixture baseline; not automotive production accuracy or homologation evidence",
       "controlled_adversarial_mutations": 9,
       "public_cases": 2
+    },
+    "standards_acceptance": {
+      "openscenario_version": "1.4.0",
+      "schema_archive": "https://openscenario.asam.net/ASAM_OpenSCENARIO_XML/v1.4.0/_attachments/generated/ASAM_OpenSCENARIO_v1.4.0_Schema.zip",
+      "validation": "official ASAM XSD validated in dedicated CI"
     }
   },
-  "sha256": "8320136341aeadf43ce4cecd69182f5d09898c33360d2f48aea292e0ed8f5805"
+  "sha256": "2358c4db90bf2314daeebfcb824df913f9195d33a83cdad8b9f1ea21fba20a5f"
 }
