@@ -1,9 +1,12 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BENCHMARK = ROOT / "benchmarks" / "ai_boost_challenge4" / "run.py"
+BENCHMARK_DIR = ROOT / "benchmarks" / "ai_boost_challenge4"
+BENCHMARK = BENCHMARK_DIR / "run.py"
+BASELINE = BENCHMARK_DIR / "BASELINE.json"
 
 
 def test_ai_boost_challenge4_benchmark_acceptance() -> None:
@@ -14,10 +17,10 @@ def test_ai_boost_challenge4_benchmark_acceptance() -> None:
         capture_output=True,
         text=True,
     )
-    print(completed.stdout)
-    if completed.stderr:
-        print(completed.stderr)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert '"evidence_coverage_milli": 1000' in completed.stdout
-    assert '"invalidation_recall_milli": 1000' in completed.stdout
-    assert '"receipt_reproduction_rate_milli": 1000' in completed.stdout
+    generated = json.loads(completed.stdout)
+    retained = json.loads(BASELINE.read_text(encoding="utf-8"))
+    assert generated == retained
+    assert generated["body"]["metrics"]["evidence_coverage_milli"] == 1000
+    assert generated["body"]["metrics"]["invalidation_recall_milli"] == 1000
+    assert generated["body"]["metrics"]["receipt_reproduction_rate_milli"] == 1000
