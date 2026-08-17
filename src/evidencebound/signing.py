@@ -113,7 +113,7 @@ def signed_receipt_bytes(receipt: SignedProofReceipt) -> bytes:
     prefix = (
         f"evidencebound:{_SIGNED_RECEIPT_DOMAIN}:{CANONICALIZATION_VERSION}:"
         f"{receipt.signature_version}\0"
-    ).encode("utf-8")
+    ).encode()
     return prefix + canonical_bytes(receipt.signed_payload())
 
 
@@ -176,7 +176,11 @@ def verify_signed_receipt(
     """Verify signature authentication and checkpoint/result binding, failing closed."""
     if isinstance(receipt, ProofReceipt):
         binding_valid = _binding_valid(receipt, checkpoint, verification_result)
-        status = SignedReceiptStatus.UNSIGNED if binding_valid else SignedReceiptStatus.INVALID_BINDING
+        status = (
+            SignedReceiptStatus.UNSIGNED
+            if binding_valid
+            else SignedReceiptStatus.INVALID_BINDING
+        )
         reason = (
             "legacy ProofReceipt has valid deterministic binding but no issuer signature"
             if binding_valid
