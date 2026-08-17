@@ -265,12 +265,12 @@ def main() -> int:
     args = parser.parse_args()
 
     receipt = build_receipt()
-    if args.assert_targets:
-        assert_targets(receipt)
     rendered = json.dumps(receipt, sort_keys=True, indent=2, ensure_ascii=False)
     if args.output is not None:
         args.output.write_text(rendered + "\n", encoding="utf-8")
-    print(rendered)
+    print(rendered, flush=True)
+    if args.assert_targets:
+        assert_targets(receipt)
     return 0
 
 
