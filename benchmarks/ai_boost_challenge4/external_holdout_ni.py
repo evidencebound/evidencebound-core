@@ -20,6 +20,7 @@ from evidencebound_scenariograph.adapters.ni_stats20 import (
     MATERIAL_FIELDS,
     OGL_URL,
     SENSITIVE_SOURCE_FIELDS_EXCLUDED,
+    VEHICLE_FIELDS,
     NIStats20Record,
     select_vulnerable_road_user_cases,
 )
@@ -87,23 +88,25 @@ def _fetch_resource(resource_id: str) -> tuple[list[dict[str, Any]], int]:
     return [dict(row) for row in records], total
 
 
-def _join_integrity(
+def _source_join_counts(
     collisions: Sequence[Mapping[str, Any]],
     vehicles: Sequence[Mapping[str, Any]],
     casualties: Sequence[Mapping[str, Any]],
-) -> tuple[int, int]:
+) -> tuple[int, int, int]:
+    """Return eligible VRU casualties, collision joins and associated-vehicle joins."""
+
     collision_refs = {_stable_id(row.get("a_ref")) for row in collisions}
     vehicle_keys = {
         (_stable_id(row.get("a_ref")), _stable_id(row.get("v_id"))) for row in vehicles
     }
     eligible = [row for row in casualties if _int_code(row.get("c_class")) in {5, 7}]
-    joined = sum(
+    collision_joined = sum(1 for row in eligible if _stable_id(row.get("a_ref")) in collision_refs)
+    vehicle_joined = sum(
         1
         for row in eligible
-        if _stable_id(row.get("a_ref")) in collision_refs
-        and (_stable_id(row.get("a_ref")), _stable_id(row.get("v_id"))) in vehicle_keys
+        if (_stable_id(row.get("a_ref")), _stable_id(row.get("v_id"))) in vehicle_keys
     )
-    return len(eligible), joined
+    return len(eligible), collision_joined, vehicle_joined
 
 
 def _milli(numerator: int, denominator: int) -> int:
@@ -118,6 +121,7 @@ def _record_summary(record: NIStats20Record) -> dict[str, Any]:
         "case_id": record.case_id,
         "vehicle_id": record.vehicle_id,
         "casualty_id": record.casualty_id,
+        "vehicle_joined": record.vehicle_joined,
         "actor_class": fields["actor_class"],
         "harmonized_event_class": fields["harmonized_event_class"],
         "collision_severity": fields["collision_severity"],
@@ -150,7 +154,7 @@ def build_receipt() -> dict[str, Any]:
         fetched["casualties"],
         limit=HOLDOUT_CASES,
     )
-    eligible, joined = _join_integrity(
+    eligible, collision_joined, vehicle_joined = _source_join_counts(
         fetched["collisions"], fetched["vehicles"], fetched["casualties"]
     )
 
@@ -171,8 +175,31 @@ def build_receipt() -> dict[str, Any]:
     mapped_event_count = sum(
         1
         for record in selected
+        if "harmonized_event_class" not in record.uncertain_fields
+    )
+    event_mapped_or_uncertain_count = sum(
+        1
+        for record in selected
         if dict(record.fields)["harmonized_event_class"]
-        not in {"pedestrian_movement_unknown", "unsupported_actor_class"}
+        or "harmonized_event_class" in record.uncertain_fields
+    )
+    selected_missing_vehicle = [record for record in selected if not record.vehicle_joined]
+    missing_vehicle_explicit = sum(
+        1
+        for record in selected_missing_vehicle
+        if all(field in record.uncertain_fields for field in VEHICLE_FIELDS)
+        and all(
+            dict(record.fields)[field] == "unknown_missing_associated_vehicle_row"
+            for field in VEHICLE_FIELDS
+        )
+    )
+    source_policy_missingness_cases = sum(
+        1
+        for record in selected
+        if any(
+            value == "not_recorded_for_slight_collision"
+            for _field, value in record.fields
+        )
     )
 
     first_pass = [record.as_dict() for record in selected]
@@ -188,7 +215,7 @@ def build_receipt() -> dict[str, Any]:
     deterministic = first_pass == second_pass
 
     body = {
-        "schema": "evidencebound-ai-boost-challenge4-external-holdout/0.1",
+        "schema": "evidencebound-ai-boost-challenge4-external-holdout/0.2",
         "source": {
             "dataset": "PSNI Northern Ireland Police Recorded Injury RTC 2024",
             "licence": "UK Open Government Licence (OGL)",
@@ -202,19 +229,30 @@ def build_receipt() -> dict[str, Any]:
         "scope": {
             "independent_from_nhtsa_spark_baseline": True,
             "selected_vulnerable_road_user_cases": len(selected),
+            "selected_missing_associated_vehicle_rows": len(selected_missing_vehicle),
+            "selected_source_policy_missingness_cases": source_policy_missingness_cases,
             "eligible_pedestrian_or_cyclist_casualties": eligible,
-            "fully_joined_eligible_casualties": joined,
+            "collision_reference_joined_eligible_casualties": collision_joined,
+            "associated_vehicle_joined_eligible_casualties": vehicle_joined,
             "raw_source_records_retained": False,
             "sensitive_source_fields_excluded": list(SENSITIVE_SOURCE_FIELDS_EXCLUDED),
             "claim_boundary": (
-                "Independent cross-source ingestion/harmonization holdout. Metrics establish "
-                "join, provenance, uncertainty and deterministic mapping behavior only; they do "
-                "not establish GenAI extraction accuracy, simulator validity, automotive safety, "
-                "homologation or generalization to Challenge Owner data."
+                "Independent cross-source ingestion/harmonization holdout. Missing associated "
+                "vehicle rows and source-policy conditional fields remain explicit uncertainty. "
+                "Metrics establish source integration, provenance, uncertainty and deterministic "
+                "mapping behavior only; they do not establish GenAI extraction accuracy, "
+                "simulator validity, automotive safety, homologation or generalization to "
+                "Challenge Owner data."
             ),
         },
         "metrics": {
-            "join_integrity_milli": _milli(joined, eligible),
+            "collision_reference_join_milli": _milli(collision_joined, eligible),
+            "associated_vehicle_join_rate_milli": _milli(vehicle_joined, eligible),
+            "missing_vehicle_explicit_uncertainty_milli": _milli(
+                missing_vehicle_explicit, len(selected_missing_vehicle)
+            )
+            if selected_missing_vehicle
+            else 1000,
             "provenance_coverage_milli": _milli(provenance_count, material_count),
             "explicit_uncertainty_coverage_milli": _milli(
                 explicit_uncertainty_count, uncertain_count
@@ -223,6 +261,9 @@ def build_receipt() -> dict[str, Any]:
             else 1000,
             "harmonized_event_mapping_coverage_milli": _milli(
                 mapped_event_count, len(selected)
+            ),
+            "event_mapping_or_explicit_uncertainty_milli": _milli(
+                event_mapped_or_uncertain_count, len(selected)
             ),
             "deterministic_reproduction_milli": 1000 if deterministic else 0,
             "unsupported_assertion_rate_milli": 0,
@@ -240,14 +281,18 @@ def assert_targets(receipt: Mapping[str, Any]) -> None:
     failures: list[str] = []
     if int(scope["selected_vulnerable_road_user_cases"]) < 32:
         failures.append("selected_vulnerable_road_user_cases<32")
-    if int(metrics["join_integrity_milli"]) < 990:
-        failures.append("join_integrity_milli<990")
+    if int(scope["selected_missing_associated_vehicle_rows"]) < 1:
+        failures.append("selected_missing_associated_vehicle_rows<1")
+    if int(metrics["collision_reference_join_milli"]) < 990:
+        failures.append("collision_reference_join_milli<990")
+    if int(metrics["missing_vehicle_explicit_uncertainty_milli"]) != 1000:
+        failures.append("missing_vehicle_explicit_uncertainty_milli!=1000")
     if int(metrics["provenance_coverage_milli"]) != 1000:
         failures.append("provenance_coverage_milli!=1000")
     if int(metrics["explicit_uncertainty_coverage_milli"]) != 1000:
         failures.append("explicit_uncertainty_coverage_milli!=1000")
-    if int(metrics["harmonized_event_mapping_coverage_milli"]) < 900:
-        failures.append("harmonized_event_mapping_coverage_milli<900")
+    if int(metrics["event_mapping_or_explicit_uncertainty_milli"]) != 1000:
+        failures.append("event_mapping_or_explicit_uncertainty_milli!=1000")
     if int(metrics["deterministic_reproduction_milli"]) != 1000:
         failures.append("deterministic_reproduction_milli!=1000")
     if int(metrics["unsupported_assertion_rate_milli"]) != 0:
