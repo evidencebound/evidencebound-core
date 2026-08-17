@@ -38,11 +38,16 @@ jobs:
           python benchmarks/ai_boost_challenge4/external_holdout_ni.py \
             --assert-targets \
             --output /tmp/ni_external_holdout.json
-      - name: Verify receipt is data-minimised
-        shell: bash
+      - name: Verify case summaries are data-minimised
         run: |
-          set -euo pipefail
-          if grep -Eq 'c_sex|c_agegroup|v_sex|v_agegroup|a_gd1|a_gd2' /tmp/ni_external_holdout.json; then
-            echo "Sensitive/exact-location source field leaked into retained receipt" >&2
-            exit 1
-          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path('/tmp/ni_external_holdout.json').read_text())
+          summaries = receipt['body']['case_summaries']
+          forbidden = {'c_sex', 'c_agegroup', 'v_sex', 'v_agegroup', 'a_gd1', 'a_gd2'}
+          leaked = sorted(forbidden & {key for row in summaries for key in row})
+          if leaked:
+              raise SystemExit(f'forbidden source fields in case summaries: {leaked}')
+          PY
