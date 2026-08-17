@@ -1,6 +1,8 @@
 # Funding Readiness
 
-Canonical repository: https://github.com/moneyparking/evidencebound-core
+Canonical repository: https://github.com/moneyparking/evidencebound-core  
+Institutional site: https://evidencebound.org  
+Maintainer/contact: Ruslan Vrublevskyi — ruslan@evidencebound.org
 
 ## Public-good value
 
