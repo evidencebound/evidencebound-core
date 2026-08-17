@@ -116,3 +116,39 @@ def test_dependency_cycle_fails_closed() -> None:
 
     assert graph.assess_field("a").decision is FieldDecision.BLOCKED
     assert graph.assess_field("b").decision is FieldDecision.BLOCKED
+
+
+def test_deterministic_validation_error_forces_blocked() -> None:
+    graph = ScenarioGraph()
+    graph.add_evidence(EvidenceItem("source", "fixture://source", _sha("d")))
+    graph.add_field(
+        ScenarioField(
+            "physics_gate",
+            {"deviation_milli": 900},
+            evidence_ids=("source",),
+            validation_errors=("kinematic_incoherence",),
+        )
+    )
+
+    assessment = graph.assess_field("physics_gate")
+
+    assert assessment.decision is FieldDecision.BLOCKED
+    assert assessment.reasons == ("validation_error=kinematic_incoherence",)
+
+
+def test_deterministic_validation_warning_requires_review() -> None:
+    graph = ScenarioGraph()
+    graph.add_evidence(EvidenceItem("source", "fixture://source", _sha("e")))
+    graph.add_field(
+        ScenarioField(
+            "physics_gate",
+            {"deviation_milli": 300},
+            evidence_ids=("source",),
+            validation_warnings=("kinematic_borderline",),
+        )
+    )
+
+    assessment = graph.assess_field("physics_gate")
+
+    assert assessment.decision is FieldDecision.REVIEW_REQUIRED
+    assert assessment.reasons == ("validation_warning=kinematic_borderline",)
