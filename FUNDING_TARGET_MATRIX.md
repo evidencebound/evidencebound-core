@@ -1,5 +1,7 @@
 # Funding Target Matrix — verified 2026-08-16
 
+Canonical project repository: https://github.com/moneyparking/evidencebound-core
+
 Point-in-time engineering planning artifact. Recheck official program pages immediately before application.
 
 | Program | Current status | OSS / eligibility signal | EvidenceBound fit now | Missing prerequisites | Recommended timing |

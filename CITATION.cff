@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: "Vrublevskyi"
     given-names: "Ruslan"
-repository-code: "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption"
-url: "https://github.com/moneyparking/EvidenceBound-OSS-Core-Funding-Adoption"
+repository-code: "https://github.com/moneyparking/evidencebound-core"
+url: "https://github.com/moneyparking/evidencebound-core"
 license: "Apache-2.0"
 keywords:
   - autonomous agents
