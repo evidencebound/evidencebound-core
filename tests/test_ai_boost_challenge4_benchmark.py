@@ -14,6 +14,9 @@ def test_ai_boost_challenge4_benchmark_acceptance() -> None:
         capture_output=True,
         text=True,
     )
+    print(completed.stdout)
+    if completed.stderr:
+        print(completed.stderr)
     assert completed.returncode == 0, completed.stdout + completed.stderr
     assert '"evidence_coverage_milli": 1000' in completed.stdout
     assert '"invalidation_recall_milli": 1000' in completed.stdout
