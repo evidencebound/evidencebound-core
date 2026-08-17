@@ -5,7 +5,6 @@
     "name": "Ruslan Vrublevskyi",
     "canonical_url": "https://evidencebound.org/#maintainer",
     "email": "ruslan@evidencebound.org",
-    "location": {"city":"Kyiv","country":"Ukraine"},
     "orcid": "https://orcid.org/0009-0004-2468-5232",
     "linkedin": "https://www.linkedin.com/in/ruslan-vrublevskyi",
     "github": "https://github.com/moneyparking",
@@ -16,6 +15,6 @@
     {"name":"EvidenceBound Core","relationship":"maintainer_creator","url":"https://github.com/moneyparking/evidencebound-core","site":"https://evidencebound.org"},
     {"name":"SignalReview","relationship":"founder_separate_asset","url":"https://signalreview.co"}
   ],
-  "publication_policy": {"telephone_published":false,"private_address_published":false,"date_of_birth_published":false,"personal_social_accounts_published":false},
+  "publication_policy": {"telephone_published":false,"private_address_published":false,"date_of_birth_published":false,"personal_social_accounts_published":false,"transient_location_published":false},
   "last_updated":"2026-08-17"
 }
