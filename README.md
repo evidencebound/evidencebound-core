@@ -9,13 +9,13 @@
 
 Created and maintained by Ruslan Vrublevskyi.
 
-> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. Current `main` contains additional **Unreleased** hardening, including provider-neutral signed receipts. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
+> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. Current `main` contains additional **Unreleased** hardening, including provider-neutral signed receipts and durable persistence/restart support. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
 
 ## Why EvidenceBound?
 
 Agent memory answers “what did the system remember?” EvidenceBound adds “what evidence supported it, which policy governed it, is the historical record intact, is it still applicable, and what must be recomputed if a dependency changes?”
 
-It is **not** a vector database, RAG framework, tracing backend, LLM framework, truth oracle, or consensus system. A cryptographic digest or signature can bind/authenticate bytes under configured trust roots; neither can make a malicious upstream source truthful.
+It is **not** a vector database, RAG framework, tracing backend, LLM framework, truth oracle, or consensus system. A cryptographic digest or signature can bind/authenticate bytes under configured trust roots; neither can make a malicious upstream source truthful. A durable database row is likewise not automatically trusted state.
 
 ```mermaid
 flowchart LR
@@ -40,7 +40,7 @@ From a checkout:
 python -m pip install .
 ```
 
-No unconditional runtime dependency is required beyond Python 3.10+.
+No unconditional runtime dependency is required beyond Python 3.10+. The SQLite reference persistence provider uses Python's stdlib `sqlite3` and therefore adds no third-party dependency.
 
 Optional Ed25519 signed-receipt reference provider:
 
@@ -119,6 +119,27 @@ Current `main` also exposes provider-neutral `ReceiptSigner` / `ReceiptVerifier`
 
 A valid signature authenticates the signed receipt under the application's configured key identity/trust roots. It does **not** prove upstream truth, provenance honesty, secure key custody, secure time, or legal compliance. See [`docs/SIGNED_RECEIPTS.md`](docs/SIGNED_RECEIPTS.md).
 
+## Durable persistence and restart
+
+Current `main` defines a provider-neutral `PersistenceStore` contract and a stdlib reference implementation at `evidencebound.providers.sqlite.SQLiteStore`.
+
+```python
+from evidencebound.providers.sqlite import SQLiteStore
+
+with SQLiteStore("agent-state.sqlite3") as store:
+    store.commit_bundle(checkpoint, verification_result)
+
+# New process / later restart
+with SQLiteStore("agent-state.sqlite3") as store:
+    graph, verification_by_id = store.load_recovery_state()
+```
+
+Checkpoint, receipt, verification state and an optional replay record are committed as one transaction. A pre-commit interruption rolls the bundle back. On reopen, persisted verification is **not trusted because it was stored**: EvidenceBound reconstructs the checkpoint/receipt/result and re-runs deterministic result binding before the state can feed recovery as reusable.
+
+`SQLiteReplayGuard` preserves equal-payload duplicate detection and conflicting-payload rejection across restart. It remains an idempotency primitive, not an exactly-once guarantee. Unknown/incomplete persistence schemas fail closed; the alpha provider does not silently migrate trust-bearing history.
+
+SQLite is not claimed immutable or authenticated. For attackers able to rewrite both checkpoint and receipt state consistently, use an independent receipt anchor and/or signed receipts with independently protected verification roots as appropriate to the threat model. See [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md).
+
 ## Canonicalization
 
 `EBCJ-1` accepts null, booleans, integers, Unicode strings, lists, and string-keyed maps. Maps are sorted, JSON is compact UTF-8, and floats are rejected to avoid cross-runtime ambiguity. This is an EvidenceBound format, **not a claim of RFC 8785 compliance**. See [`SPEC.md`](SPEC.md).
@@ -134,7 +155,7 @@ A valid signature authenticates the signed receipt under the application's confi
 - `requires_verification`: unaffected state that cannot yet be trusted for reuse;
 - `blocked`: consequential actions that may not proceed.
 
-Re-verification requirements are dependency-path-specific, so an unrelated invalidation does not contaminate an independent branch. `ReplayGuard` provides idempotent duplicate detection; it does **not** claim exactly-once execution.
+Re-verification requirements are dependency-path-specific, so an unrelated invalidation does not contaminate an independent branch. `ReplayGuard` provides in-process idempotent duplicate detection; `SQLiteReplayGuard` can persist those semantics across restart. Neither claims exactly-once execution.
 
 ## Adapters
 
@@ -162,7 +183,7 @@ CI additionally performs an isolated clean-room installation, runtime-dependency
 
 ## Security and non-goals
 
-Read [`THREAT_MODEL.md`](THREAT_MODEL.md) before using EvidenceBound for consequential actions. The library helps detect unsupported/missing/stale/refuted evidence when that state is supplied or derivable; it cannot establish truthfulness of a malicious source, protect a compromised runtime, guarantee safe key custody, or guarantee legal/regulatory compliance.
+Read [`THREAT_MODEL.md`](THREAT_MODEL.md) before using EvidenceBound for consequential actions. The library helps detect unsupported/missing/stale/refuted evidence when that state is supplied or derivable; it cannot establish truthfulness of a malicious source, protect a compromised runtime, guarantee safe key custody/immutable storage, or guarantee legal/regulatory compliance.
 
 ## Project documents
 
@@ -173,6 +194,7 @@ Read [`THREAT_MODEL.md`](THREAT_MODEL.md) before using EvidenceBound for consequ
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - [`ROADMAP.md`](ROADMAP.md)
 - [`docs/SIGNED_RECEIPTS.md`](docs/SIGNED_RECEIPTS.md)
+- [`docs/PERSISTENCE.md`](docs/PERSISTENCE.md)
 - [`RELEASE_READINESS.md`](RELEASE_READINESS.md)
 - [`FUNDING_READINESS.md`](FUNDING_READINESS.md)
 - [`PREEXISTING_WORK.md`](PREEXISTING_WORK.md)
