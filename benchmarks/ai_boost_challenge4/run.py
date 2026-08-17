@@ -17,6 +17,10 @@ from evidencebound_scenariograph import CrashFixture, FieldDecision, load_fixtur
 HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
 FIXTURE_NAMES = ("nhtsa_vicis_991.json", "nhtsa_vicis_1027.json")
+ASAM_SCHEMA_URL = (
+    "https://openscenario.asam.net/ASAM_OpenSCENARIO_XML/v1.4.0/"
+    "_attachments/generated/ASAM_OpenSCENARIO_v1.4.0_Schema.zip"
+)
 
 
 @dataclass(frozen=True)
@@ -300,14 +304,19 @@ def build_report() -> dict[str, Any]:
         for fixture, result in zip(fixtures, results, strict=True)
     ]
     body: dict[str, Any] = {
-        "schema": "evidencebound-ai-boost-challenge4-benchmark/0.2",
+        "schema": "evidencebound-ai-boost-challenge4-benchmark/0.3",
         "scope": {
             "public_cases": len(fixtures),
             "controlled_adversarial_mutations": len(mutation_cases),
             "claim_boundary": (
-                "SPARK controlled-fixture baseline; not automotive production accuracy, "
-                "homologation evidence, or full OpenSCENARIO XSD conformance"
+                "SPARK controlled-fixture baseline; not automotive production accuracy "
+                "or homologation evidence"
             ),
+        },
+        "standards_acceptance": {
+            "openscenario_version": "1.4.0",
+            "validation": "official ASAM XSD validated in dedicated CI",
+            "schema_archive": ASAM_SCHEMA_URL,
         },
         "metrics": metrics,
         "cases": cases,
@@ -333,6 +342,7 @@ def assert_targets(report: dict[str, Any]) -> None:
     assert metrics["mutation_unrelated_preservation_milli"] == 1000
     assert metrics["missing_evidence_no_completion_milli"] == 1000
     assert metrics["missing_evidence_review_required_milli"] == 1000
+    assert report["body"]["standards_acceptance"]["openscenario_version"] == "1.4.0"
 
 
 def main() -> None:
