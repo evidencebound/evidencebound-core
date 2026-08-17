@@ -14,7 +14,7 @@ All notable changes are documented here. The project follows Semantic Versioning
 - stdlib `SQLiteStore` and `SQLiteReplayGuard` reference providers with explicit transaction and schema/version semantics;
 - restart, persisted-tamper, transaction crash-injection, replay persistence and graph-reconstruction tests;
 - durable persistence/recovery documentation;
-- pinned real-framework compatibility CI for `google-adk==2.7.0` on Python 3.13 using real `BaseAgent`, `Runner`, callback validation, event streaming and `InMemorySessionService` without model/cloud credentials;
+- pinned real-framework compatibility CI for `google-adk==2.7.0` on Python 3.13 using real `BaseAgent`, `Runner`, runtime keyword callback invocation/name enforcement, event streaming and `InMemorySessionService` without model/cloud credentials;
 - dependency-free `adk_consequential_action_allowed()` application gate that requires explicit serialized EvidenceBound `ALLOW` callback state.
 
 ### Hardened
@@ -25,6 +25,7 @@ All notable changes are documented here. The project follows Semantic Versioning
 - partial SQLite bundle writes roll back before commit, and unknown/incomplete persistence schemas fail closed rather than being silently repaired;
 - durable replay records preserve duplicate/conflict semantics across restart but do not imply exactly-once execution or authorization to reuse mismatched checkpoint state;
 - Google ADK event consumption is fail-closed: a completed v2.7.0 lifecycle persists EvidenceBound verification before the consequential gate allows action, while deliberately closing the real async event stream before the after-agent callback leaves verification missing and the gate blocked;
+- fresh ADK v2.7.0 runner invocations in the compatibility lane satisfy the upstream `new_message` requirement with a synthetic user message and still perform no model/provider/network call;
 - `google-adk` remains isolated from EvidenceBound runtime dependencies and Core imports.
 
 ## [0.3.0] - 2026-08-17
