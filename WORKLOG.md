@@ -2,81 +2,51 @@
 
 ## 2026-08-16 — 2026-08-17
 
-### Reality refresh and extraction
-- Reviewed current EvidenceBound reference repositories and the SignalReview boundary before implementation.
-- Initialized the independent public OSS repository under legacy slug `moneyparking/EvidenceBound-OSS-Core-Funding-Adoption`; it initially contained only an initial README.
-- Renamed the canonical repository on 2026-08-17 to `moneyparking/evidencebound-core` without changing repository identity/history.
-- Kept cloud/hackathon/product implementations as reference material rather than mechanically merging their code.
-- Locked the core boundary as stdlib-only Python, framework/cloud/LLM independent, with structured deterministic inputs and outputs.
+### Foundation and release
+- Built the independent Python core, typed evidence/provenance/policy/checkpoint/verification/receipt contracts, EBCJ-1 canonicalization, fail-closed trust semantics, exact dependency graph/recovery, replay/idempotency, provider-neutral events and thin integration seams.
+- Added public architecture/spec/threat/security/contribution/governance/funding/release documentation, Apache-2.0 licensing, Python 3.10–3.13 CI, clean-room installation, Ruff, strict mypy, package build, pip-audit and Bandit.
+- Renamed the repository to canonical `moneyparking/evidencebound-core` and synchronized package/docs/citation/security/funding URLs.
+- Published and independently verified GitHub source release `v0.3.0` at exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`; release-source CI `31991997448` SUCCESS. PyPI was not published.
 
-### v0.1 — independent core
-- Added typed evidence, provenance, policy, checkpoint, verification and receipt contracts.
-- Added versioned `EBCJ-1` deterministic canonicalization and domain-separated SHA-256 binding.
-- Separated historical integrity from current applicability.
-- Added fail-closed `ALLOW` / `REVIEW_REQUIRED` / `BLOCK` semantics.
-- Added tamper detection, missing evidence/provenance handling and policy-version binding.
-- Preserved the invariant `hash changed != REFUTED`.
+### Post-release hardening
 
-### v0.2 — graph and recovery
-- Added deterministic DAG validation, ancestors/descendants and exact blast-radius invalidation.
-- Added selective recovery, replay/idempotency guard and provider-neutral structured events.
-- Added plain Python integration and a dependency-free Google ADK callback seam.
-- Hardened recovery so unverified unaffected state is not labeled reusable.
-- Bound reusable verification to the exact graph checkpoint payload.
-- Added path-specific re-verification requirements so unrelated invalidations do not contaminate independent branches.
-- Added explicit `NEW` semantics, duplicate evidence-ID rejection and current-evidence identity binding.
+#### #7 — signed receipts
+- Added provider-neutral signer/verifier protocols, detached signed envelopes, ACTIVE/RETIRED/REVOKED/UNKNOWN key states and optional Ed25519 implementation without unconditional crypto dependency.
+- Added wrong-key/tamper/malformed/provider-error/legacy-unsigned tests and signing security/migration docs.
+- PR #14 accepted; merged main `eb2268e34260720690eb2ee7c0e70955c1e60ddb`; exact-main CI `31993226080` SUCCESS; issue #7 closed completed.
 
-### v0.3 — public API, security, adoption and funding readiness
-- Added README, architecture, specification, threat model, security policy, contribution guide, roadmap, changelog, integration/troubleshooting docs, pre-existing-work boundary and Apache-2.0 license decision.
-- Added reproducible selective-recovery benchmark and executable golden acceptance.
-- Added Python 3.10–3.13 CI, Ruff, strict mypy, build/wheel reinstall, clean-room install, pip-audit and Bandit.
-- Pinned GitHub Actions by exact commit SHA.
-- Added Dependabot, issue templates, adoption docs and grounded funding work packages/matrix.
+#### #8 — persistence/restart
+- Added provider-neutral persistence contract, stdlib SQLite reference store, atomic checkpoint/receipt/verification/replay bundle, reverify-on-load semantics and durable replay guard.
+- Added crash injection, tamper, missing state, schema/version and restart graph/blast-radius tests.
+- PR #15 accepted; merged main `92a913c3896642c2ad67ee076d85dad5bec5bdef`; exact-main CI `31994016152` SUCCESS; issue #8 closed completed.
 
-### Merged hardening history
-- PR #1 -> `main` `6ca6ff78abf0012f4d7c216497394e9edb848bd1`: independent core candidate; exact-main CI `31968100914` SUCCESS.
-- PR #2 -> `main` `56aba73a0a5cb12b539740a3720d3629310232f6`: explicit clean-room acceptance; exact-main CI `31968333678` SUCCESS.
-- PR #3 -> `main` `c1ba29d748157001a31521f47b0358f0f29862ac`: graph-bound reusable state, receipt verification and path-specific recovery; exact-main CI `31968624967` SUCCESS.
-- PR #4 -> `main` `6317d0701a7873c4711357bd140062aac00965d1`: current evidence identity mismatch fail-closed; exact-main CI `31968785923` SUCCESS.
-- PR #5 -> `main` `f1dace847af3e2073f06e8410dc422a929823941`: release-readiness metadata, benchmark CI acceptance and modern license metadata; exact-main CI `31969049837` SUCCESS.
-- PR #6 -> `main` `ffb4aa2ed317640b76f2590c859dfc60d533be28`: PEP 561 typed distribution, project URLs, governance/citation metadata and fail-closed ADK lifecycle guidance; exact-main CI `31990753200` SUCCESS.
-- PR #10 -> `main` `4bed13c0a2b5113e7e9b90aa2b3d92a1c3d7adcd`: final pre-rename acceptance evidence sync; exact-main CI `31990950455` SUCCESS.
-- PR #11 -> `main` `9a4aa995d7cd71d14443369ced5ae6b220c5cb86`: canonical repo rename links/metadata/badges; exact-main CI `31991814352` SUCCESS.
-- PR #12 -> `main` `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`: guarded release publisher; exact-main CI `31991997448` SUCCESS.
+#### #9 — Google ADK compatibility
+- Verified current upstream `google-adk==2.7.0`; diagnosed real runtime contracts rather than relying on stale assumptions: callback is invoked via `callback_context=...`, and fresh Runner invocation requires `new_message` or resume `invocation_id`.
+- Added real credential-free BaseAgent/Runner/InMemorySessionService compatibility lane and fail-closed consequential gate. Complete lifecycle persists ALLOW/state delta; early stream close leaves verification absent/BLOCK.
+- PR #16 accepted; merged main `48c5bf8d8847bc25a9d6e0580f634d2a8b57c562`; exact-main CI `31994792165` SUCCESS; issue #9 closed completed.
 
-### v0.3.0 publication
-- Exact accepted release source: `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`.
-- Release-source CI: `31991997448` — SUCCESS.
-- Release publisher run: `31992021940` — SUCCESS.
-- `refs/tags/v0.3.0` independently fetched and verified to resolve exactly to the accepted release source.
-- GitHub Release `EvidenceBound Core v0.3.0` independently fetched and verified public, non-draft and non-prerelease.
-- Release date: 2026-08-17.
-- PyPI publication: NOT PERFORMED / NOT CLAIMED.
+#### #17 — conformance/property invariants
+- Added versioned EBCJ-1 language-neutral vectors, Python invalid-input expectations and explicit no-Unicode-normalization semantics.
+- Added dev-only deterministic Hypothesis properties for canonical ordering/round-trip, digest domain separation, CHANGED-not-REFUTED, receipt mutation and exact generated-DAG blast radius.
+- PR #18 accepted; merged main `73dcf936806c2d1f73842df01fbadb5f6b2661a3`; exact-main CI `31995166680` SUCCESS; issue #17 closed completed.
 
-### Release-source acceptance
-- Python 3.10 / 3.11 / 3.12 / 3.13: SUCCESS.
-- Python 3.13 pytest: **32 passed**.
-- Golden acceptance: PASS.
-- Synthetic benchmark: 100 full restart / 25 recompute / 75 reusable / 0 requires verification / 75 avoided.
-- Ruff: PASS.
-- strict mypy: PASS across 12 source files.
-- sdist/wheel build and reinstall/import: PASS.
-- PEP 561 `py.typed`: PASS.
-- clean-room runtime-only install/plain/golden/no-unconditional-runtime-dependency gate: PASS.
-- pip-audit and Bandit: PASS.
+#### #19 — supply-chain evidence
+- Added read-only PR build/checksum/CycloneDX validation and isolated trusted-main attestation job; PR code never receives OIDC/attestation write permissions.
+- Official `actions/attest` v4.2.2 pinned at `1e69f48acb82d1966a394da916b4c1698aa569d6`.
+- Trusted-main job rebuilds artifacts, validates SHA-256 subjects/SBOM, creates SLSA build-provenance and SBOM attestations, and emits exact hashes plus attestation IDs/URLs.
+- PR #20 accepted; merged main `f6f46d4f21d6fcb2dc53cfeb0ebe70a742a34d9c`; exact-main CI `31995557238` SUCCESS including `attest-supply-chain`; issue #19 closed completed.
+- `v0.3.0` predates this workflow and is not claimed to be retroactively attested.
 
-### Post-release consistency wave
-Branch: `agent/post-v0.3-release-sync`.
+### Current verified state before truth-sync
+- `main`: `f6f46d4f21d6fcb2dc53cfeb0ebe70a742a34d9c`.
+- exact-main CI: `31995557238` — SUCCESS.
+- published release remains `v0.3.0` → `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`.
+- PyPI: NOT PUBLISHED.
+- Independent external adopter: NOT VERIFIED.
+- External security audit: NOT PERFORMED.
 
-Scope is documentation/release-state cleanup only:
-- mark README/CHANGELOG/CITATION as released `v0.3.0`;
-- record immutable release evidence in readiness/handoff/worklog;
-- update funding readiness so a public release is no longer listed as missing;
-- remove the one-time publisher workflow to prevent future main CI runs from attempting to republish `v0.3.0`.
-
-### Grounded funding/adoption backlog
-- #7 signed receipt provider protocol and algorithm agility;
-- #8 crash-consistent SQLite persistence/restart recovery;
-- #9 maintained real Google ADK callback lifecycle compatibility CI.
-
-These issues are work packages, not claims that the capabilities already exist. Independent external adoption, external security review, cross-runtime conformance and release provenance/SBOM remain unfinished.
+### Highest-value next work
+- clean-room external-consumer package/integration fixture through public APIs only;
+- genuinely independent external integration evidence;
+- future release artifact/tag/SBOM/attestation linkage;
+- formal state-machine/model and external security review preparation.
