@@ -20,7 +20,7 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: pytest
       - run: python examples/golden_acceptance.py
-      - run: python -m compileall -q src examples benchmarks compat
+      - run: python -m compileall -q src examples benchmarks compat tools
       - if: matrix.python-version == '3.13'
         name: Run selective-recovery benchmark acceptance
         run: python benchmarks/selective_recovery.py
@@ -153,3 +153,85 @@ jobs:
           python -m pip check
       - name: Run real Google ADK lifecycle compatibility acceptance
         run: python compat/google_adk_v2_7.py
+
+  supply-chain:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - name: Install pinned supply-chain tools
+        run: python -m pip install 'build==1.5.1' 'pip-audit==2.10.1'
+      - name: Build sdist and wheel from exact checkout
+        run: python -m build
+      - name: Generate SHA-256 artifact manifest
+        run: |
+          (cd dist && sha256sum *.tar.gz *.whl | sort > SHA256SUMS)
+          cat dist/SHA256SUMS
+      - name: Generate CycloneDX runtime dependency SBOM
+        run: |
+          python -m pip_audit \
+            --strict \
+            --progress-spinner=off \
+            --format cyclonedx-json \
+            --output dist/evidencebound-core.sbom.cdx.json \
+            .
+      - name: Validate checksums, package metadata and SBOM structure
+        run: python tools/validate_supply_chain.py dist
+
+  attest-supply-chain:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: supply-chain
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - name: Install pinned supply-chain tools
+        run: python -m pip install 'build==1.5.1' 'pip-audit==2.10.1'
+      - name: Rebuild trusted main artifacts
+        run: python -m build
+      - name: Generate trusted artifact checksums
+        run: |
+          (cd dist && sha256sum *.tar.gz *.whl | sort > SHA256SUMS)
+          cat dist/SHA256SUMS
+      - name: Generate trusted CycloneDX runtime dependency SBOM
+        run: |
+          python -m pip_audit \
+            --strict \
+            --progress-spinner=off \
+            --format cyclonedx-json \
+            --output dist/evidencebound-core.sbom.cdx.json \
+            .
+      - name: Validate trusted supply-chain evidence
+        run: python tools/validate_supply_chain.py dist
+      - name: Attest SLSA build provenance
+        id: provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-checksums: dist/SHA256SUMS
+      - name: Attest CycloneDX SBOM
+        id: sbom
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-checksums: dist/SHA256SUMS
+          sbom-path: dist/evidencebound-core.sbom.cdx.json
+      - name: Report attestation evidence
+        run: |
+          echo "PROVENANCE_ATTESTATION_ID=${{ steps.provenance.outputs.attestation-id }}"
+          echo "PROVENANCE_ATTESTATION_URL=${{ steps.provenance.outputs.attestation-url }}"
+          echo "SBOM_ATTESTATION_ID=${{ steps.sbom.outputs.attestation-id }}"
+          echo "SBOM_ATTESTATION_URL=${{ steps.sbom.outputs.attestation-url }}"

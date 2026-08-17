@@ -17,7 +17,9 @@ All notable changes are documented here. The project follows Semantic Versioning
 - pinned real-framework compatibility CI for `google-adk==2.7.0` on Python 3.13 using real `BaseAgent`, `Runner`, runtime keyword callback invocation/name enforcement, event streaming and `InMemorySessionService` without model/cloud credentials;
 - dependency-free `adk_consequential_action_allowed()` application gate that requires explicit serialized EvidenceBound `ALLOW` callback state;
 - versioned EBCJ-1 language-neutral canonicalization/digest conformance vectors and Python invalid-input expectations;
-- bounded, deterministic Hypothesis property tests for canonicalization ordering/round-trip stability, digest domain separation, changed-evidence semantics, retained-receipt tamper detection, and exact generated-DAG blast radius.
+- bounded, deterministic Hypothesis property tests for canonicalization ordering/round-trip stability, digest domain separation, changed-evidence semantics, retained-receipt tamper detection, and exact generated-DAG blast radius;
+- CI-built sdist/wheel SHA-256 manifest and CycloneDX runtime-dependency SBOM validation;
+- trusted-`main` GitHub/Sigstore SLSA build-provenance and SBOM attestations using `actions/attest` pinned by exact commit SHA.
 
 ### Hardened
 - legacy unsigned receipts remain distinguishable as `UNSIGNED` and are never silently upgraded to authenticated trust;
@@ -30,7 +32,9 @@ All notable changes are documented here. The project follows Semantic Versioning
 - fresh ADK v2.7.0 runner invocations in the compatibility lane satisfy the upstream `new_message` requirement with a synthetic user message and still perform no model/provider/network call;
 - `google-adk` remains isolated from EvidenceBound runtime dependencies and Core imports;
 - EBCJ-1 explicitly preserves Unicode code-point sequences without normalization; composed/decomposed fixtures remain intentionally distinct;
-- property-testing tooling is dev-only and does not change the zero-unconditional-runtime-dependency contract.
+- property-testing tooling is dev-only and does not change the zero-unconditional-runtime-dependency contract;
+- attestation-capable OIDC/write permissions are isolated from pull-request validation and exist only in the trusted `main`-push job;
+- the already-published `v0.3.0` release is explicitly excluded from retroactive provenance/SBOM-attestation claims.
 
 ## [0.3.0] - 2026-08-17
 
