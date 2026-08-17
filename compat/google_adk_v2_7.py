@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import traceback
 from collections.abc import AsyncGenerator
 from importlib.metadata import version
 from typing import Any
@@ -60,24 +61,42 @@ def make_adapter() -> AdkCallbackAdapter:
 def make_agent(adapter: AdkCallbackAdapter) -> SyntheticAgent:
     parameters = tuple(inspect.signature(adapter.after_agent).parameters)
     assert parameters == ("callback_context",), parameters
-
-    # Construction exercises ADK's real callback signature validator. v2.7.0
-    # requires the callback parameter to be named exactly ``callback_context``.
     return SyntheticAgent(
         name="synthetic_agent",
         after_agent_callback=adapter.after_agent,
     )
 
 
-def assert_upstream_rejects_wrong_callback_name() -> None:
+async def wrong_callback_name_fails_real_lifecycle() -> None:
     def wrong_name(context: Any) -> None:
         del context
 
+    sessions = InMemorySessionService()
+    await sessions.create_session(
+        app_name=APP_NAME,
+        user_id=USER_ID,
+        session_id="wrong-callback-name",
+    )
+    runner = Runner(
+        app_name=APP_NAME,
+        agent=SyntheticAgent(
+            name="invalid_callback_agent",
+            after_agent_callback=wrong_name,
+        ),
+        session_service=sessions,
+    )
     try:
-        SyntheticAgent(name="invalid_callback_agent", after_agent_callback=wrong_name)
-    except ValueError:
+        async for _event in runner.run_async(
+            user_id=USER_ID,
+            session_id="wrong-callback-name",
+        ):
+            pass
+    except TypeError as exc:
+        assert "callback_context" in str(exc), str(exc)
         return
-    raise AssertionError("Google ADK accepted an after_agent_callback without callback_context")
+    raise AssertionError(
+        "Google ADK lifecycle accepted an after_agent_callback without callback_context"
+    )
 
 
 async def make_runner(
@@ -190,12 +209,28 @@ async def main() -> None:
         f"compatibility lane expected google-adk {EXPECTED_ADK_VERSION}, got {installed}"
     )
     print(f"GOOGLE_ADK_VERSION={installed}")
-    assert_upstream_rejects_wrong_callback_name()
+    await wrong_callback_name_fails_real_lifecycle()
+    print("ADK_CALLBACK_NAME_ENFORCEMENT_PASS")
     await completed_lifecycle_is_allowed()
+    print("ADK_COMPLETED_LIFECYCLE_PASS")
     await completed_lifecycle_emits_verification_state_event()
+    print("ADK_STATE_DELTA_PASS")
     await early_stopped_lifecycle_is_blocked()
+    print("ADK_EARLY_STOP_BLOCK_PASS")
     print("GOOGLE_ADK_COMPAT_PASS")
 
 
+def _github_error_annotation(detail: str) -> str:
+    return detail.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception:
+        detail = traceback.format_exc()
+        print(
+            "::error title=Google ADK compatibility failure::"
+            + _github_error_annotation(detail)
+        )
+        raise
