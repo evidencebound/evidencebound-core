@@ -38,6 +38,91 @@ def test_nhtsa_1027_end_to_end_matches_expected_catalog_scenario() -> None:
     assert result.matches[0].catalog_id == fixture.expected_catalog_id
     assert result.graph.assess_field("light_condition").decision is FieldDecision.VERIFIED
     assert result.graph.assess_field("vehicle_speed_kph").decision is FieldDecision.VERIFIED
+    assert result.graph.assess_field("kinematic_coherence").decision is FieldDecision.VERIFIED
+
+
+def test_baseline_kinematic_gate_is_float_free_and_reproducible() -> None:
+    result = run_pipeline(_fixture("nhtsa_vicis_991.json"))
+
+    gate = result.receipt["body"]["kinematic_gate"]
+    details = gate["details"]
+
+    assert gate["decision"] == "VERIFIED"
+    assert details["expected_reveal_time_millis"] == 3240
+    assert details["observed_reveal_time_millis"] == 3000
+    assert details["deviation_milli"] == 74
+    assert details["policy_id"] == "spark-kinematic-coherence/0.1"
+
+
+def test_kinematic_review_zone_is_explicit() -> None:
+    fixture = _fixture("nhtsa_vicis_991.json").with_value(
+        "kinematics",
+        "calculated_reveal_time_millis",
+        4300,
+        label="review-zone",
+    )
+
+    result = run_pipeline(fixture)
+    assessment = result.graph.assess_field("kinematic_coherence")
+
+    assert assessment.decision is FieldDecision.REVIEW_REQUIRED
+    assert assessment.reasons == (
+        "validation_warning=constant_speed_time_deviation_milli=327>250",
+    )
+
+
+def test_kinematic_incoherence_is_blocked_before_export_trust() -> None:
+    fixture = _fixture("nhtsa_vicis_991.json").with_value(
+        "kinematics",
+        "calculated_reveal_time_millis",
+        500,
+        label="collapse",
+    )
+
+    result = run_pipeline(fixture)
+    assessment = result.graph.assess_field("kinematic_coherence")
+
+    assert assessment.decision is FieldDecision.BLOCKED
+    assert assessment.reasons == (
+        "validation_error=constant_speed_time_deviation_milli=845>500",
+    )
+    assert 'name="eb_verification" parameterType="string" value="BLOCKED"' in (
+        result.openscenario.xml
+    )
+
+
+def test_non_positive_speed_is_blocked_by_kinematic_gate() -> None:
+    fixture = _fixture("nhtsa_vicis_1027.json").with_value(
+        "kinematics",
+        "pre_event_speed_kph",
+        0,
+        label="zero-speed",
+    )
+
+    result = run_pipeline(fixture)
+
+    assert (
+        result.graph.assess_field("kinematic_coherence").decision
+        is FieldDecision.BLOCKED
+    )
+    assert (
+        "validation_error=non_positive_vehicle_speed_kph"
+        in result.graph.assess_field("kinematic_coherence").reasons
+    )
+
+
+def test_missing_kinematics_requires_review_not_completion() -> None:
+    fixture = _fixture("nhtsa_vicis_1027.json").without_evidence("kinematics")
+
+    result = run_pipeline(fixture)
+
+    assert result.graph.fields["vehicle_speed_kph"].value is None
+    assert result.graph.fields["detection_distance_m"].value is None
+    assert result.graph.fields["reveal_time_millis"].value is None
+    assert (
+        result.graph.assess_field("kinematic_coherence").decision
+        is FieldDecision.REVIEW_REQUIRED
+    )
 
 
 def test_missing_environment_is_explicit_not_hallucinated() -> None:
@@ -67,6 +152,23 @@ def test_visibility_change_recomputes_only_dependent_branch() -> None:
     assert recovery.recompute_fields == ("catalog_match_top1", "obstruction_context")
     assert "functional_label" in recovery.preserve_fields
     assert "vehicle_speed_kph" in recovery.preserve_fields
+    assert "kinematic_coherence" in recovery.preserve_fields
+
+
+def test_kinematic_change_recomputes_coherence_gate_but_not_unrelated_fields() -> None:
+    fixture = _fixture("nhtsa_vicis_991.json")
+    result = run_pipeline(fixture)
+
+    recovery = result.graph.plan_recovery({"kinematics"})
+
+    assert recovery.recompute_fields == (
+        "detection_distance_m",
+        "kinematic_coherence",
+        "reveal_time_millis",
+        "vehicle_speed_kph",
+    )
+    assert "functional_label" in recovery.preserve_fields
+    assert "obstruction_context" in recovery.preserve_fields
 
 
 def test_public_fixture_payloads_exclude_sensitive_person_fields() -> None:
