@@ -17,6 +17,14 @@ from .models import (
     ProvenanceRecord,
     VerificationResult,
 )
+from .persistence import (
+    PERSISTED_RECORD_VERSION,
+    PERSISTENCE_SCHEMA_VERSION,
+    PersistenceError,
+    PersistenceIntegrityError,
+    PersistenceStore,
+    UnsupportedPersistenceSchema,
+)
 from .recovery import RecoveryPlan, action_after_recovery, plan_recovery
 from .replay import ReplayConflict, ReplayGuard, ReplayStatus
 from .signing import (
@@ -61,6 +69,11 @@ __all__ = [
     "KeyState",
     "ListEventSink",
     "NullEventSink",
+    "PERSISTED_RECORD_VERSION",
+    "PERSISTENCE_SCHEMA_VERSION",
+    "PersistenceError",
+    "PersistenceIntegrityError",
+    "PersistenceStore",
     "PolicyBinding",
     "ProofReceipt",
     "ProvenanceRecord",
@@ -75,6 +88,7 @@ __all__ = [
     "SignedProofReceipt",
     "SignedReceiptStatus",
     "SignedReceiptVerification",
+    "UnsupportedPersistenceSchema",
     "VerificationResult",
     "action_after_recovery",
     "canonical_bytes",

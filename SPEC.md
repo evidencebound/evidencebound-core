@@ -106,8 +106,62 @@ A consequential action remains blocked until every path-specific required checkp
 
 ## 8. Replay
 
-`ReplayGuard` associates an operation ID with one payload digest. First observation is `APPLIED`; equal replay is `ALREADY_APPLIED`; same ID with different payload is a conflict. This is an in-process idempotency guard, not an exactly-once distributed execution guarantee.
+`ReplayGuard` associates an operation ID with one payload digest. First observation is `APPLIED`; equal replay is `ALREADY_APPLIED`; same ID with different payload is a conflict. The base guard is in-process only.
 
-## 9. Versioning boundary
+A persistence provider MAY implement the same semantics durably. `SQLiteReplayGuard` stores the existing `operation` domain digest so duplicate/conflict behavior survives process restart. This remains an idempotency primitive, not an exactly-once distributed execution guarantee.
 
-`0.x` releases are alpha/pre-1.0. Public imports are curated, but compatibility changes remain possible when documented. Canonicalization, receipt-version, and signed-envelope-version changes require explicit version changes rather than silent reinterpretation of historical records.
+## 9. Persistence
+
+`PersistenceStore` is the provider-neutral durability contract. Persisted state MUST NOT be treated as trusted solely because it exists in storage.
+
+### 9.1 Persisted bundle
+
+A persistence implementation that stores verification state for reuse MUST preserve the logical relationship between:
+
+- checkpoint;
+- proof receipt;
+- verification state;
+- optional replay/idempotency record associated with the checkpoint operation.
+
+Before a `VerificationResult` is accepted for persistence, its receipt MUST verify against the exact checkpoint being stored.
+
+On load, a persistence implementation MUST reconstruct the stored checkpoint, receipt and verification state and verify the result binding again before returning verification state for recovery/reuse. Missing or malformed trust-bearing records MUST fail closed.
+
+### 9.2 SQLite reference provider
+
+The version-1 SQLite provider uses:
+
+- persistence schema version `1`;
+- individual record version `1`;
+- explicit SQLite transactions for bundle writes;
+- foreign-key enforcement;
+- deterministic canonical JSON text for structured records;
+- `synchronous=FULL` and WAL for file-backed stores.
+
+Checkpoint, receipt, verification and optional replay rows are committed in one transaction. An injected failure before commit MUST leave no partial bundle visible after reopen. A failure after commit MAY leave the complete bundle durable; that bundle still MUST pass receipt/result binding verification when loaded.
+
+An existing replay record does not by itself authorize a repeated bundle. For a same-payload duplicate, the stored checkpoint, receipt and verification payloads MUST exactly match the intended bundle; otherwise replay fails as a persistence integrity error.
+
+### 9.3 Reconstruction
+
+`load_checkpoint()` reconstructs stored data only and MUST NOT be interpreted as a trust decision.
+
+`load_graph()` reconstructs all stored checkpoints and runs normal dependency-graph validation. Invalid IDs, missing dependencies and cycles fail closed.
+
+`load_verification()` returns a persisted verification result only after deterministic receipt/result binding succeeds against the exact loaded checkpoint.
+
+`load_recovery_state()` returns a graph plus verified persisted results. The reference SQLite provider requires complete valid verification state for every persisted checkpoint; it does not silently omit corrupted verification rows.
+
+### 9.4 Schema evolution
+
+Unknown persistence schema versions or record versions MUST fail closed. The alpha version-1 provider does not silently auto-migrate unknown trust-bearing schemas. A future migration mechanism must be explicit, versioned and tested for semantic preservation.
+
+### 9.5 Security boundary
+
+SQLite is not claimed immutable or authenticated. The reference provider protects transactional consistency under its supported failure model and detects persisted modifications when EvidenceBound receipt/result binding no longer matches. If an attacker can consistently replace checkpoint and receipt/trust-root state together, applications need an independent receipt anchor and/or signed receipts with independently protected verification roots.
+
+See `docs/PERSISTENCE.md` and `THREAT_MODEL.md`.
+
+## 10. Versioning boundary
+
+`0.x` releases are alpha/pre-1.0. Public imports are curated, but compatibility changes remain possible when documented. Canonicalization, receipt-version, signed-envelope-version and persistence-schema changes require explicit version changes rather than silent reinterpretation of historical records.
