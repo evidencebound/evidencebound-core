@@ -42,9 +42,9 @@ EvidenceBound ScenarioGraph addresses the challenge’s core bottleneck: turning
 
 ### Quantifiable Outcomes
 
-**Characters:** 953 / 1500
+**Characters:** 1018 / 1500
 
-Measured SPARK baseline: a reproducible CI benchmark over 2 sanitized public NHTSA VICIS cases plus 2 controlled adversarial mutations produced 100% evidence coverage for asserted material fields, 0% unsupported assertions, 100% explicit uncertainty for unknown fields, 100% Functional Scenario label accuracy, Recall@1=100% and MRR=1.0 on the small controlled validation catalogue, 100% receipt reproduction, and 100% precision/recall for the controlled dependency-invalidation test. Receipt SHA-256: f751a951ba5d1c97a46528e378ec9a9089e8b5581cfea5a81b38578826f18ed0. These are fixture-level results, not automotive production accuracy. Advance targets: ≥95% evidence coverage, <2% unsupported assertions, macro-F1 ≥0.80 for scenario taxonomy, ≥0.80 logical-attribute completeness/correctness, Recall@5 ≥0.90, calibrated uncertainty, reproducible containerized evaluation, and measured runtime/cost per 1,000 records on broader Challenge Owner datasets.
+Measured SPARK baseline: a reproducible CI benchmark over 2 sanitized public NHTSA VICIS cases plus 9 controlled adversarial mutations produced 100% evidence coverage for asserted material fields, 0% unsupported assertions, 100% explicit uncertainty for unknown fields, 100% Functional Scenario label accuracy, Recall@1=100% and MRR=1.0 on the small controlled catalogue, 100% receipt reproduction, 100% exact changed-evidence detection, and 100% selective-recovery precision/recall plus unrelated-field preservation. Both generated .xosc artifacts pass the official ASAM OpenSCENARIO XML 1.4.0 XSD in CI. Receipt SHA-256: 2358c4db90bf2314daeebfcb824df913f9195d33a83cdad8b9f1ea21fba20a5f. These are controlled-fixture results, not automotive production accuracy. Advance targets: ≥95% evidence coverage, <2% unsupported assertions, macro-F1 ≥0.80, logical-attribute completeness/correctness ≥0.80, Recall@5 ≥0.90, calibrated uncertainty, and measured runtime/cost per 1,000 records on broader Challenge Owner datasets.
 
 ### Innovation & Novelty
 
@@ -54,9 +54,9 @@ Most GenAI scenario pipelines optimize extraction or generation quality and add 
 
 ### Technology Readiness
 
-**Characters:** 967 / 1500
+**Characters:** 1185 / 1500
 
-EvidenceBound Core is pre-existing Apache-2.0 background technology with working deterministic verification, provenance-bound state, dependency blast-radius analysis and selective recovery. Public reference implementations demonstrate these primitives in multi-agent recovery, governed data actions and verified memory. The Challenge 4 foreground is now at TRL 3: the SPARK vertical slice ingests sanitized public NHTSA crash cases, creates evidence-bound Functional/Logical Scenario state, performs validation-catalog matching, exposes an ASAM OpenSCENARIO XML 1.4 structural export seam, handles missing evidence fail-closed, and retains a reproducible benchmark receipt. During Advance we will integrate Challenge Owner datasets, schema-constrained LLM/VLM extraction, multimodal enrichment, broader matching benchmarks, uncertainty/physics constraints and XSD validation. Goal: TRL 5 prototype validated in a relevant automotive-safety workflow, not homologation.
+EvidenceBound Core is pre-existing Apache-2.0 background technology with working deterministic verification, provenance-bound state, dependency blast-radius analysis and selective recovery. Public reference implementations demonstrate these primitives in multi-agent recovery, governed data actions and verified memory. The Challenge 4 foreground is now at TRL 3: the SPARK vertical slice ingests sanitized public NHTSA crash cases, creates evidence-bound Functional/Logical Scenario state, performs validation-catalog matching, detects exact evidence changes, computes preserve/recompute recovery sets, and exports ASAM OpenSCENARIO XML 1.4 documents validated in CI against the official 1.4.0 XSD. A strict recorded-GenAI candidate boundary also proves that invented evidence references are deterministically BLOCKED. The retained benchmark covers 2 public cases plus 9 controlled mutations. During Advance we will integrate Challenge Owner datasets, real schema-constrained LLM/VLM extraction, multimodal enrichment, broader matching benchmarks and stronger uncertainty/physics constraints. Goal: TRL 5 prototype validated in a relevant automotive-safety workflow, not homologation.
 
 ### AI Technology & Justification
 
@@ -72,9 +72,9 @@ Trustworthiness is enforced at runtime, not added as a report after generation. 
 
 ### Ethics & Data Governance
 
-**Characters:** 1029 / 1500
+**Characters:** 1142 / 1500
 
-The SPARK prototype applies data minimization by retaining only scenario-relevant geometry, movement, environment, visibility and kinematic fields from public NHTSA cases; demographics, injury/medical, alcohol/drug and other sensitive person data are excluded. During Advance, data will be used only where public, licensed, organizer-provided or otherwise authorized. Dataset source, access/license context, transformations and integrity hashes will be recorded. Personal or sensitive accident data will not be transmitted to external AI services; where such data is required, processing will follow the applicable controller instructions, lawful basis, GDPR safeguards and an approved local/private path. Missing demographic/contextual values will not be inferred without evidence. Bias and representativeness will be assessed across source datasets, regions and scenario classes. External models/APIs/cloud services will be disclosed. Outputs are engineering validation aids, not legal, certification or homologation decisions.
+The SPARK prototype applies data minimisation by retaining only scenario-relevant geometry, movement, environment, visibility and kinematic fields from public NHTSA cases; demographics, injury/medical, alcohol/drug and other sensitive person data are explicitly excluded in both fixtures and receipts. This is data-minimisation by design, aligned with the GDPR data-minimisation principle; it is not presented as blanket GDPR compliance. During Advance, data will be used only where public, licensed, organizer-provided or otherwise authorized. Dataset source, access/license context, transformations and integrity hashes will be recorded. Personal or sensitive accident data will not be transmitted to external AI services; where such data is required, processing will follow applicable controller instructions, lawful basis, safeguards and an approved local/private path. Missing demographic/contextual values will not be inferred without evidence. Bias and representativeness will be assessed across source datasets, regions and scenario classes. Outputs are engineering validation aids, not legal, certification or homologation decisions.
 
 ## IMPACT
 
@@ -106,17 +106,17 @@ The immediate exploitation path is technical collaboration with Siemens Industry
 
 ### Work Plan (Advance Phase)
 
-**Characters:** 1816 / 3000
+**Characters:** 1956 / 3000
 
-SPARK starting point: a green-CI TRL-3 vertical slice over two sanitized public NHTSA VICIS cases, with evidence-bound Functional/Logical Scenario state, deterministic catalog matching, exact dependency invalidation/recovery, an OpenSCENARIO XML 1.4 structural export seam, two adversarial missing/change-evidence tests and a retained benchmark receipt.
+SPARK starting point: a green-CI TRL-3 vertical slice over two sanitized public NHTSA VICIS cases, with evidence-bound Functional/Logical Scenario state, deterministic catalog matching, exact evidence-change detection and selective recovery, a strict GenAI candidate trust boundary, 9 controlled adversarial mutations, a retained content-addressed benchmark receipt, and generated ASAM OpenSCENARIO XML 1.4 artifacts validated against the official 1.4.0 XSD in CI.
 
-Month 1 — Data & taxonomy: integrate representative Challenge Owner/open datasets; implement versioned ingestion adapters, source-addressed evidence packs, common Functional Scenario taxonomy mapping and labelled evaluation subsets. Add schema-constrained LLM extraction beside the deterministic baseline.
+Month 1 — Data & taxonomy: integrate representative Challenge Owner/open datasets; implement versioned ingestion adapters, source-addressed evidence packs, common Functional Scenario taxonomy mapping and labelled evaluation subsets. Add live schema-constrained LLM/VLM extraction beside the deterministic baseline.
 
 Month 2 — Multimodal Logical Scenario enrichment: link text/images/maps/context where available; extract parameter ranges with field-level uncertainty and conflict provenance; benchmark completeness/correctness and uncertainty calibration.
 
 Month 3 — Matching & coverage: implement hybrid semantic + structured matching to validation catalogues, measure Recall@K/MRR and coverage-gap usefulness, and validate dependency-aware invalidation/selective recovery at larger scale.
 
-Month 4 — Simulation readiness: add stronger physical/kinematic consistency gates, complete common Structured Scenario Representation, validate ASAM OpenSCENARIO export against the applicable schema, and add visualization/simulation integration where practical.
+Month 4 — Simulation readiness: add stronger physical/kinematic consistency gates, complete the common Structured Scenario Representation, enrich XSD-valid OpenSCENARIO exports with simulation-relevant entities/actions, and add visualization/simulation integration where practical.
 
 Month 5 — TRL-5 validation: run heterogeneous holdout/adversarial suites, optimize runtime/cost, document failure modes, validate with Challenge Owner experts, freeze reproducible container/environment, final algorithm, benchmark report and live demo.
 
@@ -134,13 +134,13 @@ No CINECA allocation is requested for SPARK/initial Advance planning. The curren
 
 ### Team Credentials & Expertise
 
-**Words:** 299 / 1750
+**Words:** 322 / 1750
 
 Ruslan Vrublevskyi is the creator and maintainer of EvidenceBound Core, an Apache-2.0 framework-agnostic Python runtime for evidence/provenance-bound state, deterministic verification, dependency blast-radius analysis and fail-closed selective recovery. The public core includes architecture and threat-model documentation, deterministic canonicalization, persistence/replay and signing seams, interoperability/conformance work, CI across Python 3.10–3.13, security checks and supply-chain/release evidence.
 
 Public reference implementations demonstrate the same trust primitives across different AI/cloud environments. EvidenceBound Recovery Mesh uses Google ADK, Gemini/Vertex AI and Cloud Run to demonstrate controlled trust-break propagation, exact downstream blast radius and selective recomputation. EvidenceBound DataHub Gate binds DataHub MCP metadata to governed actions, restricted execution and tamper-evident Proof Packs with a signing/verification path. EvidenceBound Verified Memory uses CockroachDB and AWS to persist canonical decision snapshots, reconstruct historical integrity and separately determine current applicability.
 
-For AI-BOOST Challenge 4, a new foreground workstream is already implemented in a public draft branch/PR. The SPARK ScenarioGraph vertical slice uses sanitized official NHTSA VICIS crash cases, source-addressed evidence, typed Functional and Logical Scenario fields, explicit uncertainty, deterministic validation-catalog matching, exact dependency invalidation/selective recovery and an ASAM OpenSCENARIO XML 1.4 structural export seam. A dedicated GitHub Actions benchmark reproduces the retained baseline receipt; the normal repository CI is green across Python 3.10–3.13, including pytest, Ruff, Mypy, security and build checks.
+For AI-BOOST Challenge 4, a new foreground workstream is already implemented in a public draft branch/PR. The SPARK ScenarioGraph vertical slice uses sanitized official NHTSA VICIS crash cases, source-addressed evidence, typed Functional and Logical Scenario fields, explicit uncertainty, deterministic validation-catalog matching, exact evidence-change detection and selective recovery. A strict recorded-GenAI boundary demonstrates that invented evidence references are blocked by the deterministic trust gate. The retained benchmark covers 2 public cases plus 9 controlled adversarial mutations, and generated ASAM OpenSCENARIO XML 1.4 artifacts pass the official 1.4.0 XSD in dedicated CI. The normal repository CI covers Python 3.10–3.13, pytest, Ruff, Mypy, security and build checks.
 
 Technical experience spans Python, TypeScript, Next.js, FastAPI, PostgreSQL/CockroachDB, AWS, Google Cloud, Docker, GitHub Actions, OIDC/WIF, MCP and agent orchestration. The project approach emphasizes narrow claims, reproducible acceptance, fail-closed execution and explicit separation between model-generated candidates and deterministic trust decisions.
 
@@ -172,13 +172,15 @@ Use these if the live F6S form provides project/demo/repository/supporting-link 
 - Institutional project site: https://evidencebound.org
 - EvidenceBound Core: https://github.com/moneyparking/evidencebound-core
 - AI-BOOST SPARK workstream / draft PR: https://github.com/moneyparking/evidencebound-core/pull/26
+- Judge-facing SPARK evidence index: https://github.com/moneyparking/evidencebound-core/blob/ai-boost-challenge-4/docs/applications/ai-boost-challenge-4/SPARK_EVIDENCE.md
 - Retained benchmark baseline: https://github.com/moneyparking/evidencebound-core/blob/ai-boost-challenge-4/benchmarks/ai_boost_challenge4/BASELINE.json
 - Reproduction instructions: https://github.com/moneyparking/evidencebound-core/blob/ai-boost-challenge-4/benchmarks/ai_boost_challenge4/README.md
 
 ## SUBMISSION SAFETY NOTES
 
-- The measured 100% values are explicitly scoped to **2 sanitized public NHTSA VICIS cases + 2 controlled adversarial mutations**. Never restate them as general automotive accuracy.
-- Current Functional Scenario benchmark extraction is a deterministic coded-record baseline. The architecture contains a provider seam for schema-constrained LLM/VLM extraction; actual GenAI benchmark performance is not yet claimed.
-- Current ASAM OpenSCENARIO XML 1.4 output is a structural export seam and is explicitly **not yet XSD validated**.
+- The measured 100% values are explicitly scoped to **2 sanitized public NHTSA VICIS cases + 9 controlled adversarial mutations**. Never restate them as general automotive accuracy.
+- Current Functional Scenario benchmark extraction is a deterministic coded-record baseline. The architecture also contains a strict provider seam for schema-constrained LLM/VLM extraction; actual live GenAI benchmark performance is not yet claimed.
+- Generated ASAM OpenSCENARIO XML 1.4 artifacts pass the official **1.4.0 XSD** in dedicated CI. This is XML schema acceptance, not simulator-behavior validation, production-safety evidence, homologation or certification.
+- Data minimisation is implemented and explicitly recorded; do not turn this into a blanket claim that the full system is “GDPR compliant”.
 - EvidenceBound Core and pre-existing reference implementations are Background IP. Challenge 4 domain adapters, benchmark integration and scenario pipeline are proposed Foreground.
 - Submit one deliberate proposal only. If multiple proposals are submitted, the competition rules state only the last timestamped proposal is evaluated.
