@@ -1,10 +1,18 @@
 {
-  "schema": "evidencebound-ai-boost-crash-fixture/0.1",
+  "schema": "evidencebound-ai-boost-crash-fixture/0.2",
   "case_id": "NHTSA-VICIS-1027",
   "dataset": "NHTSA VICIS / CIREN Crash Viewer",
   "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=1027&Study=CIRENVICIS",
   "source_accessed": "2026-08-17",
   "privacy": "Scenario-only extract. Demographics, medical/injury, substance-use and other sensitive person data are intentionally excluded.",
+  "excluded_data_categories": [
+    "demographics",
+    "medical",
+    "injuries",
+    "alcohol",
+    "drugs",
+    "other_sensitive_person_data"
+  ],
   "evidence": [
     {
       "id": "crash_classification",
