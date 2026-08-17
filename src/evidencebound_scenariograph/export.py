@@ -7,7 +7,7 @@ structure. CI validates generated artifacts against the official ASAM 1.4.0 XSD.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 from .model import FieldDecision, ScenarioGraph
 
@@ -32,8 +32,8 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
     )
     verification = "BLOCKED" if blocked else "REVIEW_REQUIRED" if review else "VERIFIED"
 
-    root = ET.Element("OpenSCENARIO")
-    ET.SubElement(
+    root = Element("OpenSCENARIO")
+    SubElement(
         root,
         "FileHeader",
         {
@@ -44,7 +44,7 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
             "author": "EvidenceBound ScenarioGraph",
         },
     )
-    declarations = ET.SubElement(root, "ParameterDeclarations")
+    declarations = SubElement(root, "ParameterDeclarations")
     values = {
         "eb_case_id": case_id,
         "eb_functional_label": str(graph.fields["functional_label"].value),
@@ -52,18 +52,18 @@ def export_openscenario_14(graph: ScenarioGraph, *, case_id: str) -> OpenScenari
         "eb_export_conformance": XOSC_CONFORMANCE,
     }
     for name, value in sorted(values.items()):
-        ET.SubElement(
+        SubElement(
             declarations,
             "ParameterDeclaration",
             {"name": name, "parameterType": "string", "value": value},
         )
 
-    ET.SubElement(root, "CatalogLocations")
-    ET.SubElement(root, "RoadNetwork")
-    ET.SubElement(root, "Entities")
-    storyboard = ET.SubElement(root, "Storyboard")
-    init = ET.SubElement(storyboard, "Init")
-    ET.SubElement(init, "Actions")
-    ET.SubElement(storyboard, "StopTrigger")
-    xml = ET.tostring(root, encoding="unicode", short_empty_elements=True)
+    SubElement(root, "CatalogLocations")
+    SubElement(root, "RoadNetwork")
+    SubElement(root, "Entities")
+    storyboard = SubElement(root, "Storyboard")
+    init = SubElement(storyboard, "Init")
+    SubElement(init, "Actions")
+    SubElement(storyboard, "StopTrigger")
+    xml = tostring(root, encoding="unicode", short_empty_elements=True)
     return OpenScenarioArtifact(xml=xml)
