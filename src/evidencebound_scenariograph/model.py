@@ -48,6 +48,9 @@ class ScenarioField:
 
     ``uncertainty_milli`` is an integer in [0, 1000]. This keeps receipts inside
     EvidenceBound EBCJ-1's intentionally float-free deterministic domain.
+
+    ``validation_errors`` and ``validation_warnings`` are deterministic gate outputs.
+    Errors force BLOCKED; warnings force REVIEW_REQUIRED after dependency checks.
     """
 
     field_id: str
@@ -56,12 +59,18 @@ class ScenarioField:
     uncertainty_milli: int = 0
     material: bool = True
     depends_on_fields: tuple[str, ...] = ()
+    validation_errors: tuple[str, ...] = ()
+    validation_warnings: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.field_id:
             raise ValueError("field_id must not be empty")
         if not 0 <= self.uncertainty_milli <= 1000:
             raise ValueError("uncertainty_milli must be between 0 and 1000")
+        if any(not reason for reason in self.validation_errors):
+            raise ValueError("validation_errors must not contain empty reasons")
+        if any(not reason for reason in self.validation_warnings):
+            raise ValueError("validation_warnings must not contain empty reasons")
 
 
 @dataclass(frozen=True)
@@ -143,20 +152,6 @@ class ScenarioGraph:
                 reasons=tuple(reasons),
             )
 
-        if scenario_field.value is None:
-            return FieldAssessment(
-                field_id=field_id,
-                decision=FieldDecision.REVIEW_REQUIRED,
-                reasons=("value_unknown",),
-            )
-
-        if scenario_field.uncertainty_milli >= self.review_threshold_milli:
-            return FieldAssessment(
-                field_id=field_id,
-                decision=FieldDecision.REVIEW_REQUIRED,
-                reasons=(f"uncertainty_milli={scenario_field.uncertainty_milli}",),
-            )
-
         dependency_assessments = [
             self._assess_field(dependency, active=(*active, field_id))
             for dependency in scenario_field.depends_on_fields
@@ -167,6 +162,16 @@ class ScenarioGraph:
                 decision=FieldDecision.BLOCKED,
                 reasons=("blocked_dependency",),
             )
+
+        if scenario_field.validation_errors:
+            return FieldAssessment(
+                field_id=field_id,
+                decision=FieldDecision.BLOCKED,
+                reasons=tuple(
+                    f"validation_error={reason}" for reason in scenario_field.validation_errors
+                ),
+            )
+
         if any(
             item.decision is FieldDecision.REVIEW_REQUIRED
             for item in dependency_assessments
@@ -175,6 +180,30 @@ class ScenarioGraph:
                 field_id=field_id,
                 decision=FieldDecision.REVIEW_REQUIRED,
                 reasons=("dependency_requires_review",),
+            )
+
+        if scenario_field.value is None:
+            return FieldAssessment(
+                field_id=field_id,
+                decision=FieldDecision.REVIEW_REQUIRED,
+                reasons=("value_unknown",),
+            )
+
+        if scenario_field.validation_warnings:
+            return FieldAssessment(
+                field_id=field_id,
+                decision=FieldDecision.REVIEW_REQUIRED,
+                reasons=tuple(
+                    f"validation_warning={reason}"
+                    for reason in scenario_field.validation_warnings
+                ),
+            )
+
+        if scenario_field.uncertainty_milli >= self.review_threshold_milli:
+            return FieldAssessment(
+                field_id=field_id,
+                decision=FieldDecision.REVIEW_REQUIRED,
+                reasons=(f"uncertainty_milli={scenario_field.uncertainty_milli}",),
             )
 
         return FieldAssessment(
@@ -224,7 +253,7 @@ class ScenarioGraph:
         assessments = self.assessments()
         recovery = self.plan_recovery(changed)
         body: dict[str, Any] = {
-            "schema": "evidencebound-scenariograph-receipt/0.2",
+            "schema": "evidencebound-scenariograph-receipt/0.3",
             "review_threshold_milli": self.review_threshold_milli,
             "evidence": [
                 {
@@ -243,6 +272,8 @@ class ScenarioGraph:
                     "uncertainty_milli": item.uncertainty_milli,
                     "material": item.material,
                     "depends_on_fields": list(item.depends_on_fields),
+                    "validation_errors": list(item.validation_errors),
+                    "validation_warnings": list(item.validation_warnings),
                     "decision": assessments[item.field_id].decision.value,
                     "reasons": list(assessments[item.field_id].reasons),
                 }
