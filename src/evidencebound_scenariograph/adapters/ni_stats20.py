@@ -7,8 +7,9 @@ Data Guide; no missing code or missing associated-vehicle row is silently comple
 """
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 DATASET_ID = "psni-ni-injury-rtc-2024"
 DATA_GUIDE_URL = (
@@ -310,7 +311,7 @@ def normalize_ni_stats20_case(
         *,
         conditional_slight: bool = False,
     ) -> None:
-        if conditional_slight and slight_collision and (raw is None or raw == ""):
+        if conditional_slight and slight_collision and _code(raw) is None:
             values[name] = "not_recorded_for_slight_collision"
             provenance[name] = (source, "collision.a_type", DATA_GUIDE_URL)
             uncertain.add(name)
