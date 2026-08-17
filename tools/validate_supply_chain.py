@@ -78,7 +78,9 @@ def validate_sbom(sbom: Path) -> None:
     components = document.get("components", [])
     assert isinstance(components, list), "CycloneDX components must be a list when present"
     vulnerabilities = document.get("vulnerabilities", [])
-    assert isinstance(vulnerabilities, list), "CycloneDX vulnerabilities must be a list when present"
+    assert isinstance(vulnerabilities, list), (
+        "CycloneDX vulnerabilities must be a list when present"
+    )
     print(
         "SBOM_VALID "
         f"format=CycloneDX spec={spec_version} components={len(components)} "
