@@ -1,6 +1,7 @@
 """EvidenceBound ScenarioGraph foreground prototype for AI-BOOST Challenge 4."""
 
 from .fixture import CrashFixture, FixtureEvidence, load_fixture
+from .genai import GenerativeCandidateError, RecordedGenerativeExtractor
 from .model import (
     EvidenceItem,
     FieldAssessment,
@@ -16,7 +17,9 @@ __all__ = [
     "FieldAssessment",
     "FieldDecision",
     "FixtureEvidence",
+    "GenerativeCandidateError",
     "PipelineResult",
+    "RecordedGenerativeExtractor",
     "ScenarioField",
     "ScenarioGraph",
     "load_fixture",
