@@ -71,9 +71,16 @@ class FieldAssessment:
     reasons: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class ScenarioRecoveryPlan:
+    changed_evidence_ids: tuple[str, ...]
+    preserve_fields: tuple[str, ...]
+    recompute_fields: tuple[str, ...]
+
+
 @dataclass
 class ScenarioGraph:
-    """Evidence-linked fields plus deterministic trust and invalidation semantics."""
+    """Evidence-linked fields plus deterministic trust and recovery semantics."""
 
     evidence: dict[str, EvidenceItem] = field(default_factory=dict)
     fields: dict[str, ScenarioField] = field(default_factory=dict)
@@ -125,6 +132,7 @@ class ScenarioGraph:
             scenario_field.material
             and scenario_field.value is not None
             and not scenario_field.evidence_ids
+            and not scenario_field.depends_on_fields
         ):
             reasons.append("material_claim_has_no_evidence")
 
@@ -172,7 +180,7 @@ class ScenarioGraph:
         return FieldAssessment(
             field_id=field_id,
             decision=FieldDecision.VERIFIED,
-            reasons=("evidence_bound",),
+            reasons=("evidence_bound_or_derived",),
         )
 
     def assessments(self) -> dict[str, FieldAssessment]:
@@ -197,13 +205,26 @@ class ScenarioGraph:
                     changed = True
         return tuple(sorted(affected))
 
+    def plan_recovery(self, changed_evidence_ids: set[str]) -> ScenarioRecoveryPlan:
+        """Preserve unaffected fields and recompute only the transitive blast radius."""
+
+        recompute = self.affected_fields(changed_evidence_ids)
+        recompute_set = set(recompute)
+        preserve = tuple(sorted(set(self.fields) - recompute_set))
+        return ScenarioRecoveryPlan(
+            changed_evidence_ids=tuple(sorted(changed_evidence_ids)),
+            preserve_fields=preserve,
+            recompute_fields=recompute,
+        )
+
     def receipt(self, *, changed_evidence_ids: set[str] | None = None) -> dict[str, Any]:
         """Return a deterministic, content-addressed verification receipt."""
 
         changed = changed_evidence_ids or set()
         assessments = self.assessments()
+        recovery = self.plan_recovery(changed)
         body: dict[str, Any] = {
-            "schema": "evidencebound-scenariograph-receipt/0.1",
+            "schema": "evidencebound-scenariograph-receipt/0.2",
             "review_threshold_milli": self.review_threshold_milli,
             "evidence": [
                 {
@@ -227,8 +248,11 @@ class ScenarioGraph:
                 }
                 for item in sorted(self.fields.values(), key=lambda item: item.field_id)
             ],
-            "changed_evidence_ids": sorted(changed),
-            "affected_fields": list(self.affected_fields(changed)),
+            "recovery": {
+                "changed_evidence_ids": list(recovery.changed_evidence_ids),
+                "preserve_fields": list(recovery.preserve_fields),
+                "recompute_fields": list(recovery.recompute_fields),
+            },
         }
         return {
             "body": body,
