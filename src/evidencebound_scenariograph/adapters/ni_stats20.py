@@ -2,8 +2,8 @@
 
 The adapter intentionally retains scenario-relevant coded fields only. Driver/casualty
 sex, age-group and exact OSGR coordinates are excluded from the normalized record.
-Code semantics are taken from the PSNI 2024 public Data Guide; no missing code is
-silently completed.
+Code semantics and conditional recording rules are taken from the PSNI 2024 public
+Data Guide; no missing code or missing associated-vehicle row is silently completed.
 """
 from __future__ import annotations
 
@@ -193,6 +193,7 @@ MATERIAL_FIELDS = (
     "pedestrian_location",
     "pedestrian_movement",
 )
+VEHICLE_FIELDS = ("vehicle_type", "vehicle_manoeuvre", "vehicle_location")
 SENSITIVE_SOURCE_FIELDS_EXCLUDED = (
     "collision.a_gd1",
     "collision.a_gd2",
@@ -228,10 +229,20 @@ def _mapped(value: Any, mapping: Mapping[int, str]) -> tuple[str, bool]:
     label = mapping.get(code)
     if label is None:
         return f"unknown_code_{code}", True
-    return label, label in {"unknown", "unknown_or_other", "other_or_unknown", "other_or_not_known"}
+    return label, label in {
+        "unknown",
+        "unknown_or_other",
+        "other_or_unknown",
+        "other_or_not_known",
+    }
 
 
-def _event_class(casualty_class: int | None, pedestrian_move: int | None) -> tuple[str, bool]:
+def _event_class(
+    casualty_class: int | None,
+    pedestrian_move: int | None,
+    *,
+    slight_collision: bool,
+) -> tuple[str, bool]:
     if casualty_class == 7:
         return "pedal_cyclist_casualty", False
     if casualty_class != 5:
@@ -242,6 +253,8 @@ def _event_class(casualty_class: int | None, pedestrian_move: int | None) -> tup
         return "pedestrian_crossing", False
     if pedestrian_move in {6, 7, 8, 9}:
         return "pedestrian_in_carriageway", False
+    if pedestrian_move is None and slight_collision:
+        return "pedestrian_movement_not_recorded_for_slight_collision", True
     return "pedestrian_movement_unknown", True
 
 
@@ -252,6 +265,7 @@ class NIStats20Record:
     case_id: str
     vehicle_id: str
     casualty_id: str
+    vehicle_joined: bool
     fields: tuple[tuple[str, Any], ...]
     provenance: tuple[tuple[str, tuple[str, ...]], ...]
     uncertain_fields: tuple[str, ...]
@@ -261,6 +275,7 @@ class NIStats20Record:
             "case_id": self.case_id,
             "vehicle_id": self.vehicle_id,
             "casualty_id": self.casualty_id,
+            "vehicle_joined": self.vehicle_joined,
             "fields": dict(self.fields),
             "provenance": {key: list(value) for key, value in self.provenance},
             "uncertain_fields": list(self.uncertain_fields),
@@ -269,14 +284,17 @@ class NIStats20Record:
 
 def normalize_ni_stats20_case(
     collision: Mapping[str, Any],
-    vehicle: Mapping[str, Any],
+    vehicle: Mapping[str, Any] | None,
     casualty: Mapping[str, Any],
 ) -> NIStats20Record:
-    """Map one joined PSNI collision/vehicle/casualty triple into canonical evidence state."""
+    """Normalize one PSNI collision/casualty case with an optional vehicle row."""
 
     collision_ref = _stable_id(collision.get("a_ref"))
-    vehicle_id = _stable_id(vehicle.get("v_id"))
+    vehicle_joined = vehicle is not None
+    vehicle_id = _stable_id((vehicle or casualty).get("v_id"))
     casualty_id = _stable_id(casualty.get("c_id"))
+    collision_type_code = _code(collision.get("a_type"))
+    slight_collision = collision_type_code == 3
     casualty_class_code = _code(casualty.get("c_class"))
     pedestrian_move_code = _code(casualty.get("c_move"))
 
@@ -289,7 +307,14 @@ def normalize_ni_stats20_case(
         raw: Any,
         mapping: Mapping[int, str],
         source: str,
+        *,
+        conditional_slight: bool = False,
     ) -> None:
+        if conditional_slight and slight_collision and (raw is None or raw == ""):
+            values[name] = "not_recorded_for_slight_collision"
+            provenance[name] = (source, "collision.a_type", DATA_GUIDE_URL)
+            uncertain.add(name)
+            return
         value, is_uncertain = _mapped(raw, mapping)
         values[name] = value
         provenance[name] = (source, DATA_GUIDE_URL)
@@ -297,11 +322,16 @@ def normalize_ni_stats20_case(
             uncertain.add(name)
 
     add_mapped("actor_class", casualty.get("c_class"), CASUALTY_CLASS, "casualty.c_class")
-    event_class, event_uncertain = _event_class(casualty_class_code, pedestrian_move_code)
+    event_class, event_uncertain = _event_class(
+        casualty_class_code,
+        pedestrian_move_code,
+        slight_collision=slight_collision,
+    )
     values["harmonized_event_class"] = event_class
     provenance["harmonized_event_class"] = (
         "casualty.c_class",
         "casualty.c_move",
+        "collision.a_type",
         DATA_GUIDE_URL,
     )
     if event_uncertain:
@@ -320,27 +350,55 @@ def normalize_ni_stats20_case(
         uncertain.add("speed_limit_recorded")
 
     add_mapped(
-        "junction_detail", collision.get("a_jdet"), JUNCTION_DETAIL, "collision.a_jdet"
+        "junction_detail",
+        collision.get("a_jdet"),
+        JUNCTION_DETAIL,
+        "collision.a_jdet",
+        conditional_slight=True,
     )
     add_mapped(
-        "junction_control", collision.get("a_jcont"), JUNCTION_CONTROL, "collision.a_jcont"
+        "junction_control",
+        collision.get("a_jcont"),
+        JUNCTION_CONTROL,
+        "collision.a_jcont",
+        conditional_slight=True,
     )
     add_mapped(
-        "light_conditions", collision.get("a_light"), LIGHT_CONDITIONS, "collision.a_light"
+        "light_conditions",
+        collision.get("a_light"),
+        LIGHT_CONDITIONS,
+        "collision.a_light",
+        conditional_slight=True,
     )
     add_mapped(
-        "weather_conditions", collision.get("a_weat"), WEATHER_CONDITIONS, "collision.a_weat"
+        "weather_conditions",
+        collision.get("a_weat"),
+        WEATHER_CONDITIONS,
+        "collision.a_weat",
+        conditional_slight=True,
     )
     add_mapped(
-        "road_surface", collision.get("a_roadsc"), ROAD_SURFACE, "collision.a_roadsc"
+        "road_surface",
+        collision.get("a_roadsc"),
+        ROAD_SURFACE,
+        "collision.a_roadsc",
+        conditional_slight=True,
     )
-    add_mapped("vehicle_type", vehicle.get("v_type"), VEHICLE_TYPE, "vehicle.v_type")
-    add_mapped(
-        "vehicle_manoeuvre", vehicle.get("v_man"), VEHICLE_MANOEUVRE, "vehicle.v_man"
-    )
-    add_mapped(
-        "vehicle_location", vehicle.get("v_loc"), VEHICLE_LOCATION, "vehicle.v_loc"
-    )
+
+    if vehicle is None:
+        for name in VEHICLE_FIELDS:
+            values[name] = "unknown_missing_associated_vehicle_row"
+            provenance[name] = ("casualty.v_id", DATA_GUIDE_URL)
+            uncertain.add(name)
+    else:
+        add_mapped("vehicle_type", vehicle.get("v_type"), VEHICLE_TYPE, "vehicle.v_type")
+        add_mapped(
+            "vehicle_manoeuvre", vehicle.get("v_man"), VEHICLE_MANOEUVRE, "vehicle.v_man"
+        )
+        add_mapped(
+            "vehicle_location", vehicle.get("v_loc"), VEHICLE_LOCATION, "vehicle.v_loc"
+        )
+
     add_mapped(
         "casualty_severity", casualty.get("c_sever"), CASUALTY_SEVERITY, "casualty.c_sever"
     )
@@ -349,18 +407,21 @@ def normalize_ni_stats20_case(
         casualty.get("c_loc"),
         PEDESTRIAN_LOCATION,
         "casualty.c_loc",
+        conditional_slight=True,
     )
     add_mapped(
         "pedestrian_movement",
         casualty.get("c_move"),
         PEDESTRIAN_MOVEMENT,
         "casualty.c_move",
+        conditional_slight=True,
     )
 
     return NIStats20Record(
         case_id=f"NI-2024-{collision_ref}",
         vehicle_id=vehicle_id,
         casualty_id=casualty_id,
+        vehicle_joined=vehicle_joined,
         fields=tuple((name, values[name]) for name in MATERIAL_FIELDS),
         provenance=tuple((name, provenance[name]) for name in MATERIAL_FIELDS),
         uncertain_fields=tuple(sorted(uncertain)),
@@ -374,7 +435,7 @@ def select_vulnerable_road_user_cases(
     *,
     limit: int = 64,
 ) -> tuple[NIStats20Record, ...]:
-    """Join and deterministically select pedestrian/cyclist casualties for the holdout."""
+    """Select pedestrian/cyclist casualties without dropping missing vehicle joins."""
 
     collision_by_ref = {_stable_id(row.get("a_ref")): row for row in collisions}
     vehicle_by_key = {
@@ -394,9 +455,9 @@ def select_vulnerable_road_user_cases(
         ref = _stable_id(casualty.get("a_ref"))
         vehicle_id = _stable_id(casualty.get("v_id"))
         collision = collision_by_ref.get(ref)
-        vehicle = vehicle_by_key.get((ref, vehicle_id))
-        if collision is None or vehicle is None:
+        if collision is None:
             continue
+        vehicle = vehicle_by_key.get((ref, vehicle_id))
         result.append(normalize_ni_stats20_case(collision, vehicle, casualty))
         if len(result) >= limit:
             break
