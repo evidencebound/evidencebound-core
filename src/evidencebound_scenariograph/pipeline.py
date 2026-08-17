@@ -14,7 +14,7 @@ from .functional import (
     DeterministicCodedRecordExtractor,
     FunctionalScenarioExtractor,
 )
-from .model import ScenarioGraph
+from .model import ScenarioField, ScenarioGraph
 
 
 @dataclass(frozen=True)
@@ -46,10 +46,23 @@ def run_pipeline(
         graph.add_field(item)
 
     matches = match_catalog(graph)
+    top_match = matches[0] if matches else None
+    graph.add_field(
+        ScenarioField(
+            "catalog_match_top1",
+            None if top_match is None else top_match.catalog_id,
+            uncertainty_milli=1000 if top_match is None else 120,
+            depends_on_fields=(
+                "functional_label",
+                "crash_location",
+                "obstruction_context",
+            ),
+        )
+    )
     openscenario = export_openscenario_14(graph, case_id=fixture.case_id)
     graph_receipt = graph.receipt()
     body: dict[str, Any] = {
-        "schema": "evidencebound-scenariograph-pipeline-receipt/0.1",
+        "schema": "evidencebound-scenariograph-pipeline-receipt/0.2",
         "case_id": fixture.case_id,
         "source_uri": fixture.source_uri,
         "privacy": fixture.privacy,
