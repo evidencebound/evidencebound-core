@@ -1,0 +1,48 @@
+name: AI-BOOST Challenge 4 External Holdout
+
+on:
+  push:
+    branches: ["ai-boost-challenge-4"]
+    paths:
+      - "src/evidencebound_scenariograph/adapters/**"
+      - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "tests/test_ai_boost_external_holdout.py"
+      - ".github/workflows/ai-boost-external-holdout.yml"
+  pull_request:
+    paths:
+      - "src/evidencebound_scenariograph/adapters/**"
+      - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "tests/test_ai_boost_external_holdout.py"
+      - ".github/workflows/ai-boost-external-holdout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  psni-ni-2024-live-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .
+      - name: Verify independent adapter contract
+        run: python -m pytest tests/test_ai_boost_external_holdout.py -q
+      - name: Run live PSNI Northern Ireland 2024 holdout
+        run: |
+          python benchmarks/ai_boost_challenge4/external_holdout_ni.py \
+            --assert-targets \
+            --output /tmp/ni_external_holdout.json
+      - name: Verify receipt is data-minimised
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Eq 'c_sex|c_agegroup|v_sex|v_agegroup|a_gd1|a_gd2' /tmp/ni_external_holdout.json; then
+            echo "Sensitive/exact-location source field leaked into retained receipt" >&2
+            exit 1
+          fi
