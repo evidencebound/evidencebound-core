@@ -62,10 +62,13 @@ def run_pipeline(
     openscenario = export_openscenario_14(graph, case_id=fixture.case_id)
     graph_receipt = graph.receipt()
     body: dict[str, Any] = {
-        "schema": "evidencebound-scenariograph-pipeline-receipt/0.2",
+        "schema": "evidencebound-scenariograph-pipeline-receipt/0.3",
         "case_id": fixture.case_id,
         "source_uri": fixture.source_uri,
         "privacy": fixture.privacy,
+        "data_minimisation": {
+            "excluded_data_categories": list(fixture.excluded_data_categories),
+        },
         "extractor_id": functional.extractor_id,
         "functional_label": functional.label,
         "graph_receipt_sha256": graph_receipt["sha256"],
