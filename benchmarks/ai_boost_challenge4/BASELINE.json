@@ -1,0 +1,46 @@
+{
+  "body": {
+    "cases": [
+      {
+        "case_id": "NHTSA-VICIS-991",
+        "expected_catalog_id": "pedestrian_nearside_obstruction_intersection",
+        "expected_functional_label": "pedestrian_dart_out_visual_obstruction",
+        "observed_catalog_top1": "pedestrian_nearside_obstruction_intersection",
+        "observed_functional_label": "pedestrian_dart_out_visual_obstruction",
+        "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
+        "pipeline_receipt_sha256": "48a5291ec4b49d1e709d13c8e7cb5b4f030bec9d9b184b9657c1e49a096d7be0",
+        "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=991&Study=CIRENVICIS"
+      },
+      {
+        "case_id": "NHTSA-VICIS-1027",
+        "expected_catalog_id": "pedestrian_midblock_crossing_nonturning",
+        "expected_functional_label": "pedestrian_crossing_vehicle_not_turning",
+        "observed_catalog_top1": "pedestrian_midblock_crossing_nonturning",
+        "observed_functional_label": "pedestrian_crossing_vehicle_not_turning",
+        "openscenario_conformance": "STRUCTURAL_SEAM_NOT_XSD_VALIDATED",
+        "pipeline_receipt_sha256": "488b9c85216795a857a8b0ba98306fd7232bda4b36f83b5f91053b8ec41ddb6c",
+        "source_uri": "https://crashviewer.nhtsa.dot.gov/crashviewer/CIREN/print?CaseId=1027&Study=CIRENVICIS"
+      }
+    ],
+    "metrics": {
+      "catalog_mrr_milli": 1000,
+      "catalog_recall_at_1_milli": 1000,
+      "evidence_coverage_milli": 1000,
+      "functional_label_accuracy_milli": 1000,
+      "invalidation_precision_milli": 1000,
+      "invalidation_recall_milli": 1000,
+      "missing_evidence_no_completion_milli": 1000,
+      "missing_evidence_review_required_milli": 1000,
+      "receipt_reproduction_rate_milli": 1000,
+      "unknown_fields_with_explicit_uncertainty_milli": 1000,
+      "unsupported_assertion_rate_milli": 0
+    },
+    "schema": "evidencebound-ai-boost-challenge4-benchmark/0.1",
+    "scope": {
+      "claim_boundary": "SPARK controlled-fixture baseline; not automotive production accuracy, homologation evidence, or full OpenSCENARIO XSD conformance",
+      "controlled_adversarial_mutations": 2,
+      "public_cases": 2
+    }
+  },
+  "sha256": "f751a951ba5d1c97a46528e378ec9a9089e8b5581cfea5a81b38578826f18ed0"
+}
