@@ -7,8 +7,9 @@ date-released: 2026-08-17
 authors:
   - family-names: "Vrublevskyi"
     given-names: "Ruslan"
+    email: "ruslan@evidencebound.org"
 repository-code: "https://github.com/moneyparking/evidencebound-core"
-url: "https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0"
+url: "https://evidencebound.org"
 license: "Apache-2.0"
 keywords:
   - autonomous agents
