@@ -47,13 +47,43 @@ Staleness evaluation never silently reads wall-clock time. A caller that needs t
 
 ## 5. Receipts
 
-A receipt stores checkpoint digest, verification digest, policy ID/version, canonicalization version, checkpoint ID and receipt version.
+A `ProofReceipt` stores checkpoint digest, verification digest, policy ID/version, canonicalization version, checkpoint ID and receipt version.
 
 `verify_receipt()` validates receipt version, digest shape, policy metadata, canonicalization metadata, checkpoint identity, and binding to the exact protected checkpoint payload.
 
 `verify_verification_receipt()` additionally recomputes the historical verification payload digest and checks the supplied `VerificationResult` binding.
 
-The built-in receipt is an integrity binding, not a digital signature or source-authenticity proof. Its security value assumes the receipt/digest is retained or anchored independently enough for the application threat model.
+An unsigned `ProofReceipt` is an integrity binding, not a digital signature or source-authenticity proof. Its security value assumes the receipt/digest is retained or anchored independently enough for the application threat model.
+
+### 5.1 Signed receipt envelope
+
+`SignedProofReceipt` wraps, rather than mutates, a `ProofReceipt`. Signature format version `1` signs detached, domain-separated bytes:
+
+`evidencebound:signed-receipt:EBCJ-1:1\0 || canonical_bytes(signed_payload)`
+
+The signed payload contains:
+
+- `algorithm`;
+- `key_id`;
+- the complete underlying `ProofReceipt`, including receipt and canonicalization versions;
+- `signature_encoding`;
+- `signature_version`.
+
+The signature itself is encoded as unpadded base64url and is excluded from the signed payload.
+
+`ReceiptSigner` and `ReceiptVerifier` are provider-neutral protocols. Core does not require a cloud KMS, HSM, crypto vendor or agent framework.
+
+New signatures MUST use an `ACTIVE` signing key. A verifier MAY accept a cryptographically valid `RETIRED` key for historical verification. `REVOKED` and `UNKNOWN` keys MUST fail closed. Unsupported algorithm metadata, malformed signature encoding, provider exceptions, and invalid signature results MUST fail closed.
+
+`verify_signed_receipt()` separates signature validity from receipt/checkpoint binding:
+
+- valid signature + valid binding + ACTIVE key → `VERIFIED`;
+- valid signature + valid binding + RETIRED key → `VERIFIED_RETIRED_KEY`;
+- valid unsigned legacy receipt → `UNSIGNED`, never authenticated;
+- valid signature over a receipt that does not bind the supplied checkpoint/result → `INVALID_BINDING`;
+- all invalid/unknown/revoked/unsupported/provider-error cases → not verified.
+
+A valid signature authenticates possession/use of a configured signing key under the application's key-identity trust model. It does **not** establish that upstream evidence is truthful, complete, current, or non-malicious.
 
 ## 6. Graph
 
@@ -80,4 +110,4 @@ A consequential action remains blocked until every path-specific required checkp
 
 ## 9. Versioning boundary
 
-`0.x` releases are alpha/pre-1.0. Public imports are curated, but compatibility changes remain possible when documented. Canonicalization and receipt-version changes require explicit version changes rather than silent reinterpretation of historical records.
+`0.x` releases are alpha/pre-1.0. Public imports are curated, but compatibility changes remain possible when documented. Canonicalization, receipt-version, and signed-envelope-version changes require explicit version changes rather than silent reinterpretation of historical records.

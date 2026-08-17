@@ -2,11 +2,13 @@
 
 ## Security goal
 
-Make evidence-dependent agent state explicit, bind protected records deterministically, fail closed when required trust inputs are missing, and prevent unsafe reuse from silently crossing dependency invalidation boundaries.
+Make evidence-dependent agent state explicit, bind protected records deterministically, optionally authenticate receipt issuers through provider-neutral signatures, fail closed when required trust inputs are missing, and prevent unsafe reuse from silently crossing dependency invalidation boundaries.
 
 ## Helps detect / contain
 
 - mutation of a checkpoint while an independently retained receipt is available;
+- mutation of a signed receipt envelope or protected receipt metadata when a trusted verification key is available;
+- wrong/unknown/revoked signing-key identities and unsupported signature algorithms;
 - missing required evidence or provenance;
 - evidence staleness when a validity horizon and caller-supplied current time are available;
 - explicit evidence refutation supplied by a trusted upstream verifier;
@@ -19,22 +21,33 @@ Make evidence-dependent agent state explicit, bind protected records determinist
 ## Does not automatically solve
 
 - truthfulness, completeness or honesty of an upstream source;
-- authenticity when provenance cannot be externally authenticated;
-- an attacker who can replace both mutable checkpoint and trusted receipt anchor;
+- authenticity of provenance that is not separately authenticated;
+- compromise or theft of a trusted signing private key;
+- compromise of the application key registry / trust configuration;
+- an attacker who can replace application trust roots, verifier configuration and protected state together;
 - compromised host/runtime/interpreter;
-- stolen signing keys (signed receipts are not yet part of core);
 - arbitrary Byzantine consensus;
 - model alignment or prompt-injection generally;
 - correctness of an application’s policy;
 - legal/regulatory compliance;
 - distributed exactly-once side effects;
-- secure persistence, backup or key lifecycle.
+- secure persistence, backup, HSM/KMS operation or organization-specific key custody.
 
 ## Main attacker/error cases
 
 | Case | Expected behavior |
 |---|---|
 | Protected output modified | prior receipt mismatch → BLOCK |
+| Signed receipt field modified | detached signature fails → signed receipt not verified |
+| Signed receipt valid but checkpoint modified | signature may remain valid, binding fails → `INVALID_BINDING` |
+| Wrong existing key ID substituted | signature verification fails |
+| Unknown key ID | `UNKNOWN_KEY` → fail closed |
+| Revoked verification key | `REVOKED_KEY` → fail closed |
+| Retired verification key | historical verification may succeed as `VERIFIED_RETIRED_KEY`; new signing with retired key is rejected |
+| Unsupported algorithm | `UNSUPPORTED_ALGORITHM` → fail closed |
+| Malformed signature encoding | `INVALID_SIGNATURE` → fail closed |
+| Signature provider raises unexpectedly | `PROVIDER_ERROR` → fail closed |
+| Unsigned legacy receipt | deterministic binding may verify, but authentication status remains `UNSIGNED` |
 | Provenance deleted | required provenance incomplete → BLOCK |
 | Current evidence missing | MISSING → BLOCK |
 | Digest changes | CHANGED → REVIEW_REQUIRED, never implicit REFUTED |
@@ -42,12 +55,26 @@ Make evidence-dependent agent state explicit, bind protected records determinist
 | Policy version changes | historical integrity may remain VERIFIED; reuse requires review |
 | Graph cycle | construction fails |
 | Replay ID reused with different payload | conflict exception |
-| Worker result untrusted | application must represent required supporting evidence; absence fails closed |
 
-## Trust assumptions
+## Signing trust assumptions
 
-The application must protect or independently anchor receipts if it relies on tamper detection across persistence boundaries. Provenance locators are assertions unless independently verified by an adapter/application. System time is a caller input; EvidenceBound does not silently claim secure time.
+A signed receipt authenticates that a configured key accepted by the application signed the exact signed-envelope bytes. Mapping `key_id` to an organization, service, operator or hardware root is an application/provider responsibility.
+
+Key state is explicit:
+
+- `ACTIVE`: may sign and verify;
+- `RETIRED`: may verify historical receipts but MUST NOT create new receipts through `sign_receipt()`;
+- `REVOKED`: verification fails closed;
+- `UNKNOWN`: verification fails closed.
+
+Applications must distribute and protect verification trust roots independently enough for their threat model. A signature does not turn an untrusted evidence source into a truthful one.
+
+The optional Ed25519 reference provider is an interoperability example, not a production key-management system. Private-key generation, storage, rotation, audit, access control and compromise response remain deployment responsibilities.
+
+## Other trust assumptions
+
+The application must protect or independently anchor unsigned receipts if it relies on tamper detection across persistence boundaries. Provenance locators are assertions unless independently verified by an adapter/application. System time is a caller input; EvidenceBound does not silently claim secure time.
 
 ## Future hardening
 
-Signed receipts with algorithm agility, external key management, persistence backends with atomic state transitions, fuzz/property suites, interoperability fixtures and independent security review are roadmap work.
+Persistence backends with atomic state transitions, formal key-provider conformance fixtures, fuzz/property suites, cross-runtime interoperability fixtures, release provenance/SBOM and independent security review remain roadmap work.

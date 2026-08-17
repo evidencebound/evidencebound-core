@@ -29,7 +29,8 @@ Changelog = "https://github.com/moneyparking/evidencebound-core/blob/main/CHANGE
 Documentation = "https://github.com/moneyparking/evidencebound-core/blob/main/docs/INTEGRATION.md"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.10", "build>=1.2"]
+crypto = ["cryptography>=46"]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.10", "build>=1.2", "cryptography>=46"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
