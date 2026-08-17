@@ -20,8 +20,13 @@ def test_nhtsa_991_end_to_end_is_evidence_grounded_and_reproducible() -> None:
     assert first.matches[0].catalog_id == fixture.expected_catalog_id
     assert first.receipt == second.receipt
     assert first.openscenario.standard == "ASAM OpenSCENARIO XML 1.4"
-    assert first.openscenario.conformance == "STRUCTURAL_SEAM_NOT_XSD_VALIDATED"
+    assert (
+        first.openscenario.conformance
+        == "ASAM_OPENSCENARIO_XML_1_4_XSD_VALIDATED_IN_CI"
+    )
     assert 'revMinor="4"' in first.openscenario.xml
+    assert "<Init><Actions /></Init>" in first.openscenario.xml
+    assert "<StopTrigger />" in first.openscenario.xml
 
 
 def test_nhtsa_1027_end_to_end_matches_expected_catalog_scenario() -> None:
