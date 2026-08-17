@@ -14,6 +14,7 @@ from .functional import (
     DeterministicCodedRecordExtractor,
     FunctionalScenarioExtractor,
 )
+from .kinematics import build_kinematic_coherence_field
 from .model import ScenarioField, ScenarioGraph
 
 
@@ -44,6 +45,7 @@ def run_pipeline(
         graph.add_field(item)
     for item in enrich_logical_scenario(fixture):
         graph.add_field(item)
+    graph.add_field(build_kinematic_coherence_field(fixture))
 
     matches = match_catalog(graph)
     top_match = matches[0] if matches else None
@@ -61,8 +63,10 @@ def run_pipeline(
     )
     openscenario = export_openscenario_14(graph, case_id=fixture.case_id)
     graph_receipt = graph.receipt()
+    kinematic_field = graph.fields["kinematic_coherence"]
+    kinematic_assessment = graph.assess_field("kinematic_coherence")
     body: dict[str, Any] = {
-        "schema": "evidencebound-scenariograph-pipeline-receipt/0.3",
+        "schema": "evidencebound-scenariograph-pipeline-receipt/0.4",
         "case_id": fixture.case_id,
         "source_uri": fixture.source_uri,
         "privacy": fixture.privacy,
@@ -72,6 +76,11 @@ def run_pipeline(
         "extractor_id": functional.extractor_id,
         "functional_label": functional.label,
         "graph_receipt_sha256": graph_receipt["sha256"],
+        "kinematic_gate": {
+            "decision": kinematic_assessment.decision.value,
+            "reasons": list(kinematic_assessment.reasons),
+            "details": kinematic_field.value,
+        },
         "matches": [
             {
                 "catalog_id": item.catalog_id,
