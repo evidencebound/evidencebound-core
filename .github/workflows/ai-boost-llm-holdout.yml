@@ -11,12 +11,19 @@ on:
         description: "Gemini model ID"
         required: true
         default: "gemini-3.6-flash"
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ai-boost-llm-holdout.yml
 
 permissions:
   contents: read
 
 env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  HOLDOUT_CASES: ${{ inputs.cases || '16' }}
+  HOLDOUT_MODEL: ${{ inputs.model || 'gemini-3.6-flash' }}
 
 jobs:
   schema-constrained-live-extraction:
@@ -46,8 +53,8 @@ jobs:
       - name: Run schema-constrained Gemini generateContent holdout
         run: |
           python benchmarks/ai_boost_challenge4/llm_holdout_gemini_generate_content.py \
-            --cases "${{ inputs.cases }}" \
-            --model "${{ inputs.model }}" \
+            --cases "${HOLDOUT_CASES}" \
+            --model "${HOLDOUT_MODEL}" \
             --output /tmp/gemini_llm_holdout.json
       - name: Write measured result to GitHub step summary
         run: |
