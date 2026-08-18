@@ -11,11 +11,6 @@ on:
         description: "Gemini model ID"
         required: true
         default: "gemini-3.6-flash"
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/ai-boost-llm-holdout.yml
 
 permissions:
   contents: read
