@@ -1,0 +1,94 @@
+name: AI-BOOST Challenge 4 External Holdout
+
+on:
+  push:
+    branches: ["ai-boost-challenge-4"]
+    paths:
+      - "src/evidencebound_scenariograph/adapters/**"
+      - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json"
+      - "tests/test_ai_boost_external_holdout.py"
+      - ".github/workflows/ai-boost-external-holdout.yml"
+  pull_request:
+    paths:
+      - "src/evidencebound_scenariograph/adapters/**"
+      - "benchmarks/ai_boost_challenge4/external_holdout_ni.py"
+      - "benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json"
+      - "tests/test_ai_boost_external_holdout.py"
+      - ".github/workflows/ai-boost-external-holdout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  psni-ni-2024-live-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e '.[dev]'
+      - name: Verify independent adapter contract
+        run: python -m pytest tests/test_ai_boost_external_holdout.py -q
+      - name: Run live PSNI Northern Ireland 2024 holdout
+        run: |
+          python benchmarks/ai_boost_challenge4/external_holdout_ni.py \
+            --assert-targets \
+            --output /tmp/ni_external_holdout.json
+      - name: Verify case summaries are data-minimised
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path('/tmp/ni_external_holdout.json').read_text())
+          summaries = receipt['body']['case_summaries']
+          forbidden = {'c_sex', 'c_agegroup', 'v_sex', 'v_agegroup', 'a_gd1', 'a_gd2'}
+          leaked = sorted(forbidden & {key for row in summaries for key in row})
+          if leaked:
+              raise SystemExit(f'forbidden source fields in case summaries: {leaked}')
+          PY
+      - name: Compare live holdout with retained external baseline
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          live = json.loads(Path('/tmp/ni_external_holdout.json').read_text())
+          retained = json.loads(
+              Path('benchmarks/ai_boost_challenge4/EXTERNAL_HOLDOUT_NI_BASELINE.json').read_text()
+          )
+          body = live['body']
+          observed = {
+              'source': {
+                  'dataset': body['source']['dataset'],
+                  'licence': body['source']['licence'],
+                  'resource_ids': body['source']['resource_ids'],
+                  'resource_totals': body['source']['resource_totals'],
+                  'source_recordset_sha256': body['source']['source_recordset_sha256'],
+              },
+              'scope': {
+                  key: body['scope'][key]
+                  for key in retained['scope']
+              },
+              'metrics': body['metrics'],
+              'receipt_sha256': live['sha256'],
+          }
+          expected = {
+              'source': retained['source'],
+              'scope': retained['scope'],
+              'metrics': retained['metrics'],
+              'receipt_sha256': retained['receipt_sha256'],
+          }
+          if observed != expected:
+              print('External holdout drift detected.')
+              print('OBSERVED:', json.dumps(observed, indent=2, sort_keys=True))
+              print('EXPECTED:', json.dumps(expected, indent=2, sort_keys=True))
+              raise SystemExit(1)
+          print('EXTERNAL_HOLDOUT_BASELINE_MATCH')
+          PY

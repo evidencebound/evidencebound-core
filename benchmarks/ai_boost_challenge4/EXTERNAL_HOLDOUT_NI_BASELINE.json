@@ -1,0 +1,44 @@
+{
+  "schema": "evidencebound-ai-boost-challenge4-external-baseline/0.1",
+  "source": {
+    "dataset": "PSNI Northern Ireland Police Recorded Injury RTC 2024",
+    "licence": "UK Open Government Licence (OGL)",
+    "resource_ids": {
+      "collisions": "b9d5267a-c648-47c1-b97a-dddcf487958b",
+      "vehicles": "eba09f3d-74ef-41cf-814c-dfda8cf1eba3",
+      "casualties": "c092f66c-f877-4b6d-84b9-50d8f61065b8"
+    },
+    "resource_totals": {
+      "collisions": 4753,
+      "vehicles": 8822,
+      "casualties": 7494
+    },
+    "source_recordset_sha256": {
+      "collisions": "0011ab5b338d33675daa46ec32aba9cb3139815a60a6d1e0dfb08cd05e61464e",
+      "vehicles": "4aa9c33090e36a28487ff56117c57cdd933adb1caff3c1b6de0426a1317e0814",
+      "casualties": "94ff1f327d90545c9f0d1a5ccfb0d32131d137c32f05d559d7f7cff80676977e"
+    }
+  },
+  "scope": {
+    "selected_vulnerable_road_user_cases": 64,
+    "selected_missing_associated_vehicle_rows": 51,
+    "selected_source_policy_missingness_cases": 47,
+    "eligible_pedestrian_or_cyclist_casualties": 745,
+    "collision_reference_joined_eligible_casualties": 745,
+    "associated_vehicle_joined_eligible_casualties": 217
+  },
+  "metrics": {
+    "collision_reference_join_milli": 1000,
+    "associated_vehicle_join_rate_milli": 291,
+    "missing_vehicle_explicit_uncertainty_milli": 1000,
+    "provenance_coverage_milli": 1000,
+    "explicit_uncertainty_coverage_milli": 1000,
+    "harmonized_event_mapping_coverage_milli": 437,
+    "event_mapping_or_explicit_uncertainty_milli": 1000,
+    "deterministic_reproduction_milli": 1000,
+    "unsupported_assertion_rate_milli": 0,
+    "sensitive_fields_retained_milli": 0
+  },
+  "receipt_sha256": "274c4f68aa09aba4fdf51ac08435aa3ddfd8c558b27b621ab72c077e3c0ed153",
+  "claim_boundary": "Independent cross-source ingestion/harmonization holdout. The associated-vehicle join rate and direct event-mapping coverage are descriptive source/mapping properties, not accuracy targets. This baseline establishes source integration, provenance, explicit uncertainty, deterministic reproduction and data-minimisation behavior only; it does not establish GenAI extraction accuracy, simulator validity, automotive production safety, homologation, certification or generalization to Challenge Owner data."
+}
