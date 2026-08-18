@@ -43,9 +43,9 @@ jobs:
             echo "GEMINI_API_KEY repository secret is not configured." >&2
             exit 1
           fi
-      - name: Run schema-constrained Gemini holdout
+      - name: Run schema-constrained Gemini generateContent holdout
         run: |
-          python benchmarks/ai_boost_challenge4/llm_holdout_gemini.py \
+          python benchmarks/ai_boost_challenge4/llm_holdout_gemini_generate_content.py \
             --cases "${{ inputs.cases }}" \
             --model "${{ inputs.model }}" \
             --output /tmp/gemini_llm_holdout.json
@@ -63,6 +63,7 @@ jobs:
               '# AI-BOOST Challenge 4 — Live Gemini Holdout',
               '',
               f"- Model: `{body['model']}`",
+              f"- API surface: `{body.get('api_surface', 'unknown')}`",
               f"- SDK: `{body['sdk']}`",
               f"- Prompt: `{body['prompt_version']}`",
               f"- Cases: `{body['cases']}`",
