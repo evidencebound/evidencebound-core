@@ -23,7 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkout AI-BOOST Challenge 4 evidence branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ai-boost-challenge-4
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
@@ -40,9 +43,9 @@ jobs:
             echo "GEMINI_API_KEY repository secret is not configured." >&2
             exit 1
           fi
-      - name: Run schema-constrained Gemini holdout
+      - name: Run schema-constrained Gemini generateContent holdout
         run: |
-          python benchmarks/ai_boost_challenge4/llm_holdout_gemini.py \
+          python benchmarks/ai_boost_challenge4/llm_holdout_gemini_generate_content.py \
             --cases "${{ inputs.cases }}" \
             --model "${{ inputs.model }}" \
             --output /tmp/gemini_llm_holdout.json
@@ -60,6 +63,7 @@ jobs:
               '# AI-BOOST Challenge 4 — Live Gemini Holdout',
               '',
               f"- Model: `{body['model']}`",
+              f"- API surface: `{body.get('api_surface', 'unknown')}`",
               f"- SDK: `{body['sdk']}`",
               f"- Prompt: `{body['prompt_version']}`",
               f"- Cases: `{body['cases']}`",
