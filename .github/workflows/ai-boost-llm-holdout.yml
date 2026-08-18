@@ -1,0 +1,85 @@
+name: AI-BOOST Challenge 4 Live Gemini Holdout
+
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Number of deterministic PSNI holdout cases (1-64)"
+        required: true
+        default: "16"
+      model:
+        description: "Gemini model ID"
+        required: true
+        default: "gemini-3.6-flash"
+
+permissions:
+  contents: read
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+jobs:
+  schema-constrained-live-extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e '.[dev]' google-genai==2.13.0
+      - name: Verify live-model benchmark boundary without calling provider
+        run: python -m pytest tests/test_ai_boost_llm_holdout.py -q
+      - name: Require repository Gemini secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${GEMINI_API_KEY:-}" ]; then
+            echo "GEMINI_API_KEY repository secret is not configured." >&2
+            exit 1
+          fi
+      - name: Run schema-constrained Gemini holdout
+        run: |
+          python benchmarks/ai_boost_challenge4/llm_holdout_gemini.py \
+            --cases "${{ inputs.cases }}" \
+            --model "${{ inputs.model }}" \
+            --output /tmp/gemini_llm_holdout.json
+      - name: Write measured result to GitHub step summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path('/tmp/gemini_llm_holdout.json').read_text())
+          body = receipt['body']
+          metrics = body['metrics']
+          usage = body['usage']
+          lines = [
+              '# AI-BOOST Challenge 4 — Live Gemini Holdout',
+              '',
+              f"- Model: `{body['model']}`",
+              f"- SDK: `{body['sdk']}`",
+              f"- Prompt: `{body['prompt_version']}`",
+              f"- Cases: `{body['cases']}`",
+              f"- Receipt SHA-256: `{receipt['sha256']}`",
+              '',
+              '## Metrics',
+              '',
+          ]
+          for key, value in sorted(metrics.items()):
+              lines.append(f'- `{key}`: `{value}/1000`')
+          lines.extend([
+              '',
+              '## Usage',
+              '',
+              f"- input tokens: `{usage['total_input_tokens']}`",
+              f"- output tokens: `{usage['total_output_tokens']}`",
+              f"- thought tokens: `{usage['total_thought_tokens']}`",
+              '',
+              '> Semantic mismatch detection in this run uses a held-out deterministic comparator for evaluation only; valid provenance alone is not a truth oracle.',
+          ])
+          Path('/tmp/llm_summary.md').write_text('\n'.join(lines) + '\n')
+          PY
+          cat /tmp/llm_summary.md >> "$GITHUB_STEP_SUMMARY"
