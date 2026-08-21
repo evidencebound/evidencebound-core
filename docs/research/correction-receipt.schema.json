@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://evidencebound.org/research/agentrust/correction-receipt-0.1.schema.json",
+  "title": "CorrectionReceipt/0.1 research prototype",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "correction_id",
+    "principal_id",
+    "supersedes",
+    "replacement_digest",
+    "scope",
+    "effect",
+    "reason_digest",
+    "ordering_ref"
+  ],
+  "properties": {
+    "type": {"const": "CorrectionReceipt/0.1"},
+    "correction_id": {"type": "string", "minLength": 1},
+    "principal_id": {"type": "string", "minLength": 1},
+    "supersedes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "digest"],
+      "properties": {
+        "kind": {"enum": ["intent", "decision", "delegation_root", "state"]},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "replacement_digest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_ids", "delegation_roots", "state_refs"],
+      "properties": {
+        "action_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "delegation_roots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        },
+        "state_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "effect": {"enum": ["invalidate_authority", "require_reappraisal"]},
+    "reason_digest": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "ordering_ref": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["domain", "position", "anchor_digest"],
+          "properties": {
+            "domain": {"type": "string", "minLength": 1},
+            "position": {"type": "integer", "minimum": 0},
+            "anchor_digest": {
+              "type": ["string", "null"],
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
