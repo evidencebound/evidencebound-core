@@ -94,7 +94,8 @@ def test_incomplete_dependencies_require_reappraisal():
     private, trusted = _keys()
     body = _correction(supersedes_digest="sha256:" + "9" * 64)
     receipt = correction.sign_correction(body, "alice-1", private)
-    result = correction.evaluate_corrections(_action(dependency_set_complete=False), [receipt], trusted)
+    action = _action(dependency_set_complete=False)
+    result = correction.evaluate_corrections(action, [receipt], trusted)
     assert result.status is correction.ApplicabilityStatus.REAPPRAISAL_REQUIRED
 
 
