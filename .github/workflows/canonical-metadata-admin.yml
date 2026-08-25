@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/canonical-metadata-admin.yml
 
+# One-time metadata migration. Delete after verified readback.
 permissions:
   contents: read
 
