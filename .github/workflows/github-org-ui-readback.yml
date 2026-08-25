@@ -1,0 +1,26 @@
+name: EvidenceBound GitHub UI Readback
+
+on:
+  push:
+    paths:
+      - .github/workflows/github-org-ui-readback.yml
+
+permissions:
+  contents: read
+
+jobs:
+  readback:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.EVIDENCEBOUND_METADATA_ADMIN_TOKEN }}
+    steps:
+      - name: Verify token present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${GH_TOKEN:-}"
+      - name: Read organization avatar and pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api graphql -f query='query { organization(login:"evidencebound") { avatarUrl pinnedItems(first:10, types:[REPOSITORY]) { nodes { ... on Repository { nameWithOwner } } } } }' --jq '.data.organization'
