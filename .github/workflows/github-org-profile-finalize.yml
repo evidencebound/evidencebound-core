@@ -1,4 +1,4 @@
-name: Finalize EvidenceBound GitHub Organization Profile
+name: Inspect EvidenceBound GitHub Organization API
 
 on:
   push:
@@ -9,45 +9,10 @@ permissions:
   contents: read
 
 jobs:
-  finalize-org-profile:
+  inspect-org-api:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.EVIDENCEBOUND_METADATA_ADMIN_TOKEN }}
-      PROFILE_MD: |
-        # EvidenceBound
-
-        **Human Control Plane for Verifiable AI Agents**
-
-        EvidenceBound is early-stage open-source AI safety infrastructure for binding agent actions to evidence, provenance and executable policy, with deterministic verification, bounded blast radius and recoverable human control.
-
-        The core design principle is simple: an AI system should not be able to grant itself trust. EvidenceBound keeps verification, policy enforcement and human authority outside model-generated claims and makes unavailable, stale or mismatched evidence visible rather than silently promoting it to certainty.
-
-        ## Core public implementations
-
-        | Repository | Purpose |
-        |---|---|
-        | [evidencebound-core](https://github.com/evidencebound/evidencebound-core) | Framework-agnostic runtime for evidence/provenance binding, deterministic verification, policy enforcement and fail-closed selective recovery. |
-        | [evidencebound-recovery-mesh](https://github.com/evidencebound/evidencebound-recovery-mesh) | Trust-aware selective recovery for autonomous agent fleets after a trust break. |
-        | [evidencebound-authority-cut](https://github.com/evidencebound/evidencebound-authority-cut) | Reversible autonomy with human authority kept outside the model-callable surface and correction propagated through affected descendants. |
-        | [evidencebound-releaseproof-dws](https://github.com/evidencebound/evidencebound-releaseproof-dws) | Differential reverification for changed document evidence under a frozen historical review-equivalence policy. |
-
-        ## What EvidenceBound is designed to preserve
-
-        - **Evidence visibility** - missing, stale, blocked or mismatched evidence remains explicit.
-        - **Provenance** - claims are bound to inspectable inputs and transformations.
-        - **Executable policy** - trust decisions are enforced outside natural-language model output.
-        - **Deterministic verification** - machine-checkable gates decide whether evidence and state remain acceptable.
-        - **Bounded blast radius** - trust breaks invalidate only work that depends on the broken evidence or authority.
-        - **Recoverable human control** - human grants, revocations and corrections remain outside model self-authorization.
-
-        ## Public identity
-
-        - Website: [evidencebound.org](https://evidencebound.org)
-        - Maintainer: [Ruslan Vrublevskyi](https://github.com/moneyparking)
-        - Contact: `ruslan@evidencebound.org`
-        - LinkedIn: [Ruslan Vrublevskyi](https://www.linkedin.com/in/ruslan-vrublevskyi)
-
-        EvidenceBound does not claim that cryptographically authenticated provenance makes source data true, that an LLM can certify its own behavior, or that a working prototype is equivalent to a security-reviewed production system.
     steps:
       - name: Require admin token
         shell: bash
@@ -55,57 +20,31 @@ jobs:
           set -euo pipefail
           test -n "${GH_TOKEN:-}" || { echo '::error::Missing EVIDENCEBOUND_METADATA_ADMIN_TOKEN'; exit 1; }
 
-      - name: Create and populate organization profile repository
+      - name: Read current organization presentation
         shell: bash
         run: |
           set -euo pipefail
+          gh api /orgs/evidencebound --jq '{login,name,email,blog,description,avatar_url}'
+          gh api graphql -f query='query { organization(login:"evidencebound") { id avatarUrl pinnedItems(first:10, types:[REPOSITORY]) { nodes { ... on Repository { nameWithOwner } } } } }' --jq '.data.organization'
 
-          if ! gh api /repos/evidencebound/.github >/dev/null 2>&1; then
-            gh api --method POST /orgs/evidencebound/repos \
-              -f name='.github' \
-              -f description='Canonical GitHub organization profile and community health defaults for EvidenceBound.' \
-              -f homepage='https://evidencebound.org' \
-              -F private=false \
-              -F has_issues=false \
-              -F has_projects=false \
-              -F has_wiki=false \
-              -F has_downloads=false \
-              >/dev/null
-          fi
-
-          gh api --method PATCH /repos/evidencebound/.github \
-            -f description='Canonical GitHub organization profile and community health defaults for EvidenceBound.' \
-            -f homepage='https://evidencebound.org' \
-            >/dev/null
-
-          printf '%s' '{"names":["evidencebound","ai-safety","verifiable-ai","agentic-ai","agent-governance","human-control"]}' \
-            | gh api --method PUT /repos/evidencebound/.github/topics --input - >/dev/null
-
-          profile_b64="$(printf '%s\n' "$PROFILE_MD" | base64 -w0)"
-          existing_sha="$(gh api /repos/evidencebound/.github/contents/profile/README.md --jq '.sha' 2>/dev/null || true)"
-          payload="$(jq -n --arg message 'docs: publish canonical EvidenceBound organization profile' --arg content "$profile_b64" --arg branch 'main' --arg sha "$existing_sha" '{message:$message,content:$content,branch:$branch} + (if $sha == "" then {} else {sha:$sha} end)')"
-          printf '%s' "$payload" | gh api --method PUT /repos/evidencebound/.github/contents/profile/README.md --input - >/dev/null
-
-      - name: Inspect API support for avatar and pinned repositories
+      - name: Inspect supported organization mutations
         shell: bash
         run: |
           set -euo pipefail
-          echo '--- UpdateOrganizationInput fields ---'
+          echo 'UPDATE_ORGANIZATION_INPUT_FIELDS_BEGIN'
           gh api graphql -f query='query { __type(name:"UpdateOrganizationInput") { inputFields { name } } }' --jq '.data.__type.inputFields[].name' || true
-          echo '--- Mutation fields containing pin/avatar/organization ---'
+          echo 'UPDATE_ORGANIZATION_INPUT_FIELDS_END'
+          echo 'PIN_AVATAR_ORGANIZATION_MUTATIONS_BEGIN'
           gh api graphql -f query='query { __type(name:"Mutation") { fields { name } } }' --jq '.data.__type.fields[].name' | grep -Ei 'pin|avatar|organization' || true
+          echo 'PIN_AVATAR_ORGANIZATION_MUTATIONS_END'
 
-      - name: Verify public organization profile
+      - name: Verify canonical org fields
         shell: bash
         run: |
           set -euo pipefail
           org_json="$(gh api /orgs/evidencebound)"
-          repo_json="$(gh api /repos/evidencebound/.github)"
-          profile_json="$(gh api /repos/evidencebound/.github/contents/profile/README.md)"
           [[ "$(jq -r '.name' <<<"$org_json")" == 'EvidenceBound' ]]
           [[ "$(jq -r '.email' <<<"$org_json")" == 'ruslan@evidencebound.org' ]]
           [[ "$(jq -r '.blog' <<<"$org_json")" == 'https://evidencebound.org' ]]
-          [[ "$(jq -r '.visibility' <<<"$repo_json")" == 'public' ]]
-          [[ "$(jq -r '.homepage' <<<"$repo_json")" == 'https://evidencebound.org' ]]
-          [[ -n "$(jq -r '.sha // empty' <<<"$profile_json")" ]]
-          echo 'EVIDENCEBOUND_GITHUB_ORG_PROFILE=PASS'
+          [[ -n "$(jq -r '.description // empty' <<<"$org_json")" ]]
+          echo 'EVIDENCEBOUND_GITHUB_ORG_FIELDS=PASS'
