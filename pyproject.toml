@@ -23,10 +23,10 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/moneyparking/evidencebound-core"
-Issues = "https://github.com/moneyparking/evidencebound-core/issues"
-Changelog = "https://github.com/moneyparking/evidencebound-core/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/moneyparking/evidencebound-core/blob/main/docs/INTEGRATION.md"
+Repository = "https://github.com/evidencebound/evidencebound-core"
+Issues = "https://github.com/evidencebound/evidencebound-core/issues"
+Changelog = "https://github.com/evidencebound/evidencebound-core/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/evidencebound/evidencebound-core/blob/main/docs/INTEGRATION.md"
 
 [project.optional-dependencies]
 crypto = ["cryptography>=46"]
