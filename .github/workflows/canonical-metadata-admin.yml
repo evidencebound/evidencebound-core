@@ -1,0 +1,115 @@
+name: Canonical GitHub Metadata Admin
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/canonical-metadata-admin.yml
+
+permissions:
+  contents: read
+
+jobs:
+  apply-canonical-metadata:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.EVIDENCEBOUND_METADATA_ADMIN_TOKEN }}
+    steps:
+      - name: Require short-lived admin token
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "::error::Missing repository secret EVIDENCEBOUND_METADATA_ADMIN_TOKEN."
+            echo "Create a short-lived fine-grained PAT scoped to the EvidenceBound organization with:"
+            echo "- Repository access: evidencebound-core, evidencebound-recovery-mesh, evidencebound-authority-cut, evidencebound-releaseproof-dws"
+            echo "- Repository permission: Administration = Read and write"
+            echo "- Organization permission: Administration = Read and write"
+            echo "Store it only as the evidencebound-core Actions secret EVIDENCEBOUND_METADATA_ADMIN_TOKEN."
+            exit 1
+          fi
+
+      - name: Apply canonical organization and repository metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh api --method PATCH /orgs/evidencebound \
+            -f name='EvidenceBound' \
+            -f email='ruslan@evidencebound.org' \
+            -f blog='https://evidencebound.org' \
+            -f description='Human control plane for verifiable AI agents: evidence, provenance, executable policy, deterministic verification, bounded blast radius and recovery.' \
+            >/dev/null
+
+          update_repo() {
+            local repo="$1"
+            local description="$2"
+            local homepage="$3"
+            local topics_json="$4"
+
+            gh api --method PATCH "/repos/evidencebound/${repo}" \
+              -f description="$description" \
+              -f homepage="$homepage" \
+              >/dev/null
+
+            printf '%s' "$topics_json" | gh api --method PUT "/repos/evidencebound/${repo}/topics" --input - >/dev/null
+          }
+
+          update_repo \
+            'evidencebound-core' \
+            'Framework-agnostic runtime for evidence-bound AI agents: provenance, executable policy, deterministic verification, blast-radius analysis and fail-closed selective recovery.' \
+            'https://evidencebound.org' \
+            '{"names":["evidencebound","ai-agents","agentic-ai","ai-safety","verifiable-ai","provenance","policy-as-code","deterministic-verification","selective-recovery","agent-governance","human-control","python"]}'
+
+          update_repo \
+            'evidencebound-recovery-mesh' \
+            'Trust-aware recovery for autonomous agent fleets: detect trust breaks, compute dependency blast radius, reuse verified work, and selectively recompute affected branches on Google Cloud.' \
+            'https://evidencebound-recovery-mesh-i3lzjodgra-ew.a.run.app/' \
+            '{"names":["evidencebound","ai-agents","agentic-ai","ai-safety","verifiable-ai","google-adk","vertex-ai","gemini","google-cloud","cloud-run","selective-recovery","trust-graph","agent-governance","human-control"]}'
+
+          update_repo \
+            'evidencebound-authority-cut' \
+            'Reversible autonomy for professional AI agents: compute minimal policy-valid human authority and propagate later correction through reversible descendants without erasing unrelated safe work.' \
+            'https://evidencebound-authority-cut.vercel.app' \
+            '{"names":["evidencebound","ai-agents","agentic-ai","verifiable-ai","strands-agents","aws","amazon-bedrock","agentcore","human-in-the-loop","reversible-autonomy","agent-governance","human-control"]}'
+
+          update_repo \
+            'evidencebound-releaseproof-dws' \
+            'Differential reverification for document workflows: re-ground changed evidence and preserve prior human authority only under the review frozen equivalence policy.' \
+            'https://evidencebound-releaseproof-dws.vercel.app' \
+            '{"names":["evidencebound","document-ai","document-processing","nutrient-dws","differential-reverification","human-review","provenance","verifiable-ai","ai-safety","policy-as-code","pdf","release-governance"]}'
+
+      - name: Verify canonical readback
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          org_json="$(gh api /orgs/evidencebound)"
+          [[ "$(jq -r '.name' <<<"$org_json")" == 'EvidenceBound' ]]
+          [[ "$(jq -r '.email' <<<"$org_json")" == 'ruslan@evidencebound.org' ]]
+          [[ "$(jq -r '.blog' <<<"$org_json")" == 'https://evidencebound.org' ]]
+
+          verify_repo() {
+            local repo="$1"
+            local expected_homepage="$2"
+            shift 2
+            local expected_topics=("$@")
+
+            local repo_json topics_json
+            repo_json="$(gh api "/repos/evidencebound/${repo}")"
+            topics_json="$(gh api "/repos/evidencebound/${repo}/topics")"
+
+            [[ -n "$(jq -r '.description // empty' <<<"$repo_json")" ]]
+            [[ "$(jq -r '.homepage // empty' <<<"$repo_json")" == "$expected_homepage" ]]
+
+            for topic in "${expected_topics[@]}"; do
+              jq -e --arg topic "$topic" '.names | index($topic) != null' <<<"$topics_json" >/dev/null
+            done
+          }
+
+          verify_repo 'evidencebound-core' 'https://evidencebound.org' evidencebound verifiable-ai ai-safety policy-as-code selective-recovery agent-governance human-control
+          verify_repo 'evidencebound-recovery-mesh' 'https://evidencebound-recovery-mesh-i3lzjodgra-ew.a.run.app/' evidencebound verifiable-ai google-adk vertex-ai google-cloud selective-recovery trust-graph
+          verify_repo 'evidencebound-authority-cut' 'https://evidencebound-authority-cut.vercel.app' evidencebound verifiable-ai strands-agents aws amazon-bedrock agentcore reversible-autonomy human-control
+          verify_repo 'evidencebound-releaseproof-dws' 'https://evidencebound-releaseproof-dws.vercel.app' evidencebound document-ai nutrient-dws differential-reverification human-review provenance verifiable-ai
+
+          echo 'CANONICAL_GITHUB_METADATA=PASS'
