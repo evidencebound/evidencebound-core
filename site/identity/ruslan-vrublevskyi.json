@@ -7,7 +7,8 @@
     "homepage": "https://evidencebound.org/",
     "research_library": "https://evidencebound.org/research/",
     "assurance": "https://evidencebound.org/assurance/",
-    "repository": "https://github.com/moneyparking/evidencebound-core",
+    "repository": "https://github.com/evidencebound/evidencebound-core",
+    "organization": "https://github.com/evidencebound",
     "description": "Open-core verification and human-control infrastructure for evidence-bound, policy-bound and recoverable AI agent actions."
   },
   "signalreview": {
@@ -16,7 +17,7 @@
     "relationship": "Separate sports-intelligence product and applied EvidenceBound reference implementation."
   },
   "profiles": {
-    "github": "https://github.com/moneyparking",
+    "github_organization": "https://github.com/evidencebound",
     "linkedin": "https://www.linkedin.com/in/ruslan-vrublevskyi"
   },
   "contact": "ruslan@evidencebound.org",
