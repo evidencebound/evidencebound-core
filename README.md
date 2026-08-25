@@ -1,9 +1,9 @@
 # EvidenceBound Core
 
-[![CI](https://github.com/moneyparking/evidencebound-core/actions/workflows/ci.yml/badge.svg)](https://github.com/moneyparking/evidencebound-core/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/moneyparking/evidencebound-core)](https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0)
+[![CI](https://github.com/evidencebound/evidencebound-core/actions/workflows/ci.yml/badge.svg)](https://github.com/evidencebound/evidencebound-core/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/evidencebound/evidencebound-core)](https://github.com/evidencebound/evidencebound-core/releases/tag/v0.3.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
-[![License: Apache-2.0](https://img.shields.io/github/license/moneyparking/evidencebound-core)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/github/license/evidencebound/evidencebound-core)](LICENSE)
 
 **EvidenceBound is a framework-agnostic, LLM-independent runtime for binding agent outputs to evidence, provenance and policy; verifying protected state; computing dependency blast radius; and planning fail-closed selective recovery.**
 
