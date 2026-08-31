@@ -116,10 +116,7 @@ export async function evaluateControl(state) {
 
 export async function grantCurrentAuthority(state) {
   const next = clone(state);
-  const decision = await evaluateControl({
-    ...next,
-    authority: { grant: null, revoked: false },
-  });
+  const decision = await evaluateControl(next);
   if (decision.status !== 'HUMAN_REQUIRED') {
     throw new Error(`cannot grant authority while control state is ${decision.status}`);
   }
