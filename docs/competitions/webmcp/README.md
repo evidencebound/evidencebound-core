@@ -1,25 +1,24 @@
 # EvidenceBound WebMCP Authority Compiler — Competition Evidence Pack
 
 Competition: OpenAI WebMCP Challenge 2026
-Status of this document: branch evidence pack, 2026-08-31
-Competition branch: `feat/webmcp-authority-compiler-2026`
-Pre-competition baseline parent: `9a2137fe29d0532120a774398a45fa90a9850153`
-Current critical implementation head: `1adda44a35d4b96c937e4fa5dd4f7ac7c7cd5e7b`
+Status: production-deployed engineering evidence pack, 2026-08-31
+Pre-competition baseline: `9a2137fe29d0532120a774398a45fa90a9850153`
+Final competition implementation head: `14f7a81200daafa717af474c0747ac4e215b195d`
+Production merge SHA: `1655514e60e8266331cb431c7726f37725608c99`
+Canonical judge URL: `https://evidencebound.org/webmcp/`
 License: Apache-2.0
 
 ## Thesis
 
-**WebMCP exposes browser capability; EvidenceBound compiles current evidence, policy and human authority into which capability is valid now, then re-checks that authority at execution time.**
+**WebMCP exposes browser capability; EvidenceBound compiles current evidence, policy and human authority into which capability is valid now, then re-checks that authority at execution time and immediately before receipt commit.**
 
-The judge-facing shorthand is:
+Judge shorthand:
 
 > **Capability follows current authority.**
 
-The WebMCP-period contribution is deliberately narrower than EvidenceBound Core's prior work. It does **not** claim to invent approval, provenance, revocation, invalidation, proof receipts, dependency graphs, MCP, or dynamic tool registration. It combines those control requirements into a browser-native WebMCP authority projection whose model-visible mutation capability changes when evidence/authority changes, while a retained stale tool callback still fails closed at execution.
+This competition-period contribution does **not** claim to invent approval, provenance, revocation, invalidation, proof receipts, dependency graphs, MCP, or dynamic tool registration. The contribution is their browser-native authority projection: correction/revocation changes the model-visible WebMCP capability surface, while retained or racing execution attempts still fail closed before a success receipt can commit.
 
 ## Why WebMCP is load-bearing
-
-The controlled judge workflow is not a chat wrapper around a normal button. WebMCP is the agent's structured browser capability plane:
 
 ```mermaid
 flowchart LR
@@ -29,117 +28,141 @@ flowchart LR
   C --> S{Control state}
   S -->|HUMAN_REQUIRED / STALE / INVALIDATED / BLOCKED| R[Safe WebMCP tools only]
   S -->|AUTHORIZED| A[Safe tools + execute_authorized_release]
-  A --> X[execute-time authority recheck]
-  X -->|still authorized| Q[Controlled receipt]
-  X -->|changed / revoked / stale / blocked| F[Fail closed before effect]
+  A --> X[execute-time verification]
+  X --> K[commit-time authoritative-state check]
+  K -->|still current| Q[Controlled receipt]
+  K -->|changed / competing execution| F[Fail closed before effect]
 ```
 
-Removing WebMCP materially degrades the core judge behavior: the agent no longer receives the structured tool surface whose lifecycle is being compiled from authority state. Removing the EvidenceBound gate materially degrades it in the opposite direction: the mutation tool no longer encodes current evidence/authority validity.
+Without WebMCP, the agent loses the structured browser capability plane whose lifecycle is controlled. Without the EvidenceBound gate, that capability plane does not encode current evidence and human authority.
 
 ## Five control states
 
 | State | Meaning | Mutation tool |
 |---|---|---|
-| `AUTHORIZED` | Required evidence is current and the human grant matches its exact fingerprint. | Registered, with execute-time recheck. |
+| `AUTHORIZED` | Required evidence is current and the human grant matches its exact fingerprint. | Registered; execution re-checks authority. |
 | `HUMAN_REQUIRED` | Evidence is usable but no current human grant exists. | Absent. |
 | `STALE` | Required evidence exceeded its validity horizon. | Absent. |
 | `INVALIDATED` | A prior grant was revoked or no longer matches current evidence. | Removed/absent. |
-| `BLOCKED` | Required evidence/policy is not satisfied. | Absent. |
+| `BLOCKED` | Required evidence/policy is not satisfied, or an execution loses the commit-time race against newer authoritative state. | Absent / execution refused. |
 
-Fail-closed precedence: `BLOCKED > STALE > INVALIDATED > HUMAN_REQUIRED > AUTHORIZED`.
+Fail-closed precedence in the authority evaluator: `BLOCKED > STALE > INVALIDATED > HUMAN_REQUIRED > AUTHORIZED`.
 
-## Human boundary
+## Human authority boundary
 
-The agent can inspect state and record an authority request. It cannot grant, approve, revoke, correct, restore, or bypass authority through WebMCP.
+The model-callable surface can:
 
-Human-only visible UI controls own those transitions. The pure authority core now also rejects replacement grants directly from `INVALIDATED`, `STALE`, or `BLOCKED`; explicit recovery must return the system to `HUMAN_REQUIRED` before a new grant can be issued.
+- inspect current evidence/authority;
+- record a request for human authority;
+- list bounded controlled receipts;
+- execute only when the exact current grant is valid.
+
+The model-callable surface cannot grant, approve, revoke, correct, restore, or bypass human authority. Human-only visible UI controls own those transitions.
+
+A replacement grant is rejected while state is `INVALIDATED`, `STALE`, or `BLOCKED`; explicit human recovery must return the system to `HUMAN_REQUIRED` before a new exact-snapshot grant can be issued.
 
 ## WebMCP tool surface
 
-Always eligible for registration:
+Always eligible:
 
-- `inspect_release_control` — read-only current state, evidence summary, authority fingerprint and safe next action.
-- `request_release_authority` — records a visible pending request only; creates no grant.
-- `list_control_receipts` — reads bounded tab-local controlled receipts.
+- `inspect_release_control`
+- `request_release_authority`
+- `list_control_receipts`
 
 Conditionally registered:
 
-- `execute_authorized_release` — exists only while `evaluateControl()` returns `AUTHORIZED`; before the controlled effect it re-runs `evaluateControl()` on live state. A callback retained from an earlier discovery therefore cannot bypass a later correction/revocation.
+- `execute_authorized_release` — only while current state is `AUTHORIZED`.
 
-Implementation uses the WebMCP imperative API through `document.modelContext.registerTool(...)` and registration `AbortSignal`s. The page feature-detects the real runtime and reports `WEBMCP_UNAVAILABLE` rather than simulating WebMCP.
+The adapter uses `document.modelContext.registerTool(...)` with registration `AbortSignal`s. The public app feature-detects the real runtime and reports `WEBMCP_UNAVAILABLE` rather than simulating WebMCP.
 
-## Critical implementation map
+## Race / stale-authority hardening
 
-| Path | Responsibility | Competition-period evidence |
-|---|---|---|
-| `site/webmcp/control-core.mjs` | Deterministic evidence fingerprint, five-state evaluation, grant/revoke/recovery semantics, controlled receipt gate. | Added after baseline; hardened through `1adda44a35d4b96c937e4fa5dd4f7ac7c7cd5e7b`. |
-| `site/webmcp/webmcp-adapter.mjs` | WebMCP registration lifecycle, safe tools, conditional execution tool, execute-time revalidation. | Added in `2283993be05589d6e1f9c30e5ea259fe6d191507`. |
-| `site/webmcp/app.mjs` | Real browser feature detection, human-only transitions, live compiler/browser tool lists, visible event/receipt state. | Added in `dc5d10c872d1845291a4f6bb177b5be6c4bc2b9a`. |
-| `site/webmcp/index.html` | Credential-free judge surface and explicit claim/demo boundaries. | Added in `265a5fd855f9f06d8a23f7e01f22b67bf08f8a4c`. |
-| `site/webmcp/styles.css` | Responsive, accessibility-aware terminal surface. | Added in `45b1e135e13061264b1fdb5e96bfce261b42d530`. |
-| `site/webmcp/control-core.test.mjs` | State/recovery/receipt contract tests. | TDD RED/GREEN history retained in branch. |
-| `site/webmcp/webmcp-adapter.test.mjs` | Lifecycle, human-boundary, receipt and retained-stale-descriptor adversarial tests. | TDD RED/GREEN history retained in branch. |
-| `tests/test_webmcp_site.py` | Static public-surface/CSP/no-network/no-secret contract. | Added in `ccc9375d5ff30490db8ff73a39c9d00b3d8120cd`; initial RED recorded before UI implementation. |
-| `.github/workflows/webmcp.yml` | Pinned Node 22 syntax + unit/adversarial gate. | Added during competition period; browser modules explicitly syntax-checked. |
-| `site/vercel.json` | Self-hosted script CSP while retaining same-origin/network/frame/base/form restrictions. | Changed in `5c79243086088d26ff64d9b5c4596c94d12d8330`. |
+Formal review found two material execution gaps after the initial green implementation. Both were converted into adversarial RED tests before fixes.
 
-## TDD evidence retained in Git history
+### Correction during async verification
 
-The branch intentionally preserves meaningful RED commits rather than presenting only a final green state:
+A callback could begin from an authorized object while a human correction replaced authoritative state during an async digest. The hardened callback checks that the authoritative state object is still the verified snapshot immediately before receipt commit; no await exists between that check and `onReceipt()`.
 
-1. Missing `control-core.mjs` → WebMCP workflow failed exactly on `ERR_MODULE_NOT_FOUND`.
-2. Extended correction/revocation/receipt contract → failed on missing exports before implementation.
-3. Missing `webmcp-adapter.mjs` → existing state tests passed while adapter suite failed exactly on `ERR_MODULE_NOT_FOUND`.
-4. Missing judge UI/old CSP → existing Python tests passed while five new public-surface assertions failed.
-5. Replacement-grant invariant → 19/20 WebMCP tests passed; the sole failure was the expected missing rejection for re-granting corrected `INVALIDATED` authority. `1adda44...` fixed the invariant.
+Evidence:
 
-This history is evidence of the implemented contract, not a claim that CI failures themselves improve judging.
+- RED commit: `3b135b2af0fc56beb56a3f91a2df226bad7f3401`
+- expected failing WebMCP run: `33391975115`
+- fix: `b5ccff91c76c51c2de4298798308b4b5464937f4`
 
-## Current verified engineering status at critical implementation head
+### Concurrent execution
 
-At `1adda44a35d4b96c937e4fa5dd4f7ac7c7cd5e7b`:
+Two parallel calls could originate from the same authorized snapshot. The final contract allows at most one to commit a receipt; once the first receipt changes authoritative state, the second loses the commit check and returns typed `BLOCKED / BLOCKED_BEFORE_EFFECT` while preserving `authorityStatus=AUTHORIZED` when that distinction is relevant.
 
-- WebMCP Node syntax gate: **PASS**.
-- WebMCP unit/adversarial suite: **PASS**.
-- Full EvidenceBound Core GitHub Actions CI: **PASS** (`33364696242`).
-- Exact-commit Vercel preview build: **READY** (`dpl_CmNKp1zRBgcEjHPCVHddY9vjx1v9`).
-- Preview HTTP readback from this Project Chat: **BLOCKED** by Vercel Deployment Protection / SSO; this does not count as public production acceptance.
-- Real WebMCP discovery/invocation in a supported judge browser: **UNRUN** in this Project Chat until a WebMCP-capable browser environment is available.
-- Canonical production `/webmcp/` acceptance: **UNRUN** until merge/deploy.
+Evidence:
 
-The final production document must only upgrade the last two statuses after observed evidence.
+- RED commit: `610c2156d1a8305b5e0e40349b33885e1e40da53`
+- expected failing WebMCP run: `33392402552`
+- fix/final implementation head: `14f7a81200daafa717af474c0747ac4e215b195d`
 
-## Security and trust boundaries
+These tests support the implemented adapter contract; they are not a claim of formal verification or universal race freedom outside that contract.
 
-- No agent-callable grant/revoke/correct/restore tool.
-- No external network request in the canonical judge JS.
-- No secret, token, cookie or environment dependency in the app.
-- No external script/CDN dependency; CSP permits only self-hosted script execution.
-- Mutation capability absence is defense in depth; execution independently revalidates live authority.
-- Controlled receipts are tab-local identifiers and do not claim independent anchoring, authentication, immutability or a real external deployment.
-- The release effect is intentionally controlled and has `externalSideEffect: false`.
+## Production acceptance
 
-## Prior work and rules
+At production merge SHA `1655514e60e8266331cb431c7726f37725608c99`:
 
-- Rules freeze: [`../2026-webmcp-sibyl-rules-freeze.md`](../2026-webmcp-sibyl-rules-freeze.md)
-- Conservative prior-work ledger: [`../2026-preexisting-work-ledger.md`](../2026-preexisting-work-ledger.md)
-- Architecture tournament/spec: [`../../superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md`](../../superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md)
-- Execution plan: [`../../superpowers/plans/2026-08-31-webmcp-authority-compiler.md`](../../superpowers/plans/2026-08-31-webmcp-authority-compiler.md)
-- Root pre-existing-work disclosure: [`../../../PREEXISTING_WORK.md`](../../../PREEXISTING_WORK.md)
+- post-merge WebMCP workflow: **PASS** — run `33393610245`;
+- post-merge full Core CI: **PASS** — run `33393610270`, including security, clean-room, supply-chain and trusted supply-chain attestation jobs;
+- exact-SHA Vercel deployment: **READY / production** — `dpl_GFsK47tx8z4P5F1G42rrgSJuin5N`;
+- canonical `https://evidencebound.org/webmcp/`: **HTTP 200**;
+- `app.mjs`, `webmcp-adapter.mjs`, `control-core.mjs`: **HTTP 200**;
+- observed CSP restricts scripts/network to self and blocks framing; HSTS, `nosniff`, frame deny and restrictive Permissions-Policy are present;
+- real supported-browser WebMCP discovery/invocation/removal: **UNRUN in this Project environment**.
+
+See [`PRODUCTION_ACCEPTANCE.md`](PRODUCTION_ACCEPTANCE.md) for the exact evidence/claim boundary.
+
+## Competition-period implementation map
+
+| Path | Responsibility |
+|---|---|
+| `site/webmcp/control-core.mjs` | Evidence fingerprint, five-state evaluation, human grant/revoke/recovery, bounded controlled receipts. |
+| `site/webmcp/webmcp-adapter.mjs` | Dynamic WebMCP lifecycle, execute-time verification, stale-state and concurrency commit gate. |
+| `site/webmcp/app.mjs` | Real runtime feature detection, human-only transitions, compiler/browser tool lists, visible receipts/events. |
+| `site/webmcp/index.html` | Credential-free judge surface and explicit controlled-demo/claim boundary. |
+| `site/webmcp/styles.css` | Responsive judge UI. |
+| `site/webmcp/control-core.test.mjs` | Authority/state/recovery/receipt contract. |
+| `site/webmcp/webmcp-adapter.test.mjs` | Lifecycle, stale descriptor, correction-during-verification and concurrent-execution adversarial gates. |
+| `tests/test_webmcp_site.py` | Static public-surface, CSP, no-network and no-secret contract. |
+| `.github/workflows/webmcp.yml` | Pinned Node syntax + WebMCP tests. |
+| `site/vercel.json` | Self-hosted module CSP and security headers. |
+
+## TDD / provenance boundary
+
+Meaningful RED commits remain in Git history rather than being squashed away. The merge commit has the pre-competition main baseline and final WebMCP branch head as parents, preserving the challenge-period boundary.
+
+Pre-existing work is explicitly disclosed in [`../2026-preexisting-work-ledger.md`](../2026-preexisting-work-ledger.md) and the root [`../../../PREEXISTING_WORK.md`](../../../PREEXISTING_WORK.md). Do not present pre-existing EvidenceBound provenance, recovery, persistence, signed-receipt, authority-cut or verified-memory primitives as WebMCP-period inventions.
+
+## Security / claim boundaries
+
+- no model-callable human authority mutation;
+- no external script/CDN dependency;
+- no challenge credential, token or environment-secret dependency;
+- no external network call in the canonical judge JS;
+- controlled receipt explicitly reports `externalSideEffect=false`;
+- receipt is tab-local and is not claimed as independently durable/anchored;
+- public production deployment is real, but the controlled `execute_authorized_release` effect is not a real production release;
+- no claim of first/only/unique invention, security certification, guaranteed safety, customers or traction without separate evidence.
 
 ## Judge materials
 
-- [`CLAIMS_LEDGER.md`](CLAIMS_LEDGER.md)
-- [`JUDGE_PATH.md`](JUDGE_PATH.md)
-- [`VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md)
+- [`JUDGE_PATH.md`](JUDGE_PATH.md) — exact 60–90 second behavioral proof.
+- [`VIDEO_SCRIPT.md`](VIDEO_SCRIPT.md) — claim-safe <3 minute submission script.
+- [`PRODUCTION_ACCEPTANCE.md`](PRODUCTION_ACCEPTANCE.md) — post-merge CI/deployment/HTTP evidence.
+- [`CLAIMS_LEDGER.md`](CLAIMS_LEDGER.md) — allowed/prohibited wording.
+- [`../2026-preexisting-work-ledger.md`](../2026-preexisting-work-ledger.md) — conservative prior-work disclosure.
+- [`../../superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md`](../../superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md) — architecture tournament and design freeze.
 
-## Current winner-gap assessment
+## Winner-gap status
 
-| Criterion | Current evidence | Main remaining gap before technical READY |
+| Criterion | Current strength | Remaining controllable gap |
 |---|---|---|
-| WebMCP Leverage | Tool discoverability itself follows authority state; stale callback revalidation is tested. | Observe real discovery/invocation/removal in a supported WebMCP browser after public deployment. |
-| Execution | Dedicated Node gate + full Core CI + exact-commit preview READY. | Public production smoke/readback and visual judge-path rehearsal. |
-| Potential Impact | Pattern generalizes to consequential browser workflows requiring revocable current authority. | Keep commercial/generalization claim grounded; no fabricated customers/traction. |
-| Creativity & Ambition | Browser capability is treated as a revocable projection of evidence/authority rather than a static action catalog. | Make this distinction obvious in the first minute of the final demo. |
+| WebMCP Leverage | Current authority directly controls model-visible tool lifecycle; execution independently re-checks state. | Run and capture the exact path in a supported WebMCP browser. |
+| Execution | Post-merge CI, adversarial tests, production deployment and canonical HTTP/security acceptance PASS. | Browser-native rehearsal/video only. |
+| Potential Impact | Reusable pattern for consequential browser workflows where authorization can become stale or revoked. | Keep generalization concrete and avoid unsupported market claims. |
+| Creativity & Ambition | Treats browser capability as a revocable projection of evidence + authority rather than a static action catalog. | Make this distinction unmistakable in the first 15 seconds of the video. |
 
-The project is **not technically READY** while the public production and real-browser WebMCP gates remain non-PASS.
+Engineering production acceptance is **PASS** for the gates available in this Project environment. Competition/browser acceptance remains **UNRUN** until a supported WebMCP browser completes [`JUDGE_PATH.md`](JUDGE_PATH.md). Submission remains **ACTIVE**, not complete.
