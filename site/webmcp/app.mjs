@@ -13,6 +13,7 @@ import { createWebMCPController } from './webmcp-adapter.mjs';
 let state = createInitialState();
 let controller = null;
 let browserToolNames = [];
+let browserToolFallback = 'Not probed yet';
 let runtimeState = 'WEBMCP_UNAVAILABLE';
 let runtimeDetail = 'This browser does not expose document.modelContext. Use the supported ChatGPT browser or Chrome with WebMCP enabled.';
 let events = [];
@@ -115,7 +116,7 @@ async function render() {
 
   const compilerToolNames = controller?.getRegisteredToolNames() ?? [];
   replaceList(elements.compilerTools, compilerToolNames, runtimeState === 'AVAILABLE' ? 'No tools registered' : 'WebMCP runtime unavailable');
-  replaceList(elements.browserTools, browserToolNames, runtimeState === 'AVAILABLE' ? 'Not probed yet' : 'WebMCP runtime unavailable');
+  replaceList(elements.browserTools, browserToolNames, runtimeState === 'AVAILABLE' ? browserToolFallback : 'WebMCP runtime unavailable');
 
   elements.runtime.textContent = runtimeState;
   elements.runtime.title = runtimeDetail;
@@ -146,7 +147,8 @@ async function render() {
 async function probeBrowserTools({ record = true } = {}) {
   if (!document.modelContext || typeof document.modelContext.getTools !== 'function') {
     browserToolNames = [];
-    if (record) recordEvent('Browser tool probe unavailable: document.modelContext.getTools is absent.');
+    browserToolFallback = 'Use the browser Site tools menu; page-side enumeration is unavailable in this runtime.';
+    if (record) recordEvent('Page-side tool enumeration unavailable; use the browser Site tools menu.');
     await render();
     return;
   }
@@ -154,12 +156,14 @@ async function probeBrowserTools({ record = true } = {}) {
   try {
     const tools = await document.modelContext.getTools();
     browserToolNames = tools.map((tool) => tool.name).sort();
+    browserToolFallback = 'Browser reported no WebMCP tools.';
     if (record) recordEvent(`Browser reported ${browserToolNames.length} WebMCP tool(s).`);
   } catch (error) {
     browserToolNames = [];
     runtimeState = 'WEBMCP_ERROR';
     runtimeDetail = error instanceof Error ? error.message : String(error);
-    if (record) recordEvent(`Browser tool probe failed: ${runtimeDetail}`);
+    browserToolFallback = `Browser tool probe failed: ${runtimeDetail}`;
+    if (record) recordEvent(browserToolFallback);
   }
   await render();
 }
@@ -216,6 +220,7 @@ function bindControls() {
     state = createInitialState();
     events = [];
     browserToolNames = [];
+    browserToolFallback = 'Not probed yet';
     recordEvent('Controlled demo reset to current evidence with no human grant.');
     void syncController();
   });
