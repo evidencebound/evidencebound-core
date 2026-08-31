@@ -56,7 +56,11 @@ def test_human_authority_mutations_are_ui_only_not_webmcp_tools() -> None:
 
 def test_chatgpt_runtime_without_gettools_uses_site_tools_menu_fallback() -> None:
     app = _read(WEBMCP / "app.mjs")
-    assert "Use the browser Site tools menu; page-side enumeration is unavailable in this runtime." in app
+    fallback = (
+        "Use the browser Site tools menu; "
+        "page-side enumeration is unavailable in this runtime."
+    )
+    assert fallback in app
     assert "Browser tool probe unavailable: document.modelContext.getTools is absent." not in app
 
 
