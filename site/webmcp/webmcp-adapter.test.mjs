@@ -153,3 +153,30 @@ test('retained stale descriptor fails closed after correction and creates no rec
   assert.equal(result.effect, 'BLOCKED_BEFORE_EFFECT');
   assert.equal(h.receipts.length, 0);
 });
+
+test('correction during async authority verification blocks before receipt commit', async () => {
+  const h = harness(await grantCurrentAuthority(createInitialState()));
+  await h.controller.sync();
+  const tool = h.modelContext.descriptor('execute_authorized_release');
+
+  const subtle = globalThis.crypto.subtle;
+  const originalDigest = subtle.digest.bind(subtle);
+  let digestCalls = 0;
+  subtle.digest = async (...args) => {
+    const result = await originalDigest(...args);
+    digestCalls += 1;
+    if (digestCalls === 1) {
+      h.setState(correctSecurityEvidence(h.getState()));
+    }
+    return result;
+  };
+
+  try {
+    const result = await tool.execute({ releaseNote: 'Race correction against execution' });
+    assert.equal(result.status, 'INVALIDATED');
+    assert.equal(result.effect, 'BLOCKED_BEFORE_EFFECT');
+    assert.equal(h.receipts.length, 0);
+  } finally {
+    subtle.digest = originalDigest;
+  }
+});
