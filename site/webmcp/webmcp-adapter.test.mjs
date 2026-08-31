@@ -180,3 +180,21 @@ test('correction during async authority verification blocks before receipt commi
     subtle.digest = originalDigest;
   }
 });
+
+test('concurrent execution commits exactly one receipt and reports the loser as BLOCKED', async () => {
+  const h = harness(await grantCurrentAuthority(createInitialState()));
+  await h.controller.sync();
+  const tool = h.modelContext.descriptor('execute_authorized_release');
+
+  const [first, second] = await Promise.all([
+    tool.execute({ releaseNote: 'Concurrent execution A' }),
+    tool.execute({ releaseNote: 'Concurrent execution B' }),
+  ]);
+
+  const results = [first, second];
+  assert.equal(results.filter((result) => result.effect === 'CONTROLLED_RELEASE_EXECUTED').length, 1);
+  assert.equal(results.filter((result) => result.effect === 'BLOCKED_BEFORE_EFFECT').length, 1);
+  assert.equal(results.find((result) => result.effect === 'BLOCKED_BEFORE_EFFECT').status, 'BLOCKED');
+  assert.equal(h.receipts.length, 1);
+  assert.equal(h.receipts[0].sequence, 1);
+});
