@@ -215,13 +215,26 @@ export function createWebMCPController({
         const receipt = await createExecutionReceipt(liveState);
 
         // All authority verification above is asynchronous. Human correction,
-        // revocation, or recovery replaces the authoritative state object. Do
-        // not commit a receipt from a snapshot that stopped being authoritative
-        // during either digest await. There is intentionally no await between
-        // this identity check and onReceipt(), closing the commit-time window.
+        // revocation, recovery, or another successful execution replaces the
+        // authoritative state object. Do not commit a receipt from a snapshot
+        // that stopped being authoritative during either digest await. There
+        // is intentionally no await between this identity check and onReceipt().
         const commitState = getState();
         if (commitState !== liveState) {
           const commitDecision = await evaluateControl(commitState);
+          if (commitDecision.status === 'AUTHORIZED') {
+            return {
+              status: 'BLOCKED',
+              authorityStatus: 'AUTHORIZED',
+              reason: 'authoritative state changed during execution verification; retry against current state',
+              evidenceFingerprint: commitDecision.evidenceFingerprint,
+              grantId: commitDecision.grantId,
+              effect: 'BLOCKED_BEFORE_EFFECT',
+              externalSideEffect: false,
+              releaseNote,
+              stateChangedDuringVerification: true,
+            };
+          }
           return {
             ...commitDecision,
             effect: 'BLOCKED_BEFORE_EFFECT',
