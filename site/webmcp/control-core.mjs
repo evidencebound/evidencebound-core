@@ -135,6 +135,13 @@ export async function grantCurrentAuthority(state) {
   return next;
 }
 
+export function revokeAuthority(state) {
+  const next = clone(state);
+  next.authority.revoked = true;
+  next.pendingAuthorityRequest = false;
+  return next;
+}
+
 export function expireSecurityEvidence(state) {
   const next = clone(state);
   next.evidence.securityScan.freshness = 'STALE';
@@ -152,4 +159,49 @@ export function removeRequiredEvidence(state) {
   const next = clone(state);
   next.evidence.manifest.present = false;
   return next;
+}
+
+export function restoreFreshEvidence(state) {
+  const next = clone(state);
+  next.evidence.manifest.present = true;
+  next.evidence.manifest.revision += 1;
+  next.evidence.securityScan.present = true;
+  next.evidence.securityScan.verdict = 'PASS';
+  next.evidence.securityScan.findings = 0;
+  next.evidence.securityScan.revision += 1;
+  next.evidence.securityScan.freshness = 'CURRENT';
+  next.policy.hardBlocked = false;
+  next.authority = { grant: null, revoked: false };
+  next.pendingAuthorityRequest = false;
+  return next;
+}
+
+export function recordPendingAuthorityRequest(state) {
+  const next = clone(state);
+  next.pendingAuthorityRequest = true;
+  return next;
+}
+
+export async function createExecutionReceipt(state) {
+  const decision = await evaluateControl(state);
+  if (decision.status !== 'AUTHORIZED') {
+    throw new Error(`execution requires AUTHORIZED control state; got ${decision.status}`);
+  }
+  const sequence = state.receipts.length + 1;
+  const receiptBody = {
+    effect: 'CONTROLLED_RELEASE_EXECUTED',
+    evidenceFingerprint: decision.evidenceFingerprint,
+    grantId: decision.grantId,
+    sequence,
+  };
+  const receiptHash = await sha256Hex(canonicalize(receiptBody));
+  return {
+    receiptId: `receipt-${receiptHash.slice(0, 16)}`,
+    status: 'AUTHORIZED',
+    effect: 'CONTROLLED_RELEASE_EXECUTED',
+    externalSideEffect: false,
+    evidenceFingerprint: decision.evidenceFingerprint,
+    grantId: decision.grantId,
+    sequence,
+  };
 }
