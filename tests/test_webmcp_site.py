@@ -25,7 +25,7 @@ def test_webmcp_judge_surface_and_modules_exist() -> None:
 
 def test_webmcp_page_uses_only_self_hosted_module_script() -> None:
     html = _read(WEBMCP / "index.html")
-    scripts = re.findall(r'<script\b[^>]*src="([^"]+)"[^>]*>', html, flags=re.IGNORECASE)
+    scripts = re.findall(r'<script\\b[^>]*src="([^"]+)"[^>]*>', html, flags=re.IGNORECASE)
     assert scripts == ["/webmcp/app.mjs"]
     assert all(not src.startswith(("http://", "https://", "//")) for src in scripts)
     assert '<script type="module" src="/webmcp/app.mjs"></script>' in html
@@ -43,7 +43,7 @@ def test_judge_surface_makes_control_states_and_demo_boundary_visible() -> None:
 
 def test_human_authority_mutations_are_ui_only_not_webmcp_tools() -> None:
     adapter = _read(WEBMCP / "webmcp-adapter.mjs")
-    registered_names = re.findall(r"name:\s*'([^']+)'", adapter)
+    registered_names = re.findall(r"name:\\s*'([^']+)'", adapter)
     assert set(registered_names) == {
         "inspect_release_control",
         "request_release_authority",
@@ -52,6 +52,12 @@ def test_human_authority_mutations_are_ui_only_not_webmcp_tools() -> None:
     }
     forbidden = re.compile(r"grant|approve|revoke|correct|restore", re.IGNORECASE)
     assert not any(forbidden.search(name) for name in registered_names)
+
+
+def test_chatgpt_runtime_without_gettools_uses_site_tools_menu_fallback() -> None:
+    app = _read(WEBMCP / "app.mjs")
+    assert "Use the browser Site tools menu; page-side enumeration is unavailable in this runtime." in app
+    assert "Browser tool probe unavailable: document.modelContext.getTools is absent." not in app
 
 
 def test_vercel_csp_allows_only_self_hosted_scripts_and_preserves_fail_closed_headers() -> None:
@@ -72,7 +78,7 @@ def test_vercel_csp_allows_only_self_hosted_scripts_and_preserves_fail_closed_he
 
 
 def test_webmcp_app_has_no_network_or_secret_dependency() -> None:
-    combined = "\n".join(
+    combined = "\\n".join(
         _read(WEBMCP / name)
         for name in ("control-core.mjs", "webmcp-adapter.mjs", "app.mjs")
     )
