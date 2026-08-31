@@ -15,5 +15,10 @@ jobs:
           cache: ""
       - name: Report Node version
         run: node --version
+      - name: Syntax-check browser modules
+        run: |
+          node --check site/webmcp/control-core.mjs
+          node --check site/webmcp/webmcp-adapter.mjs
+          node --check site/webmcp/app.mjs
       - name: Run WebMCP unit and adversarial tests
         run: node --test site/webmcp/*.test.mjs
