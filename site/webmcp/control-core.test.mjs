@@ -64,6 +64,28 @@ test('restoring fresh evidence clears obsolete authority and requires a new huma
   assert.equal(state.authority.grant, null);
 });
 
+test('invalidated authority cannot be silently replaced before explicit recovery', async () => {
+  let corrected = await grantCurrentAuthority(createInitialState());
+  corrected = correctSecurityEvidence(corrected);
+  assert.equal((await evaluateControl(corrected)).status, 'INVALIDATED');
+  await assert.rejects(() => grantCurrentAuthority(corrected), /INVALIDATED/);
+
+  let revoked = await grantCurrentAuthority(createInitialState());
+  revoked = revokeAuthority(revoked);
+  assert.equal((await evaluateControl(revoked)).status, 'INVALIDATED');
+  await assert.rejects(() => grantCurrentAuthority(revoked), /INVALIDATED/);
+});
+
+test('stale or blocked state cannot receive authority', async () => {
+  const stale = expireSecurityEvidence(createInitialState());
+  assert.equal((await evaluateControl(stale)).status, 'STALE');
+  await assert.rejects(() => grantCurrentAuthority(stale), /STALE/);
+
+  const blocked = removeRequiredEvidence(createInitialState());
+  assert.equal((await evaluateControl(blocked)).status, 'BLOCKED');
+  await assert.rejects(() => grantCurrentAuthority(blocked), /BLOCKED/);
+});
+
 test('an agent authority request never grants authority', async () => {
   let state = createInitialState();
   state = recordPendingAuthorityRequest(state);
