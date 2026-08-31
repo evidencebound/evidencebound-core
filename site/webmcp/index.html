@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#081018">
+  <meta name="description" content="EvidenceBound WebMCP Authority Compiler: browser capability follows current evidence and human authority.">
+  <link rel="canonical" href="https://evidencebound.org/webmcp/">
+  <link rel="stylesheet" href="/webmcp/styles.css">
+  <title>EvidenceBound WebMCP Authority Compiler</title>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to control plane</a>
+  <header class="topbar">
+    <a class="brand" href="/">EvidenceBound</a>
+    <div class="topmeta">
+      <span>WebMCP Challenge 2026</span>
+      <span class="runtime" id="runtime-badge" aria-live="polite">WEBMCP_UNAVAILABLE</span>
+    </div>
+  </header>
+
+  <main id="main" class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">Browser-native human control plane</p>
+        <h1 id="hero-title">Capability follows current authority.</h1>
+        <p class="lead">WebMCP exposes structured browser capability. EvidenceBound decides whether that capability is valid <em>now</em>, from current evidence, policy, and an exact human grant.</p>
+      </div>
+      <aside class="boundary" aria-label="Demo boundary">
+        <strong>Controlled demo.</strong>
+        <span>No external deployment, production mutation, credential, or customer system is touched by this judge path.</span>
+      </aside>
+    </section>
+
+    <section class="status-grid" aria-label="Current control status">
+      <article class="primary-status panel">
+        <div class="panel-head">
+          <div>
+            <p class="label">Current control state</p>
+            <div class="state" id="control-state" data-state="HUMAN_REQUIRED">HUMAN_REQUIRED</div>
+          </div>
+          <button class="quiet" id="probe-tools" type="button">Probe browser tools</button>
+        </div>
+        <p class="reason" id="control-reason">Current evidence is usable, but no human grant exists.</p>
+        <dl class="decision-meta">
+          <div><dt>Evidence fingerprint</dt><dd><code id="fingerprint">pending</code></dd></div>
+          <div><dt>Grant</dt><dd><code id="grant-id">none</code></dd></div>
+          <div><dt>Pending request</dt><dd id="pending-request">false</dd></div>
+        </dl>
+      </article>
+
+      <article class="panel tools-panel">
+        <p class="label">Authority compiler output</p>
+        <h2>Model-visible capability</h2>
+        <div class="tool-columns">
+          <div>
+            <span class="subhead">Registered by compiler</span>
+            <ul class="tool-list" id="compiler-tools"><li>Not registered</li></ul>
+          </div>
+          <div>
+            <span class="subhead">Reported by browser</span>
+            <ul class="tool-list" id="browser-tools"><li>Not probed</li></ul>
+          </div>
+        </div>
+        <p class="micro" id="tool-note">The mutation tool must be absent until authority is exact and current.</p>
+      </article>
+    </section>
+
+    <section class="proof-strip" aria-label="Five explicit control states">
+      <div><strong>AUTHORIZED</strong><span>exact current grant</span></div>
+      <div><strong>HUMAN_REQUIRED</strong><span>evidence usable; no grant</span></div>
+      <div><strong>STALE</strong><span>validity horizon exceeded</span></div>
+      <div><strong>INVALIDATED</strong><span>grant no longer matches</span></div>
+      <div><strong>BLOCKED</strong><span>hard evidence/policy failure</span></div>
+    </section>
+
+    <section class="workspace">
+      <article class="panel evidence-panel">
+        <div class="panel-head">
+          <div>
+            <p class="label">Deterministic inputs</p>
+            <h2>Evidence + policy</h2>
+          </div>
+          <button class="quiet" id="reset-demo" type="button">Reset controlled demo</button>
+        </div>
+        <div class="evidence-grid">
+          <div class="evidence-card">
+            <span class="subhead">Release manifest</span>
+            <strong id="manifest-status">PRESENT</strong>
+            <dl><div><dt>Revision</dt><dd id="manifest-revision">1</dd></div><div><dt>Artifact</dt><dd><code>candidate</code></dd></div></dl>
+          </div>
+          <div class="evidence-card">
+            <span class="subhead">Security evidence</span>
+            <strong id="scan-status">PASS · CURRENT</strong>
+            <dl><div><dt>Revision</dt><dd id="scan-revision">1</dd></div><div><dt>Findings</dt><dd id="scan-findings">0</dd></div></dl>
+          </div>
+          <div class="evidence-card">
+            <span class="subhead">Operator policy</span>
+            <strong id="policy-status">release-policy-v1</strong>
+            <dl><div><dt>Hard block</dt><dd id="hard-block">false</dd></div><div><dt>Rule</dt><dd>exact evidence grant</dd></div></dl>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel human-panel">
+        <p class="label">Human-only control boundary</p>
+        <h2>Authority and correction</h2>
+        <p class="micro">These controls are deliberately <strong>not</strong> WebMCP tools. The agent can request authority; it cannot grant, restore, correct, or revoke it.</p>
+        <div class="controls">
+          <button class="primary" id="grant-authority" type="button">Grant exact evidence snapshot</button>
+          <button id="revoke-authority" type="button">Revoke grant</button>
+          <button id="expire-evidence" type="button">Expire security evidence</button>
+          <button id="correct-evidence" type="button">Correct security evidence</button>
+          <button id="remove-evidence" type="button">Remove required evidence</button>
+          <button id="restore-evidence" type="button">Restore fresh evidence</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="judge panel" aria-labelledby="judge-title">
+      <div class="judge-copy">
+        <p class="label">60-second judge path</p>
+        <h2 id="judge-title">Prove that correction changes future agent behavior.</h2>
+        <ol>
+          <li><strong>Inspect.</strong> Ask the agent to call <code>inspect_release_control</code>. It should report <code>HUMAN_REQUIRED</code>.</li>
+          <li><strong>Request.</strong> Ask it to call <code>request_release_authority</code>. A pending request appears, but authority remains human-only.</li>
+          <li><strong>Grant.</strong> Click <em>Grant exact evidence snapshot</em>. State becomes <code>AUTHORIZED</code> and <code>execute_authorized_release</code> appears.</li>
+          <li><strong>Execute.</strong> Ask the agent to call the execution tool. A tab-local controlled receipt is created; no external deployment occurs.</li>
+          <li><strong>Correct.</strong> Click <em>Correct security evidence</em>. State becomes <code>INVALIDATED</code> and the execution capability is removed. A retained stale callback is separately covered by the adversarial test and still fails closed.</li>
+        </ol>
+      </div>
+      <div class="judge-proof">
+        <p class="label">What WebMCP changes</p>
+        <div class="flow">
+          <span>evidence</span><b>→</b><span>authority</span><b>→</b><span>tool surface</span><b>→</b><span>execute-time recheck</span><b>→</b><span>receipt / refusal</span>
+        </div>
+        <p>Without WebMCP, the agent loses the structured capability surface whose lifecycle is being controlled. Without the EvidenceBound gate, that surface does not encode current authority.</p>
+      </div>
+    </section>
+
+    <section class="ledger-grid">
+      <article class="panel">
+        <p class="label">Control events</p>
+        <h2>Visible state transitions</h2>
+        <ol class="ledger" id="event-ledger"><li>Controlled demo initialized.</li></ol>
+      </article>
+      <article class="panel">
+        <p class="label">Execution evidence</p>
+        <h2>Tab-local receipts</h2>
+        <ol class="ledger" id="receipt-ledger"><li>No execution receipt yet.</li></ol>
+        <p class="micro">Receipt fingerprints identify this controlled state. They are not claimed as independently anchored or externally durable audit records.</p>
+      </article>
+    </section>
+
+    <section class="truth panel">
+      <p class="label">Claim boundary</p>
+      <p>This page demonstrates a post-competition-start WebMCP integration over pre-existing EvidenceBound control primitives. It does not claim that human approval, provenance, revocation, invalidation, receipts, or dynamic tools were invented here.</p>
+      <p><a href="https://github.com/evidencebound/evidencebound-core">Public source</a> · <a href="https://github.com/evidencebound/evidencebound-core/blob/main/PREEXISTING_WORK.md">Prior-work disclosure</a></p>
+    </section>
+  </main>
+
+  <script type="module" src="/webmcp/app.mjs"></script>
+</body>
+</html>
