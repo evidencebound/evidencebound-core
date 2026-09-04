@@ -5,6 +5,20 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/github/license/evidencebound/evidencebound-core)](LICENSE)
 
+## WebMCP Challenge: one human, one release, one capability
+
+A release manager has a simple problem: an AI agent may need permission to perform a controlled release action, but that permission must not survive after the human decision or the evidence behind it changes.
+
+EvidenceBound makes the human decision visible in the WebMCP capability surface itself. The agent starts with three safe tools. It can inspect release state and request approval, but it cannot approve, revoke, correct, or restore its own authority. When a human approves one exact release snapshot, a fourth tool — `execute_authorized_release` — appears. If the human corrects the security evidence or revokes approval, that tool disappears. Execution also re-checks current authority, so a stale retained capability cannot succeed after the decision changes.
+
+**Judge moment:** `3 tools → human approval → 4 tools → human correction/revocation → 3 tools`.
+
+**Live demo:** https://evidencebound.org/webmcp/ · **Judge guide:** [`WEBMCP.md`](WEBMCP.md)
+
+The controlled demo records `externalSideEffect=false`; it does not claim to perform a real external deployment.
+
+---
+
 **EvidenceBound is a framework-agnostic, LLM-independent runtime for binding agent outputs to evidence, provenance and policy; verifying protected state; computing dependency blast radius; and planning fail-closed selective recovery.**
 
 Created and maintained by Ruslan Vrublevskyi.
