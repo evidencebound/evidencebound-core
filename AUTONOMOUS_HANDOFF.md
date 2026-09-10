@@ -1,6 +1,18 @@
 # Autonomous Handoff
 
-## Canonical repository
+## Current agent bootstrap
+
+This document contains historical, commit-specific handoff evidence and is secondary to current
+repository truth. For substantive work, start with `control/CONTROL.yaml`, then read
+`control/ACCEPTANCE.md` and exactly one selected route's `read_first` sources. Re-resolve mutable facts
+from the canonical owners named by that route and from current Git/CI or production readback when the
+claim requires it.
+
+Chat history, model memory, and stale handoff summaries are not authoritative. If this historical
+section conflicts with current Control Center sources, use the listed canonical owner or mark the fact
+unresolved; do not silently prefer this handoff.
+
+## Historical canonical repository snapshot
 
 - Repository: `moneyparking/evidencebound-core`
 - URL: https://github.com/moneyparking/evidencebound-core
@@ -13,7 +25,8 @@
 - Release-source exact-main CI: run `31991997448` — SUCCESS
 - Release URL: https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0
 
-The release tag is fixed historical evidence. Never move `v0.3.0` to a later `main` commit. Post-release capabilities below are Unreleased `main` work unless a later release is independently verified.
+The release tag is fixed historical evidence. Never move `v0.3.0` to a later `main` commit. Post-release
+capabilities below are Unreleased `main` work unless a later release is independently verified.
 
 ## Milestone state
 
@@ -26,30 +39,43 @@ The release tag is fixed historical evidence. Never move `v0.3.0` to a later `ma
 
 ## Post-release hardening accepted on exact main
 
-- #7 signed receipt provider protocol / key lifecycle / optional Ed25519 — CLOSED completed; exact-main run `31993226080` SUCCESS.
-- #8 crash-consistent SQLite persistence/restart/replay — CLOSED completed; exact-main run `31994016152` SUCCESS.
-- #9 real Google ADK 2.7.0 lifecycle compatibility — CLOSED completed; exact-main run `31994792165` SUCCESS.
-- #17 EBCJ-1 conformance corpus + deterministic property invariants — CLOSED completed; exact-main run `31995166680` SUCCESS.
-- #19 SHA-256 manifest + CycloneDX SBOM + trusted-main SLSA/SBOM attestations — CLOSED completed; exact-main run `31995557238` SUCCESS.
+- #7 signed receipt provider protocol / key lifecycle / optional Ed25519 — CLOSED completed; exact-main
+  run `31993226080` SUCCESS.
+- #8 crash-consistent SQLite persistence/restart/replay — CLOSED completed; exact-main run
+  `31994016152` SUCCESS.
+- #9 real Google ADK 2.7.0 lifecycle compatibility — CLOSED completed; exact-main run `31994792165`
+  SUCCESS.
+- #17 EBCJ-1 conformance corpus + deterministic property invariants — CLOSED completed; exact-main run
+  `31995166680` SUCCESS.
+- #19 SHA-256 manifest + CycloneDX SBOM + trusted-main SLSA/SBOM attestations — CLOSED completed;
+  exact-main run `31995557238` SUCCESS.
 
-At `f6f46d4f21d6fcb2dc53cfeb0ebe70a742a34d9c`, standard Python matrix, golden acceptance, benchmark, Ruff, strict mypy, clean-room runtime dependency gate, security, real ADK compatibility, supply-chain validation and trusted-main attestation jobs all completed successfully.
+At `f6f46d4f21d6fcb2dc53cfeb0ebe70a742a34d9c`, standard Python matrix, golden acceptance, benchmark,
+Ruff, strict mypy, clean-room runtime dependency gate, security, real ADK compatibility, supply-chain
+validation and trusted-main attestation jobs all completed successfully.
 
 ## Trust boundaries that remain explicit
 
 - signatures authenticate signed bytes under configured trust roots; they do not prove evidence truth;
 - persisted database state is reverified and is not trusted solely because it was stored;
 - SQLite is not immutable/authenticated/distributed storage;
-- ADK compatibility is proven only for exact tested `google-adk==2.7.0` until another version passes the compatibility lane;
+- ADK compatibility is proven only for exact tested `google-adk==2.7.0` until another version passes
+  the compatibility lane;
 - EBCJ-1 is EvidenceBound-specific and not claimed RFC 8785/JCS;
 - property tests are engineering evidence, not formal verification;
-- trusted-main build attestations apply to exact generated subject digests, not retroactively to `v0.3.0`;
+- trusted-main build attestations apply to exact generated subject digests, not retroactively to
+  `v0.3.0`;
 - no independent external adopter or external security audit is claimed.
 
 ## Highest-value remaining work
 
-1. Build a clean-room external-consumer/conformance fixture that installs EvidenceBound as a third-party dependency through public APIs only; label it maintainer-authored, not external adoption.
-2. Seek/enable a genuinely independently owned integration and record only externally attributable evidence actually obtained.
-3. Create a future release workflow linking tag → exact wheel/sdist digests → SBOM → provenance attestations; do not alter `v0.3.0`.
+1. Build a clean-room external-consumer/conformance fixture that installs EvidenceBound as a
+   third-party dependency through public APIs only; label it maintainer-authored, not external
+   adoption.
+2. Seek/enable a genuinely independently owned integration and record only externally attributable
+   evidence actually obtained.
+3. Create a future release workflow linking tag → exact wheel/sdist digests → SBOM → provenance
+   attestations; do not alter `v0.3.0`.
 4. Formalize invalidation/recovery as a state machine/model where useful.
 5. Prepare an external security review scope and funding work package.
 6. Recheck current official OSS funding calls when preparing an application.
