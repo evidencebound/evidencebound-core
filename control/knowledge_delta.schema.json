@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:evidencebound:control-center:knowledge-delta:v1",
+  "title": "EvidenceBound Core Knowledge Delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "at_utc",
+    "project",
+    "objective",
+    "result",
+    "new_facts",
+    "corrected_assumptions",
+    "decisions",
+    "failed_approaches",
+    "verification",
+    "authoritative_updates"
+  ],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "at_utc": {"type": "string", "format": "date-time"},
+    "project": {"const": "EvidenceBound Core"},
+    "objective": {"type": "string", "minLength": 1},
+    "result": {"enum": ["PASS", "BLOCKED", "FAIL"]},
+    "new_facts": {"type": "array", "items": {"type": "string"}},
+    "corrected_assumptions": {"type": "array", "items": {"type": "string"}},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "failed_approaches": {"type": "array", "items": {"type": "string"}},
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "source_or_command", "status"],
+        "properties": {
+          "kind": {"type": "string", "minLength": 1},
+          "source_or_command": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1},
+          "digest": {"type": "string"},
+          "run_id": {"type": "string"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "authoritative_updates": {"type": "array", "items": {"type": "string"}}
+  }
+}
