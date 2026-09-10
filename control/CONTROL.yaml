@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "project": "EvidenceBound Core",
+  "visibility": "public",
+  "purpose": "Route substantive work through current authoritative project truth without making chat memory authoritative.",
+  "operating_loop": [
+    "control_center",
+    "select_context",
+    "executable_acceptance",
+    "execution",
+    "verification",
+    "evidence",
+    "knowledge_delta",
+    "authoritative_update"
+  ],
+  "bootstrap": [
+    "control/CONTROL.yaml",
+    "control/ACCEPTANCE.md"
+  ],
+  "truth_policy": {
+    "chat_history_authoritative": false,
+    "model_memory_authoritative": false,
+    "generated_prose_authoritative": false,
+    "conflict_policy": "Use the listed canonical owner and current verification evidence; otherwise mark the fact unresolved.",
+    "release_history_policy": "Tagged release truth is historical and immutable; newer main truth is separate until independently released and verified."
+  },
+  "current_objective": {
+    "summary": "Advance post-v0.3 adoption and security work without changing historical v0.3 release claims.",
+    "canonical_owner": "ROADMAP.md",
+    "status": "ACTIVE",
+    "blocker": "None asserted; re-resolve blockers from canonical sources before execution.",
+    "freshness": [
+      "ROADMAP.md",
+      "RELEASE_READINESS.md",
+      ".github/workflows/ci.yml"
+    ]
+  },
+  "context_selection": {
+    "mode": "progressive_disclosure",
+    "primary_route_count": 1,
+    "cross_route_requires_recorded_dependency": true,
+    "rule": "Select one primary route from the task objective; load another route only when an explicit dependency is discovered and recorded."
+  },
+  "acceptance": "control/ACCEPTANCE.md",
+  "authority_document": "control/AUTHORITY.md",
+  "knowledge_delta": {
+    "schema": "control/knowledge_delta.schema.json",
+    "directory": "evidence/control-center/knowledge_deltas"
+  },
+  "authority": {
+    "default_local_scope": "Repository inspection, tests, documentation, and reversible feature-branch work within task scope.",
+    "external_effects": {
+      "publication": {"default": "DENY", "authority": "separate project or human approval"},
+      "deployment": {"default": "DENY", "authority": "separate project or human approval"},
+      "registry_publication": {"default": "DENY", "authority": "separate project or human approval"},
+      "external_message": {"default": "DENY", "authority": "separate project or human approval"},
+      "spend_or_procurement": {"default": "DENY", "authority": "explicit human approval"},
+      "destructive_or_irreversible": {"default": "DENY", "authority": "explicit human approval"}
+    }
+  },
+  "privacy": {
+    "private_workspace_reference": "private benchmark workspace",
+    "rule": "Public Control Center artifacts must not identify or expose private benchmark repository internals."
+  },
+  "routes": {
+    "core_runtime_and_invariants": {
+      "read_first": ["ARCHITECTURE.md", "SPEC.md", "THREAT_MODEL.md"],
+      "freshness_source": "current checkout plus current repository CI",
+      "completion_evidence": "focused tests plus relevant exact-head CI"
+    },
+    "release_and_supply_chain": {
+      "read_first": ["RELEASE_READINESS.md", ".github/workflows/ci.yml", "CHANGELOG.md"],
+      "freshness_source": "current tag/main relationship plus current CI",
+      "completion_evidence": "exact artifact, tag, digest, workflow, or registry evidence required by the scoped claim"
+    },
+    "adoption_and_security": {
+      "read_first": ["ROADMAP.md", "SECURITY.md", "FUNDING_READINESS.md"],
+      "freshness_source": "current roadmap and independently observed adoption/security evidence",
+      "completion_evidence": "task-specific evidence; maintainer-authored fixtures are not external adoption"
+    },
+    "webmcp_public_surface": {
+      "read_first": ["WEBMCP.md", "docs/competitions/webmcp/CLAIMS_LEDGER.md", "docs/competitions/webmcp/PRODUCTION_ACCEPTANCE.md"],
+      "freshness_source": "current main, current CI, and current production readback where deployment claims are made",
+      "completion_evidence": "current exact-head CI and current production/browser evidence required by the claim"
+    },
+    "public_benchmark_interface": {
+      "read_first": ["benchmarks/selective_recovery.py", "RELEASE_READINESS.md", "README.md"],
+      "freshness_source": "current public benchmark source and exact-head CI",
+      "completion_evidence": "reproducible public benchmark acceptance bound to the exact source under test"
+    }
+  },
+  "session_outcome": {
+    "allowed": ["PASS", "BLOCKED", "FAIL"],
+    "pass_rule": "All scoped acceptance conditions have current executed evidence.",
+    "blocked_rule": "A specific external or authority boundary prevents further safe execution.",
+    "fail_rule": "Verification or acceptance failed without an unresolved external blocker."
+  }
+}
