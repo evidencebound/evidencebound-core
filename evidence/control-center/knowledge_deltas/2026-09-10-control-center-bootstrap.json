@@ -1,0 +1,46 @@
+{
+  "session_id": "2026-09-10-control-center-bootstrap",
+  "at_utc": "2026-09-10T10:20:00Z",
+  "project": "EvidenceBound Core",
+  "objective": "Capture verified source-of-truth inputs for the public Control Center bootstrap.",
+  "result": "PASS",
+  "new_facts": [
+    "The published v0.3.0 GitHub source release is fixed historical evidence and PyPI is not published.",
+    "The current roadmap separates post-v0.3 Unreleased hardening from next adoption and security work."
+  ],
+  "corrected_assumptions": [
+    "AUTONOMOUS_HANDOFF.md contains historical commit-specific handoff state and must not outrank current Git, CI, roadmap, or release evidence."
+  ],
+  "decisions": [
+    "Use a public repo-native Control Center as a routing index rather than a duplicate mutable project database.",
+    "Keep any private benchmark workspace reference generic and non-identifying in public Control Center artifacts."
+  ],
+  "failed_approaches": [],
+  "verification": [
+    {
+      "kind": "repository_source",
+      "source_or_command": "RELEASE_READINESS.md",
+      "status": "VERIFIED",
+      "note": "Observed fixed v0.3.0 source-release boundary and PyPI NOT PUBLISHED state."
+    },
+    {
+      "kind": "repository_source",
+      "source_or_command": "ROADMAP.md",
+      "status": "VERIFIED",
+      "note": "Observed post-v0.3 adoption/security work and scope-control non-goals."
+    },
+    {
+      "kind": "tdd_red",
+      "source_or_command": "GitHub Actions CI run 34465373612",
+      "status": "OBSERVED_RED",
+      "run_id": "34465373612",
+      "note": "Expected contract failure: Control Center surface absent; 1 failed and 104 passed on Python 3.13."
+    }
+  ],
+  "authoritative_updates": [
+    "control/CONTROL.yaml",
+    "control/ACCEPTANCE.md",
+    "control/AUTHORITY.md",
+    "evidence/control-center/INDEX.md"
+  ]
+}
