@@ -1,0 +1,45 @@
+name: Control Center Contract
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'control/**'
+      - 'evidence/control-center/**'
+      - 'tools/validate_control_center.py'
+      - 'tests/test_control_center_contract.py'
+      - 'AUTONOMOUS_HANDOFF.md'
+      - 'README.md'
+      - 'docs/superpowers/specs/2026-09-10-evidencebound-control-center-design.md'
+      - 'docs/superpowers/plans/2026-09-10-evidencebound-control-center.md'
+      - '.github/workflows/control-center.yml'
+  pull_request:
+    paths:
+      - 'control/**'
+      - 'evidence/control-center/**'
+      - 'tools/validate_control_center.py'
+      - 'tests/test_control_center_contract.py'
+      - 'AUTONOMOUS_HANDOFF.md'
+      - 'README.md'
+      - 'docs/superpowers/specs/2026-09-10-evidencebound-control-center-design.md'
+      - 'docs/superpowers/plans/2026-09-10-evidencebound-control-center.md'
+      - '.github/workflows/control-center.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+      - name: Install repository test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Validate Control Center
+        run: python tools/validate_control_center.py
+      - name: Run Control Center contract tests
+        run: python -m pytest -q tests/test_control_center_contract.py
