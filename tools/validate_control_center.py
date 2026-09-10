@@ -1,10 +1,6 @@
-from __future__ import annotations
-
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
-
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = (
@@ -62,7 +58,7 @@ FORBIDDEN_EXTERNAL_LOCATORS = (
 )
 
 
-def _load_json(path: Path, errors: list[str]) -> Any:
+def _load_json(path: Path, errors: list[str]) -> object:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -74,7 +70,7 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _local_file(path_value: Any, label: str, errors: list[str]) -> None:
+def _local_file(path_value: object, label: str, errors: list[str]) -> None:
     if not isinstance(path_value, str) or not path_value:
         errors.append(f"{label} must be a non-empty local path")
         return
@@ -86,7 +82,7 @@ def _local_file(path_value: Any, label: str, errors: list[str]) -> None:
         errors.append(f"{label} does not exist: {path_value}")
 
 
-def _validate_delta(payload: Any, path: Path, errors: list[str]) -> None:
+def _validate_delta(payload: object, path: Path, errors: list[str]) -> None:
     label = str(path.relative_to(ROOT))
     if not isinstance(payload, dict):
         errors.append(f"{label} must contain an object")
@@ -124,7 +120,7 @@ def _validate_delta(payload: Any, path: Path, errors: list[str]) -> None:
                     )
 
 
-def validate() -> dict[str, Any]:
+def validate() -> dict[str, object]:
     errors: list[str] = []
     for relative in REQUIRED_FILES:
         if not (ROOT / relative).is_file():
@@ -194,7 +190,8 @@ def validate() -> dict[str, Any]:
             errors.append("knowledge delta schema required fields do not match the contract")
         properties = schema.get("properties")
         project_schema = properties.get("project") if isinstance(properties, dict) else None
-        if not isinstance(project_schema, dict) or project_schema.get("const") != "EvidenceBound Core":
+        project_const = project_schema.get("const") if isinstance(project_schema, dict) else None
+        if project_const != "EvidenceBound Core":
             errors.append("knowledge delta schema must bind project identity")
     elif schema_path.is_file():
         errors.append("knowledge delta schema must contain an object")
@@ -217,7 +214,7 @@ def validate() -> dict[str, Any]:
         for token in FORBIDDEN_EXTERNAL_LOCATORS:
             if token in lowered:
                 errors.append(
-                    f"public Control Center artifact contains external repository locator: "
+                    "public Control Center artifact contains external repository locator: "
                     f"{path.relative_to(ROOT)}"
                 )
                 break
