@@ -1,0 +1,45 @@
+{
+  "challenge_version": "AGENT-CONTROL-CHALLENGE-v1-development",
+  "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+  "submitter": {
+    "github_handle": "replace-me",
+    "organization": "replace-me-or-none",
+    "independent_from_evidencebound": false,
+    "independence_attestation": "I attest that this adapter/run was not authored by EvidenceBound and that the submitted receipts came from the disclosed system/run.",
+    "permission_to_publish": "full"
+  },
+  "system": {
+    "system_id": "replace-me",
+    "system_name": "replace-me",
+    "version": "replace-me",
+    "repository_or_artifact": "replace-me",
+    "commit_or_digest": "replace-me",
+    "public_or_private": "public"
+  },
+  "implementation": {
+    "framework": "replace-me",
+    "framework_version": "replace-me",
+    "model_provider": "replace-me-or-none",
+    "model": "replace-me-or-none",
+    "model_version_or_snapshot": "replace-me-or-none",
+    "languages": [
+      "replace-me"
+    ],
+    "architecture_summary": "replace-me",
+    "control_strategy_summary": "replace-me"
+  },
+  "execution": {
+    "run_identity": "replace-me",
+    "wall_clock_seconds": null,
+    "model_cost_usd": null,
+    "retries": 0,
+    "human_interventions": 0,
+    "reproducible_by_reviewer": false,
+    "reproduction_instructions": "replace-me",
+    "known_limitations": "replace-me-or-none"
+  },
+  "artifacts": {
+    "receipts_file": "receipts.json",
+    "public_run_log_refs": []
+  }
+}

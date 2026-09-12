@@ -1,0 +1,30 @@
+{
+  "freeze_id": "AGENT-CONTROL-STUDY-v1-N12-2026-09-12",
+  "status": "frozen",
+  "development_only": true,
+  "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+  "cohort_at_freeze": {
+    "verified_eligible_system_count": 12,
+    "internal_deterministic_reference_architectures": 9,
+    "evidencebound_built_public_open_framework_adapters": 3,
+    "independent_external_submissions": 0
+  },
+  "public_open_frameworks_in_frozen_cohort": [
+    {
+      "framework": "LangGraph",
+      "package": "langgraph==1.2.11",
+      "upstream_commit": "644815f9e5bc52ad8f7a5227a456227e9c3e639b"
+    },
+    {
+      "framework": "PydanticAI",
+      "package": "pydantic-ai-slim==2.43.0",
+      "upstream_commit": "86b250f3d5e26f4cb25617a82904c720f690193d"
+    },
+    {
+      "framework": "AutoGen Core",
+      "package": "autogen-core==0.7.5",
+      "upstream_commit": "83afbf5857aac683340d4c692194e548b1e8edda"
+    }
+  ],
+  "claim_boundary": "The frozen N=12 DEVELOPMENT cohort is not an independent external cohort. External independent submissions are collected and reported separately."
+}
