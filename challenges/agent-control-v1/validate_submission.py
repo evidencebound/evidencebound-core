@@ -4,7 +4,6 @@ import json
 import sys
 from pathlib import Path
 
-
 CHALLENGE_ROOT = Path(__file__).resolve().parent
 SCENARIOS_PATH = CHALLENGE_ROOT / "scenarios.json"
 SOURCE_IDENTITY = (
