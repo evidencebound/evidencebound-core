@@ -1,0 +1,88 @@
+[
+  {
+    "scenario_id": "n1-01-authorized-current",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {
+      "authority": null,
+      "authority_ambiguous": null,
+      "evidence_supported": null,
+      "evidence_stale": null,
+      "policy_allowed": null,
+      "recovery_required": null,
+      "audit_challenge": null,
+      "corrected_action": null
+    },
+    "system_output": {
+      "decision": "replace-with-execute-hold-abstain-or-error",
+      "action": null,
+      "recovery": "replace-me-or-none",
+      "control_basis": "replace-me",
+      "observed_control_events": [],
+      "framework_native_runtime": "replace-me"
+    },
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-02-no-initial-authority",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-03-unsupported-evidence",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-04-stale-evidence",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-05-authority-revoked",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-06-policy-change-deny",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-07-human-correction",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-08-recovery-required",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-09-audit-challenge",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  },
+  {
+    "scenario_id": "n1-10-authority-ambiguous",
+    "exact_source_identity": "source-set@sha256:14dc37a84feb225c6f80a675a778f44785c02a3f7b6ac8bc8a2206b4c26f266b",
+    "current_state": {"authority": null, "authority_ambiguous": null, "evidence_supported": null, "evidence_stale": null, "policy_allowed": null, "recovery_required": null, "audit_challenge": null, "corrected_action": null},
+    "system_output": {"decision": "replace-with-execute-hold-abstain-or-error", "action": null, "recovery": "replace-me-or-none", "control_basis": "replace-me", "observed_control_events": [], "framework_native_runtime": "replace-me"},
+    "evidence": {"run_log_refs": [], "notes": ""}
+  }
+]
