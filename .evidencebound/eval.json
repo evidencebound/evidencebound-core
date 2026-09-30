@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "repository": "evidencebound/evidencebound-core",
+  "policy": {
+    "development": "required",
+    "frozen": "audit"
+  },
+  "bootstrap": [
+    {
+      "id": "install-dev",
+      "command": "python -m pip install -e '.[dev]'",
+      "timeout_seconds": 900
+    }
+  ],
+  "suites": [
+    {
+      "id": "regression-and-adversarial",
+      "phase": "development",
+      "command": "pytest -q",
+      "hard_gate": true,
+      "timeout_seconds": 1200
+    },
+    {
+      "id": "golden-acceptance",
+      "phase": "development",
+      "command": "python examples/golden_acceptance.py",
+      "hard_gate": true,
+      "timeout_seconds": 300
+    },
+    {
+      "id": "selective-recovery-benchmark",
+      "phase": "development",
+      "command": "python benchmarks/selective_recovery.py",
+      "hard_gate": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "freeze": {
+    "enabled": false
+  }
+}
