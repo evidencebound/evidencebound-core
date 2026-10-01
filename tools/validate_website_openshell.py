@@ -17,7 +17,7 @@ home_required = [
     "NVIDIA OpenShell",
     "12/12 hard gates",
     "8/8 frozen scenarios",
-    "href=\"/rab1\"",
+    "href=\"/rab1/\"",
     "Tested on / enforced through",
     "not NVIDIA validation or endorsement",
 ]
