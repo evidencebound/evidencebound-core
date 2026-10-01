@@ -33,7 +33,9 @@ rab1_required = [
     "36759924096",
     "73 retained files",
     "0 evidence hash failures",
-    "EvidenceBound demonstrated outcome-aware recovery authority and trusted operation-lineage enforcement at the OpenShell pre-effect HTTP boundary under the tested benchmark conditions.",
+    "EvidenceBound demonstrated outcome-aware recovery authority and trusted "
+    "operation-lineage enforcement at the OpenShell pre-effect HTTP boundary "
+    "under the tested benchmark conditions.",
     "not NVIDIA validation or endorsement",
     "independent runtime enforcement substrate",
 ]
