@@ -1,13 +1,13 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-HOME = ROOT / "website" / "index.html"
-RAB1 = ROOT / "website" / "rab1.html"
-NVIDIA = ROOT / "website" / "assets" / "nvidia-mark.svg"
+HOME = ROOT / "site" / "index.html"
+RAB1 = ROOT / "site" / "rab1" / "index.html"
+NVIDIA = ROOT / "site" / "assets" / "nvidia-mark.svg"
 
 home = HOME.read_text(encoding="utf-8")
-assert RAB1.is_file(), "missing website/rab1.html public proof page"
-assert NVIDIA.is_file(), "missing website/assets/nvidia-mark.svg"
+assert RAB1.is_file(), "missing site/rab1/index.html public proof page"
+assert NVIDIA.is_file(), "missing site/assets/nvidia-mark.svg"
 
 rab1 = RAB1.read_text(encoding="utf-8")
 nvidia = NVIDIA.read_text(encoding="utf-8")
