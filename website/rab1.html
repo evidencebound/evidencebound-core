@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RAB-1 — EvidenceBound Runtime Authority Benchmark on NVIDIA OpenShell</title>
+<meta name="description" content="Sanitized evidence summary for RAB-1: a reproducible runtime-authority benchmark on stock NVIDIA OpenShell with a negative control, frozen hard gates, retained evidence and exact-tag regeneration.">
+<meta name="theme-color" content="#090c0f">
+<meta property="og:title" content="RAB-1 — Runtime Authority on NVIDIA OpenShell">
+<meta property="og:description" content="A frozen, reproducible agent-safety benchmark testing recovery authority at the OpenShell pre-effect HTTP boundary.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://evidencebound.org/rab1">
+<link rel="canonical" href="https://evidencebound.org/rab1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#090c0f;--p:#10161b;--t:#f3f5f3;--m:#a7b0ae;--m2:#77827f;--mint:#a8e4d8;--green:#76b900;--amber:#e1cda0;--line:rgba(198,229,225,.15);--line2:rgba(198,229,225,.075);--sans:'Manrope',sans-serif;--serif:'Newsreader',serif;--mono:'IBM Plex Mono',monospace;--max:1120px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(900px 520px at 88% -8%,rgba(118,198,188,.1),transparent 64%),var(--bg);color:var(--t);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}.w{width:min(calc(100% - 42px),var(--max));margin:auto}.nav{position:sticky;top:0;z-index:20;background:rgba(9,12,15,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line2)}.ni{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{font-weight:700;letter-spacing:-.03em}.back{font:11px var(--mono);color:var(--mint);border:1px solid var(--line);border-radius:999px;padding:9px 12px}.hero{padding:90px 0 62px;border-bottom:1px solid var(--line2)}.eyebrow{font:10px var(--mono);text-transform:uppercase;letter-spacing:.17em;color:var(--mint)}h1{font-size:clamp(45px,6.5vw,82px);line-height:1;letter-spacing:-.055em;font-weight:600;margin:16px 0 24px;max-width:1000px}.ed{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--mint)}.lead{font-size:clamp(18px,2vw,22px);color:#c5cecc;max-width:880px}.badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.badge{border:1px solid var(--line);border-radius:999px;padding:9px 12px;font:10px var(--mono);color:#cbd4d2}.badge.good{border-color:rgba(168,228,216,.35);color:var(--mint)}section{padding:64px 0;border-bottom:1px solid var(--line2)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card,.quote,.flow{border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.014);padding:24px}.card h2,.flow h2{font-size:28px;line-height:1.1;letter-spacing:-.035em;margin:0 0 12px}.card p,.flow p{color:var(--m);font-size:14px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px}.stat{border:1px solid var(--line);border-radius:17px;padding:17px}.stat b{display:block;font-size:23px;letter-spacing:-.04em}.stat span{font:9px var(--mono);color:var(--m2);text-transform:uppercase;letter-spacing:.1em}.code{font-family:var(--mono);font-size:12px;white-space:pre-wrap;color:#d7dfdd}.quote{border-left:3px solid var(--mint);font-family:var(--serif);font-size:24px;line-height:1.35}.note{border-left:2px solid var(--amber);padding:14px 18px;background:rgba(225,205,160,.035);color:#cfc8b9;font-size:12px;margin-top:18px}.nvidia{display:flex;align-items:center;gap:13px;margin-top:24px;border-top:1px solid var(--line2);padding-top:24px}.nvidia img{width:36px;height:36px}.nvidia b{display:block;font-size:14px}.nvidia small{display:block;color:var(--m2);margin-top:2px}.list{margin:0;padding-left:18px;color:var(--m);font-size:14px}.list li{margin:8px 0}.footer{padding:30px 0 42px;color:var(--m2);font-size:11px}.footer a{color:var(--mint)}@media(max-width:760px){.grid,.stats{grid-template-columns:1fr 1fr}.hero{padding-top:58px}}@media(max-width:520px){.grid,.stats{grid-template-columns:1fr}.w{width:min(calc(100% - 28px),var(--max))}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="w ni"><a class="brand" href="/">EvidenceBound</a><a class="back" href="/">← Main site</a></div></nav>
+<header class="hero"><div class="w">
+<div class="eyebrow">RAB-1 · frozen reproducible result</div>
+<h1>Runtime authority after <span class="ed">uncertain consequences.</span></h1>
+<p class="lead">EvidenceBound Runtime Authority Benchmark on NVIDIA OpenShell tests whether recovery authority and trusted operation-lineage constraints remain enforceable at an independent pre-effect HTTP boundary immediately before a consequential side effect.</p>
+<div class="badges"><span class="badge good">FULL_PASS</span><span class="badge">Protocol v1.0.0</span><span class="badge">Stock OpenShell v0.1.2</span><span class="badge">Exact-tag regenerated</span></div>
+</div></header>
+
+<section><div class="w">
+<div class="grid">
+<div class="card"><h2>What was tested</h2><p>RAB-1 uses stock NVIDIA OpenShell as the <strong>independent runtime enforcement substrate</strong>. The target is synthetic and non-idempotent: every accepted <code>POST /effect</code> creates a new consequence.</p><div class="code">agent / sandbox request
+        ↓
+NVIDIA OpenShell Supervisor Middleware
+HTTP_REQUEST / PRE_CREDENTIALS
+        ↓
+EvidenceBound authority middleware
+        ↓
+ALLOW / DENY
+        ↓
+non-idempotent consequential target</div></div>
+<div class="card"><h2>Controlled comparison</h2><p><strong>Negative control:</strong> the same OpenShell runtime, network policy and target without EvidenceBound authority middleware. An uncertain original consequence followed by retry produced two target contacts and two consequences.</p><p><strong>Controlled condition:</strong> the same runtime and target with EvidenceBound authority middleware attached fail-closed.</p></div>
+</div>
+<div class="stats">
+<div class="stat"><b>12/12</b><span>hard gates passed</span></div>
+<div class="stat"><b>8/8</b><span>frozen scenarios</span></div>
+<div class="stat"><b>0</b><span>DENY → target contacts</span></div>
+<div class="stat"><b>73</b><span>retained regeneration files</span></div>
+</div>
+</div></section>
+
+<section><div class="w">
+<div class="grid">
+<div class="flow"><h2>Authority conditions exercised</h2><ul class="list"><li>Uncertain-outcome replay.</li><li>Replacement attempt without fresh recovery authority.</li><li>Revoked or already-claimed authority.</li><li>Wrong-lineage recovery authority.</li><li>Fresh recovery authority after externally adjudicated NOT_COMMITTED.</li><li>Concurrent replay of the same operation authority.</li><li>Selective preservation of unrelated valid authority.</li></ul></div>
+<div class="flow"><h2>Reproducibility anchors</h2><ul class="list"><li>OpenShell release: <code>v0.1.2</code>.</li><li>OpenShell source commit: <code>6648bd0c290efbc41ba131ee9831ee45cd431f94</code>.</li><li>Execution tag: <code>rab1-v1-full-pass-20260930</code>.</li><li>Frozen execution SHA: <code>5f4948894e0af6cb4a39f3823a400313c76d366b</code>.</li><li>Exact-tag regeneration run: <code>36759924096</code>.</li><li><strong>0 evidence hash failures</strong>.</li></ul></div>
+</div>
+</div></section>
+
+<section><div class="w">
+<div class="eyebrow">Permitted external claim</div>
+<div class="quote">EvidenceBound demonstrated outcome-aware recovery authority and trusted operation-lineage enforcement at the OpenShell pre-effect HTTP boundary under the tested benchmark conditions.</div>
+<div class="note"><strong>Claim boundary.</strong> RAB-1 does not establish universal agent safety, exactly-once execution, production correctness, distributed recovery correctness, regulatory-reasoning accuracy, superiority over OpenShell, or NVIDIA validation or endorsement. Independent blinded practitioner review is in progress and is separate from the frozen benchmark verdict.</div>
+<div class="nvidia"><img src="/assets/nvidia-mark.svg" alt="NVIDIA logo"><div><b>Tested on / enforced through NVIDIA OpenShell</b><small>Independent EvidenceBound research. NVIDIA and OpenShell identifiers are used only to identify the tested runtime technology; this is not NVIDIA validation or endorsement.</small></div></div>
+<div class="badges"><a class="badge good" href="https://www.nvidia.com/en-us/ai/openshell/">NVIDIA OpenShell ↗</a><a class="badge" href="https://github.com/NVIDIA/OpenShell">OpenShell source ↗</a><a class="badge" href="mailto:ruslan@evidencebound.org?subject=RAB-1%20technical%20review">Discuss technical review</a></div>
+</div></section>
+
+<footer class="footer"><div class="w">EvidenceBound · RAB-1 sanitized evidence surface · frozen empirical record retained privately · <a href="/">evidencebound.org</a></div></footer>
+</body>
+</html>
