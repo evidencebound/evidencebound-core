@@ -29,6 +29,10 @@ def read(path: str) -> str:
 def test_required_routes_exist() -> None:
     required = [
         "index.html",
+        "assessment/index.html",
+        "partners/oem/index.html",
+        "rab1/index.html",
+        "assets/evidencebound-mark.png",
         "assurance/index.html",
         "research/index.html",
         "research/deterministic-control-plane-for-ai-agents/index.html",
@@ -43,19 +47,41 @@ def test_required_routes_exist() -> None:
     assert not missing, f"missing site files: {missing}"
 
 
-def test_homepage_has_safe_ai_assurance_positioning() -> None:
+def test_homepage_has_commercial_control_assurance_positioning() -> None:
     html = read("index.html")
     for phrase in [
-        "AI Safety Assurance",
-        "Human Control Plane",
-        "EvidenceBound Core",
-        "Early-stage research",
-        "no production customers claimed",
-        "not a certification",
+        "Independent agent-control assurance",
+        "Consequential Agent Control Assessment",
+        "Authorization is not a one-time event",
+        "OEM / assurance partners",
+        "Evidence-scoped claims",
+        "No certification claim",
     ]:
         assert phrase.lower() in html.lower(), phrase
+    assert "Human Control Plane for Verifiable AI Agents".lower() not in html.lower()
     assert "guarantees compliance" not in html.lower()
     assert "guarantees safety" not in html.lower()
+
+
+def test_commercial_routes_and_disclosure_boundary() -> None:
+    assessment = read("assessment/index.html")
+    partner = read("partners/oem/index.html")
+    combined = "\n".join([read("index.html"), assessment, partner]).lower()
+    assert "Consequential Agent Control Assessment".lower() in assessment.lower()
+    assert "PASS / FAIL / BLOCKED / UNVERIFIED".lower() in assessment.lower()
+    assert "OEM / assurance partner".lower() in partner.lower()
+    forbidden_phrases = [
+        "private benchmark corpus",
+        "frozen oracle",
+        "scoring rules",
+        "exp-005",
+        "failure schedules",
+        "customer-specific methodology",
+    ]
+    for forbidden in forbidden_phrases:
+        assert forbidden not in combined, forbidden
+    logo = SITE / "assets" / "evidencebound-mark.png"
+    assert logo.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
 
 
 def test_assurance_page_has_framework_mappings_and_boundaries() -> None:
