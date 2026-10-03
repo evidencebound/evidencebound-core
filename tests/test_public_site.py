@@ -29,6 +29,9 @@ def read(path: str) -> str:
 def test_required_routes_exist() -> None:
     required = [
         "index.html",
+        "assessment/index.html",
+        "partners/oem/index.html",
+        "assets/evidencebound-mark.jpg",
         "assurance/index.html",
         "research/index.html",
         "research/deterministic-control-plane-for-ai-agents/index.html",
@@ -43,19 +46,45 @@ def test_required_routes_exist() -> None:
     assert not missing, f"missing site files: {missing}"
 
 
-def test_homepage_has_safe_ai_assurance_positioning() -> None:
+def test_homepage_has_consequential_agent_control_positioning() -> None:
     html = read("index.html")
     for phrase in [
-        "AI Safety Assurance",
-        "Human Control Plane",
-        "EvidenceBound Core",
-        "Early-stage research",
-        "no production customers claimed",
-        "not a certification",
+        "Consequential Agent Control Assessment",
+        "Authorization is not a one-time event.",
+        "Independent agent-control assurance",
+        "Evidence-scoped claims",
+        "OEM / assurance partners",
+        "No certification claim",
     ]:
         assert phrase.lower() in html.lower(), phrase
+
+    for route in ["/assessment/", "/partners/oem/", "/rab1/", "/assurance/", "/research/"]:
+        assert f'href="{route}"' in html, route
+
+    assert "not positioned as a replacement for IAM, PAM, DLP" in html
     assert "guarantees compliance" not in html.lower()
     assert "guarantees safety" not in html.lower()
+
+
+def test_commercial_pages_keep_method_boundary_controlled() -> None:
+    public = "\n".join(
+        [
+            read("index.html"),
+            read("assessment/index.html"),
+            read("partners/oem/index.html"),
+        ]
+    )
+    for forbidden in [
+        "EXP-005",
+        "GROUND_TRUTH_PRIVATE",
+        "blind-case-manifest-private",
+        "reviewer_id",
+    ]:
+        assert forbidden not in public
+
+    assert "not released as a public roadmap" in public.lower()
+    assert "not a public implementation recipe" in public.lower()
+    assert "not transferred by default" in public.lower()
 
 
 def test_assurance_page_has_framework_mappings_and_boundaries() -> None:
@@ -90,16 +119,19 @@ def test_research_canonical_ownership_is_evidencebound() -> None:
         assert "signalreview.co/research" not in html.lower()
 
 
-def test_current_product_does_not_use_audit_compliance_platform_as_product_name() -> None:
+def test_current_product_uses_bounded_assessment_architecture() -> None:
     current = "\n".join(
         [
             read("index.html"),
+            read("assessment/index.html"),
+            read("partners/oem/index.html"),
             read("assurance/index.html"),
             read("research/index.html"),
         ]
     )
     assert "Audit Compliance Platform" not in current
-    assert "AI Safety Assurance" in current
+    assert "Consequential Agent Control Assessment" in current
+    assert "OEM / assurance" in current
 
 
 def test_signalreview_is_case_study_not_identity_home() -> None:

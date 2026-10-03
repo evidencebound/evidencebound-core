@@ -4,22 +4,28 @@ ROOT = Path(__file__).resolve().parents[1]
 HOME = ROOT / "site" / "index.html"
 RAB1 = ROOT / "site" / "rab1" / "index.html"
 NVIDIA = ROOT / "site" / "assets" / "nvidia-mark.svg"
+ASSESSMENT = ROOT / "site" / "assessment" / "index.html"
+OEM = ROOT / "site" / "partners" / "oem" / "index.html"
+LOGO = ROOT / "site" / "assets" / "evidencebound-mark.jpg"
 
 home = HOME.read_text(encoding="utf-8")
 assert RAB1.is_file(), "missing site/rab1/index.html public proof page"
 assert NVIDIA.is_file(), "missing site/assets/nvidia-mark.svg"
+assert ASSESSMENT.is_file(), "missing site/assessment/index.html"
+assert OEM.is_file(), "missing site/partners/oem/index.html"
+assert LOGO.is_file(), "missing site/assets/evidencebound-mark.jpg"
 
 rab1 = RAB1.read_text(encoding="utf-8")
 nvidia = NVIDIA.read_text(encoding="utf-8")
 
 home_required = [
-    "RAB-1",
+    "Consequential Agent Control Assessment",
+    "Authorization is not a one-time event.",
     "NVIDIA OpenShell",
-    "12/12 hard gates",
-    "8/8 frozen scenarios",
+    "href=\"/assessment/\"",
+    "href=\"/partners/oem/\"",
     "href=\"/rab1/\"",
-    "Tested on / enforced through",
-    "not NVIDIA validation or endorsement",
+    "bounded tested property",
 ]
 for marker in home_required:
     assert marker in home, f"homepage missing required RAB-1 marker: {marker}"
