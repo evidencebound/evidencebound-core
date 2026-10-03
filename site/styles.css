@@ -21,11 +21,11 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 .nav{position:sticky;top:0;z-index:20;background:rgba(3,10,29,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .navin{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand{display:inline-flex;align-items:center;gap:10px;font-weight:780;letter-spacing:-.02em;color:#fff}
-.brand::before{content:"";width:34px;height:34px;display:inline-block;background:url('/assets/evidencebound-mark.png') center/cover no-repeat;border-radius:9px;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.brand::before{content:"";width:32px;height:32px;display:inline-block;background:url('/assets/evidencebound-mark.png') center/cover no-repeat;border-radius:8px}
 .navlinks{display:flex;gap:17px;flex-wrap:wrap;align-items:center}.navlinks a{font-size:14px;color:#c1cbea}
 .hero{padding:88px 0 64px;border-bottom:1px solid var(--line);background:radial-gradient(circle at 76% 12%,rgba(109,134,255,.22),transparent 38%),radial-gradient(circle at 18% 8%,rgba(38,73,156,.18),transparent 34%)}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,390px);gap:56px;align-items:center}
-.hero-logo{width:min(100%,360px);aspect-ratio:1;object-fit:cover;border-radius:34px;box-shadow:0 28px 90px rgba(0,0,0,.38),0 0 0 1px rgba(119,143,255,.2)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:48px;align-items:center}
+.hero-brand-lockup{display:flex;flex-direction:column;align-items:center;gap:14px}.hero-logo{width:min(100%,250px);aspect-ratio:1;object-fit:cover;border-radius:24px;box-shadow:none}.hero-wordmark{font-size:24px;font-weight:780;letter-spacing:-.025em;color:#fff}
 .eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:#8fa4ff;font-weight:780}
 .hero h1{font-size:clamp(44px,7vw,78px);line-height:1.01;letter-spacing:-.052em;max-width:900px;margin:12px 0 22px}
 .lead{font-size:20px;line-height:1.55;color:var(--muted);max-width:850px}
@@ -41,7 +41,7 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 .article{width:min(840px,calc(100% - 40px));margin:auto;padding:72px 0}.article h1{font-size:clamp(38px,7vw,62px);line-height:1.05;letter-spacing:-.045em}.article h2{font-size:28px;letter-spacing:-.025em;margin-top:52px}.article p,.article li{color:#bdc7df}.article ul{padding-left:22px}.article .summary{font-size:20px;color:#dbe2f3}.meta{font-size:13px;color:#8ea0c5;margin:12px 0 28px}
 .footer{padding:38px 0;color:#8b9abd;font-size:13px}.footerin{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}.source-list{font-size:14px}.kicker{color:#97a8ff;font-weight:760}.small{font-size:13px}.skip{position:absolute;left:-999px}.skip:focus{left:10px;top:10px;background:white;color:black;padding:8px;z-index:99}
 .metric{font-size:40px;font-weight:820;letter-spacing:-.04em;color:#fff}.metric-label{font-size:13px;color:#9eacd0}
-.architecture{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}.architecture .step{border:1px solid #213a6f;border-radius:14px;padding:20px;background:#07132e}.architecture .step b{display:block;color:#fff;margin-bottom:5px}.architecture .step span{color:#9faccc;font-size:14px}
+.architecture{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:28px}.architecture .step{border:1px solid #213a6f;border-radius:14px;padding:20px;background:#07132e}.architecture .step b{display:block;color:#fff;margin-bottom:5px}.architecture .step span{color:#9faccc;font-size:14px}
 .artifact-label{display:inline-flex;align-items:center;gap:8px;border:1px solid #3e5aa5;border-radius:999px;padding:6px 10px;background:#0b1a3d;color:#b9c5ff;font-size:12px;font-weight:760;text-transform:uppercase;letter-spacing:.08em}
 .offer-band{margin-top:28px;border:1px solid #36549c;border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(109,134,255,.15),rgba(8,20,46,.85))}.offer-band h3{font-size:26px}.offer-band p{max-width:840px}
 .use-cases{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.use-cases span{border:1px solid #294276;border-radius:999px;padding:7px 10px;font-size:12px;color:#c6d0eb;background:#07132e}

@@ -1,6 +1,6 @@
 {
   "name": "Ruslan Vrublevskyi",
-  "canonical_url": "https://evidencebound.org/#maintainer",
+  "canonical_url": "https://evidencebound.org/",
   "role": "Creator and Maintainer of EvidenceBound",
   "location": "Kyiv, Ukraine",
   "evidencebound": {
@@ -9,7 +9,7 @@
     "assurance": "https://evidencebound.org/assurance/",
     "repository": "https://github.com/evidencebound/evidencebound-core",
     "organization": "https://github.com/evidencebound",
-    "description": "Open-core verification and human-control infrastructure for evidence-bound, policy-bound and recoverable AI agent actions."
+    "description": "Independent technical assurance for consequential AI-agent control, backed by public research and open technical reference implementations."
   },
   "signalreview": {
     "homepage": "https://signalreview.co/",
@@ -21,5 +21,5 @@
     "linkedin": "https://www.linkedin.com/in/ruslan-vrublevskyi"
   },
   "contact": "ruslan@evidencebound.org",
-  "claim_boundary": "EvidenceBound is early-stage research and open-source infrastructure. Public code and tests do not constitute certification, legal compliance, production customer adoption or a guarantee of safety."
+  "claim_boundary": "EvidenceBound makes bounded technical assurance claims tied to retained evidence. Public research and reference implementations do not constitute certification, legal compliance, production correctness or a guarantee of safety."
 }
