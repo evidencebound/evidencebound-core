@@ -70,7 +70,15 @@ def test_commercial_routes_and_disclosure_boundary() -> None:
     assert "Consequential Agent Control Assessment".lower() in assessment.lower()
     assert "PASS / FAIL / BLOCKED / UNVERIFIED".lower() in assessment.lower()
     assert "OEM / assurance partner".lower() in partner.lower()
-    for forbidden in ["private benchmark corpus", "frozen oracle", "scoring rules", "exp-005", "failure schedules", "customer-specific methodology"]:
+    forbidden_phrases = [
+        "private benchmark corpus",
+        "frozen oracle",
+        "scoring rules",
+        "exp-005",
+        "failure schedules",
+        "customer-specific methodology",
+    ]
+    for forbidden in forbidden_phrases:
         assert forbidden not in combined, forbidden
     logo = SITE / "assets" / "evidencebound-mark.png"
     assert logo.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
