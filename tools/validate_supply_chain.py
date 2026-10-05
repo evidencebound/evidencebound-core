@@ -12,7 +12,7 @@ from pathlib import Path
 
 _SHA256_LINE = re.compile(r"^([0-9a-f]{64})  ([^/\\]+)$")
 _EXPECTED_NAME = "evidencebound-core"
-_EXPECTED_VERSION = "0.3.0"
+_EXPECTED_VERSION = "0.4.0"
 
 
 def sha256(path: Path) -> str:
@@ -100,7 +100,7 @@ def main() -> None:
     assert len(wheels) == 1, f"expected exactly one wheel, found: {wheels}"
     assert len(sdists) == 1, f"expected exactly one sdist, found: {sdists}"
     artifacts = [sdists[0], wheels[0]]
-    assert all(path.name.startswith("evidencebound_core-0.3.0") for path in artifacts), artifacts
+    assert all(path.name.startswith(f"evidencebound_core-{_EXPECTED_VERSION}") for path in artifacts), artifacts
 
     validate_manifest(dist, artifacts)
     validate_wheel_metadata(wheels[0])
