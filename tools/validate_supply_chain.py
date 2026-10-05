@@ -100,7 +100,10 @@ def main() -> None:
     assert len(wheels) == 1, f"expected exactly one wheel, found: {wheels}"
     assert len(sdists) == 1, f"expected exactly one sdist, found: {sdists}"
     artifacts = [sdists[0], wheels[0]]
-    assert all(\n        path.name.startswith(f"evidencebound_core-{_EXPECTED_VERSION}") for path in artifacts\n    ), artifacts
+    assert all(
+        path.name.startswith(f"evidencebound_core-{_EXPECTED_VERSION}")
+        for path in artifacts
+    ), artifacts
 
     validate_manifest(dist, artifacts)
     validate_wheel_metadata(wheels[0])
