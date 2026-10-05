@@ -2,13 +2,13 @@ cff-version: 1.2.0
 message: "If you use EvidenceBound Core in research or engineering work, please cite the software repository."
 title: "EvidenceBound Core"
 type: software
-version: "0.3.0"
-date-released: 2026-08-17
+version: "0.4.0"
+date-released: 2026-10-05
 authors:
   - family-names: "Vrublevskyi"
     given-names: "Ruslan"
     email: "ruslan@evidencebound.org"
-repository-code: "https://github.com/moneyparking/evidencebound-core"
+repository-code: "https://github.com/evidencebound/evidencebound-core"
 url: "https://evidencebound.org"
 license: "Apache-2.0"
 keywords:
