@@ -1,108 +1,82 @@
-# v0.3.0 Release Evidence
+# v0.4.0 Release Candidate Evidence
 
 ## Status
 
-**EvidenceBound Core v0.3.0 is published as a GitHub source release and independently verified.**
+**RELEASE PREPARATION ONLY — NOT TAGGED, NOT RELEASED, NOT PUBLISHED TO PYPI.**
 
-Technical acceptance and publication remain separate evidence layers; both are recorded below. PyPI publication is a separate distribution action and has not occurred.
+Prepared from exact `main` SHA `1d128d2bfae6627802be403e84bb114ffcb36580`.
 
-## Verified release source
+The exact release-candidate commit is the draft pull-request head containing this file. A Git
+commit cannot embed its own SHA without changing that SHA, so exact-head identity is recorded
+by GitHub PR metadata and exact-head CI/readback rather than by a self-referential literal
+inside the commit.
 
-- Repository: `moneyparking/evidencebound-core`
-- URL: https://github.com/moneyparking/evidencebound-core
-- Visibility: public
-- Tag: `v0.3.0`
-- Tag target SHA: `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`
-- Exact-main CI before publication: run `31991997448` — SUCCESS
-- Release publisher run: `31992021940` — SUCCESS
-- GitHub Release: https://github.com/moneyparking/evidencebound-core/releases/tag/v0.3.0
-- Release title: `EvidenceBound Core v0.3.0`
-- Published: 2026-08-17
-- Draft: false
-- Prerelease: false
+## Minimal v0.4.0 release delta
 
-The `v0.3.0` tag is intentionally fixed to the accepted release source. Later documentation or development commits on `main` do not move this tag.
+- package metadata version: `0.4.0`;
+- public runtime version: `0.4.0`;
+- current signed-receipt, persistence/restart, compatibility, conformance and supply-chain
+  hardening frozen from `Unreleased` into `0.4.0`, with no new trust semantics;
+- `CITATION.cff` updated to version `0.4.0`, intended release date `2026-10-05`, and
+  canonical repository `https://github.com/evidencebound/evidencebound-core`;
+- manual-only guarded GitHub/PyPI release workflow using PyPI Trusted Publishing.
 
-## Acceptance evidence at tagged source
+The intended date above is release-preparation metadata. It does not establish that publication
+has occurred.
 
-- Python 3.10 / 3.11 / 3.12 / 3.13: SUCCESS.
-- Python 3.13 pytest: **32 passed**.
-- Golden acceptance: SUCCESS.
-- Selective-recovery benchmark acceptance: SUCCESS.
-- Ruff: SUCCESS.
-- strict mypy: SUCCESS across 12 source files.
-- sdist/wheel build and reinstall/import: SUCCESS.
-- built-wheel PEP 561 `py.typed`: VERIFIED.
-- clean-room runtime-only install + typing marker + plain example + golden acceptance: SUCCESS.
-- no unconditional runtime dependency assertion: SUCCESS.
-- pip-audit: SUCCESS.
-- Bandit core-source scan: SUCCESS.
+No AgenTrust-specific semantics or adapter behavior are added to EvidenceBound Core.
 
-## Acceptance invariants represented in tests
+## Required exact-head acceptance before publication
 
-1. protected payload tamper with retained receipt -> integrity failure -> `BLOCK`;
-2. historical integrity `VERIFIED` can coexist with current applicability `REVIEW_REQUIRED`;
-3. digest change -> `CHANGED`, never implicit `REFUTED`;
-4. missing/refuted evidence, required provenance loss, duplicate evidence IDs, or current evidence identity mismatch fail closed;
-5. graph cycle/missing dependency/duplicate checkpoint IDs reject;
-6. invalidating a node affects only that node and real descendants;
-7. unaffected state is `reusable` only with an `ALLOW` verification receipt bound to the exact checkpoint payload in the current graph;
-8. unrelated branch invalidation does not become a false recovery prerequisite;
-9. consequential actions remain blocked until path-specific required checkpoints are successfully re-verified;
-10. replay guard rejects one operation ID reused with a different payload.
+The draft PR head must have a successful `CI` pull-request run covering:
 
-## Reproducible benchmark acceptance
+- Python 3.10 / 3.11 / 3.12 / 3.13 test matrix;
+- golden acceptance and deterministic benchmark acceptance;
+- Ruff and strict mypy;
+- sdist/wheel build, wheel reinstall/import and PEP 561 marker verification;
+- clean-room runtime-only installation and zero-unconditional-runtime-dependency assertion;
+- pip-audit and Bandit security gates;
+- exact `google-adk==2.7.0` compatibility lane;
+- supply-chain build, SHA-256 manifest, CycloneDX SBOM and validation.
 
-`benchmarks/selective_recovery.py` constructs a verified synthetic 100-node linear workflow and invalidates node `n075`.
+The `attest-supply-chain` job is intentionally not a pull-request job. It is restricted to
+trusted `main` pushes. The release workflow additionally refuses publication unless the
+approved exact `main` SHA has a successful completed `CI` push run; that post-merge CI run
+includes the trusted-main provenance/SBOM attestation job.
 
-Asserted scenario-specific result:
+## Publication guard
 
-- full restart nodes: 100;
-- selective recompute: 25;
-- reusable: 75;
-- requires verification: 0;
-- recomputations avoided: 75.
+`.github/workflows/release-v0.4.0.yml` is `workflow_dispatch` only and requires:
 
-Elapsed time is scenario telemetry only, not a universal performance claim.
+1. invocation from `refs/heads/main`;
+2. confirmation string `publish-v0.4.0`;
+3. an explicit approved `accepted_sha` equal to both the workflow SHA and live `main` SHA;
+4. a successful completed `CI` push run for that exact SHA;
+5. a locally rebuilt `0.4.0` sdist/wheel whose installed metadata and runtime version agree;
+6. PyPI Trusted Publishing through the protected `pypi` environment;
+7. live PyPI `0.4.0` readback before creating the non-draft GitHub Release;
+8. exact tag and release readback after publication.
 
-## Package/release engineering
+The workflow may create/reuse only tag `v0.4.0` at the accepted SHA. It refuses a mismatched
+existing tag.
 
-- Python runtime requirement: `>=3.10`.
-- Unconditional runtime dependencies: none.
-- Build backend: setuptools.
-- License metadata: SPDX `Apache-2.0`, with `LICENSE` included in built artifacts.
-- PEP 561 typed-package marker is included and verified after wheel installation.
-- Repository/issues/changelog/documentation URLs point to `moneyparking/evidencebound-core`.
-- GitHub Actions dependencies are pinned by commit SHA.
-- Dependency and static-security scans are explicit CI jobs.
-- Maintainer-led governance is documented; no external governance body is claimed.
-- `CITATION.cff` identifies version `0.3.0` and the release date.
+## External prerequisite
 
-## Adapter boundary
+Before the publication workflow can succeed, PyPI must have a Trusted Publisher (or pending
+Trusted Publisher for the first project release) matching:
 
-The Google ADK seam remains dependency-free. Consequential integrations must wait for callback completion and a present EvidenceBound `ALLOW` result; a missing callback result or prematurely stopped lifecycle is unverified/blocked. Real upstream ADK compatibility CI remains unfinished work tracked in issue #9.
+- PyPI project: `evidencebound-core`;
+- GitHub owner: `evidencebound`;
+- repository: `evidencebound-core`;
+- workflow: `release-v0.4.0.yml`;
+- environment: `pypi`.
 
-## Publication audit
+Absence or mismatch of that external configuration is a release blocker, not a condition the
+repository workflow may bypass.
 
-The repository intentionally excludes SignalReview commercial logic, provider credentials, private cloud payloads, `.env` files, private keys and hackathon media. The core is a generic implementation rather than a mechanical merge of reference applications documented in `PREEXISTING_WORK.md`.
+## Prior published release
 
-Apache-2.0 is the project license. This is an engineering OSS-license decision, not legal advice.
-
-## Grounded unfinished work
-
-- #7 — signed receipts/key-provider protocol;
-- #8 — crash-consistent persistence and restart/recovery tests;
-- #9 — maintained Google ADK compatibility lifecycle CI;
-- cross-runtime conformance/property/formal testing;
-- external security review and SBOM/release provenance;
-- at least one independently verified external adopter/integration.
-
-## Distribution state
-
-### GitHub
-
-`v0.3.0`: **PUBLISHED / VERIFIED** at `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`.
-
-### PyPI
-
-**NOT PUBLISHED.** No registry availability/install claim is made.
+- GitHub release: `v0.3.0`;
+- tag target: `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`;
+- published: `2026-08-17`;
+- PyPI: not published.
