@@ -4,6 +4,10 @@ All notable changes are documented here. The project follows Semantic Versioning
 
 ## [Unreleased]
 
+_No entries yet._
+
+## [0.4.0] - 2026-10-05
+
 ### Added
 - provider-neutral `ReceiptSigner` / `ReceiptVerifier` protocols and detached `SignedProofReceipt` envelopes;
 - explicit ACTIVE / RETIRED / REVOKED / UNKNOWN signing-key lifecycle semantics;
