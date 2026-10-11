@@ -67,7 +67,7 @@ Read:
 - [`docs/competitions/webmcp/VIDEO_SCRIPT.md`](docs/competitions/webmcp/VIDEO_SCRIPT.md) — <3 minute claim-safe video script
 - [`docs/competitions/webmcp/PRODUCTION_ACCEPTANCE.md`](docs/competitions/webmcp/PRODUCTION_ACCEPTANCE.md) — historical post-merge production evidence
 - [`docs/competitions/webmcp/CLAIMS_LEDGER.md`](docs/competitions/webmcp/CLAIMS_LEDGER.md) — allowed/prohibited wording
-- [`docs/superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md`](docs/superpowers/specs/2026-08-31-webmcp-authority-compiler-design.md) — architecture tournament / design freeze
+- [`site/webmcp/control-core.test.mjs`](site/webmcp/control-core.test.mjs) and [`site/webmcp/webmcp-adapter.test.mjs`](site/webmcp/webmcp-adapter.test.mjs) — public executable authority and stale-execution acceptance tests
 
 ## Claim boundary
 
