@@ -25,7 +25,7 @@
     "release_history_policy": "Tagged release truth is historical and immutable; newer main truth is separate until independently released and verified."
   },
   "current_objective": {
-    "summary": "Advance post-v0.3 adoption and security work without changing historical v0.3 release claims.",
+    "summary": "Preserve v0.4.0 public verification, protect private IP boundaries, and advance evidence-backed adoption/security work.",
     "canonical_owner": "ROADMAP.md",
     "status": "ACTIVE",
     "blocker": "None asserted; re-resolve blockers from canonical sources before execution.",

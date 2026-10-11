@@ -1,7 +1,7 @@
 # EvidenceBound contact
 
 **Institutional site:** https://evidencebound.org  
-**Canonical source:** https://github.com/moneyparking/evidencebound-core  
+**Canonical source:** https://github.com/evidencebound/evidencebound-core  
 **Maintainer:** Ruslan Vrublevskyi  
 **Email:** ruslan@evidencebound.org  
 **Location:** Kyiv, Ukraine

@@ -69,8 +69,8 @@ sha256sum -c SHA256SUMS
 For a future attested artifact downloaded from a trusted build, GitHub CLI can verify that a local artifact digest has a matching attestation in this repository:
 
 ```bash
-gh attestation verify evidencebound_core-0.3.0-py3-none-any.whl \
-  --repo moneyparking/evidencebound-core
+gh attestation verify evidencebound_core-0.4.0-py3-none-any.whl \
+  --repo evidencebound/evidencebound-core
 ```
 
 The verifier should also inspect which workflow/repository/ref identity produced the attestation and whether that identity matches the intended trust policy. Verification of an attestation does not replace EvidenceBound's own evidence/provenance/policy verification semantics.

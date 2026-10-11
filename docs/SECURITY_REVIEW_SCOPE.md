@@ -2,7 +2,7 @@
 
 Status: **review requested / not yet performed**  
 Tracking issue: #23  
-Canonical repository: https://github.com/moneyparking/evidencebound-core
+Canonical repository: https://github.com/evidencebound/evidencebound-core
 
 This document is a reviewer-facing scope and reproducibility packet. Its existence is not an audit, certification, endorsement, or finding that the implementation is secure.
 
@@ -143,7 +143,7 @@ A finding should not be based solely on the absence of a guarantee the project d
 - The project does not claim exactly-once side effects across arbitrary external systems.
 - No external security audit has been completed as of this packet.
 - No independent external adopter is claimed as of this packet.
-- PyPI publication has not been performed.
+- At this historical review-packet baseline, PyPI publication had not occurred. EvidenceBound Core v0.4.0 was subsequently published on PyPI on 2026-10-05.
 
 ## Reproducibility baseline
 

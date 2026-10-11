@@ -1,7 +1,7 @@
 # EvidenceBound Core
 
 [![CI](https://github.com/evidencebound/evidencebound-core/actions/workflows/ci.yml/badge.svg)](https://github.com/evidencebound/evidencebound-core/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/evidencebound/evidencebound-core)](https://github.com/evidencebound/evidencebound-core/releases/tag/v0.3.0)
+[![Release](https://img.shields.io/github/v/release/evidencebound/evidencebound-core)](https://github.com/evidencebound/evidencebound-core/releases/tag/v0.4.0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: Apache-2.0](https://img.shields.io/github/license/evidencebound/evidencebound-core)](LICENSE)
 
@@ -23,7 +23,7 @@ The controlled demo records `externalSideEffect=false`; it does not claim to per
 
 Created and maintained by Ruslan Vrublevskyi.
 
-> Status: **GitHub source release `v0.3.0` published 2026-08-17** from exact commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. The tagged source passed the full Python 3.10–3.13, clean-room, typing/build, benchmark and security CI gates before publication. Current `main` contains additional **Unreleased** hardening, including provider-neutral signed receipts, durable persistence/restart support, and a real Google ADK 2.7.0 lifecycle compatibility lane. PyPI is **not published**. Pre-1.0 API compatibility is not guaranteed.
+> Status: **EvidenceBound Core v0.4.0 was published on GitHub and PyPI on 2026-10-05** from exact source commit `91bbc620a0676c7ce54adaf32527ee90c963d1b9`. It includes signed receipts, durable persistence/restart, EBCJ-1 conformance and Google ADK compatibility evidence. The earlier GitHub v0.3.0 source release (2026-08-17, `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`) remains separate historical evidence. Pre-1.0 API compatibility is not guaranteed.
 
 ## Why EvidenceBound?
 

@@ -1,6 +1,6 @@
 # Funding Readiness
 
-Canonical repository: https://github.com/moneyparking/evidencebound-core  
+Canonical repository: https://github.com/evidencebound/evidencebound-core  
 Institutional site: https://evidencebound.org  
 Maintainer/contact: Ruslan Vrublevskyi — ruslan@evidencebound.org
 
@@ -10,9 +10,9 @@ EvidenceBound targets a reusable gap between agent memory/tracing and consequent
 
 ## Existing engineering evidence
 
-The project has a public, independently verified GitHub source release: `v0.3.0`, tagged at exact accepted commit `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`. That release source passed Python 3.10–3.13 CI, golden acceptance, clean-room installation, package/type checks, the scenario-specific recovery benchmark, pip-audit and Bandit before publication.
+The project has a historical GitHub source release `v0.3.0` (2026-08-17, `2477164acfbdca6a843bf7b2eac5fa21ce9901b2`) and a subsequent GitHub/PyPI release `v0.4.0` (2026-10-05, `91bbc620a0676c7ce54adaf32527ee90c963d1b9`). The v0.3.0 source passed its recorded Python 3.10–3.13, clean-room, typing/build, benchmark and security CI before publication.
 
-Post-release Unreleased `main` has additional executable evidence that is **not** retroactively attributed to `v0.3.0`:
+The following post-v0.3 hardening was included in the published `v0.4.0` release and is **not** retroactively attributed to `v0.3.0`:
 
 - provider-neutral signed-receipt contracts plus optional Ed25519 reference provider; issue #7 accepted on exact-main CI;
 - provider-neutral persistence contract plus crash-consistent stdlib SQLite/restart/replay reference implementation; issue #8 accepted on exact-main CI;
@@ -25,7 +25,7 @@ Only executable/public artifacts, exact commits/runs, published source releases 
 ## Missing maturity
 
 - independently verified external adopter/integration outside maintainer-owned projects;
-- explicit future release-artifact workflow tying release tag, artifact digests and attestations together;
+- independent downstream verification of released artifact provenance and installation;
 - formal state-machine specification/model checking beyond generated property tests;
 - a second independent runtime implementation consuming the EBCJ-1 conformance corpus;
 - additional maintained framework integrations only where external demand justifies maintenance;
@@ -54,10 +54,10 @@ Future funding proposals may still fund audits, additional providers/adapters, f
 **Risk:** a maintainer-authored fixture is not external adoption; keep that distinction explicit.
 
 ### Medium — Security and release hardening
-**Problem:** trusted-main attestations exist, but the published v0.3.0 source release predates artifact attestation and no external audit has occurred.  
-**Deliverables:** future release workflow with exact tag/artifact/attestation linkage, external security review, remediation tracking, persistence/provider conformance, migration tests and release verification guide.  
-**Acceptance:** a future release has independently verifiable artifact digests/attestations and audit findings are resolved or documented.  
-**Risk:** do not retrofit later attestations to historical release claims.
+**Problem:** v0.4.0 has a guarded GitHub/PyPI release workflow, but external security review and independent downstream provenance verification remain outstanding.  
+**Deliverables:** external security review, remediation tracking, independently executable artifact verification, persistence/provider conformance, migration tests and a release verification guide.  
+**Acceptance:** an external reviewer can check exact published artifact provenance and audit findings are resolved or documented.  
+**Risk:** do not retrofit v0.4.0 attestations to the historical v0.3.0 release.
 
 ### Large — Multi-runtime verifiable agent-state infrastructure
 **Problem:** Python-only implementation limits ecosystem-level interoperability evidence.  
@@ -67,4 +67,4 @@ Future funding proposals may still fund audits, additional providers/adapters, f
 
 ## Application timing
 
-Public source release, signed-receipt architecture, crash-consistent persistence, real ADK compatibility, conformance/property testing and trusted-main supply-chain attestations are now concrete engineering evidence. The largest remaining credibility gap for stronger OSS funding applications is **independent external integration/adoption**, followed by external security review and future release-artifact provenance. Funding target status and eligibility must still be rechecked from official program sources at application time.
+Public source release, signed-receipt architecture, crash-consistent persistence, real ADK compatibility, conformance/property testing and trusted-main supply-chain attestations are now concrete engineering evidence. The largest remaining credibility gap for stronger OSS funding applications is **independent external integration/adoption**, followed by external security review and independent verification of published release-artifact provenance. Funding target status and eligibility must still be rechecked from official program sources at application time.

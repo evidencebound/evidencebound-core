@@ -1,8 +1,10 @@
-# v0.4.0 Release Candidate Evidence
+# v0.4.0 Release Candidate Evidence (Historical)
+
+> **Current status (verified 2026-10-11):** EvidenceBound Core v0.4.0 was published on GitHub and PyPI on 2026-10-05 from source commit `91bbc620a0676c7ce54adaf32527ee90c963d1b9`. This file retains the original prepublication preparation and acceptance record; the preparation status below is not current release status.
 
 ## Status
 
-**RELEASE PREPARATION ONLY — NOT TAGGED, NOT RELEASED, NOT PUBLISHED TO PYPI.**
+**HISTORICAL PREPUBLICATION STATUS — superseded by the verified v0.4.0 publication on 2026-10-05.**
 
 Prepared from exact `main` SHA `1d128d2bfae6627802be403e84bb114ffcb36580`.
 
