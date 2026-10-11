@@ -1,12 +1,12 @@
 # Release Checklist
 
-Canonical repository: https://github.com/moneyparking/evidencebound-core
+Canonical repository: https://github.com/evidencebound/evidencebound-core
 
 Use this checklist for every EvidenceBound Core release. Exact-head evidence is required; a previously green commit does not validate a later release commit.
 
 ## Source and semantics
 
-- [ ] Resolve the exact `main` SHA intended for release from `moneyparking/evidencebound-core`.
+- [ ] Resolve the exact `main` SHA intended for release from `evidencebound/evidencebound-core`.
 - [ ] Confirm version in `pyproject.toml` and `src/evidencebound/__init__.py` match.
 - [ ] Confirm `CHANGELOG.md` accurately describes implemented behavior.
 - [ ] Confirm `SPEC.md`, `THREAT_MODEL.md`, README and public API agree with executable semantics.

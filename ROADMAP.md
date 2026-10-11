@@ -10,9 +10,9 @@ Acyclic dependency graph, exact blast radius, selective recovery, replay/idempot
 
 ## v0.3 — Adoption/funding baseline — released
 
-Public API curation, threat model/spec/docs, reproducible benchmark, CI, clean-install path, license/provenance audit and funding work packages. GitHub source release `v0.3.0` is published and verified; PyPI is not published.
+Public API curation, threat model/spec/docs, reproducible benchmark, CI, clean-install path, license/provenance audit and funding work packages. GitHub source release `v0.3.0` was published on 2026-08-17. The subsequent `v0.4.0` release was published on GitHub and PyPI on 2026-10-05.
 
-## Post-v0.3 hardening — implemented on Unreleased main
+## v0.4.0 — published on GitHub and PyPI, 2026-10-05
 
 - provider-neutral signed receipts, explicit key lifecycle and optional Ed25519 provider;
 - provider-neutral persistence contract + crash-consistent SQLite reference backend/restart recovery;
@@ -20,13 +20,13 @@ Public API curation, threat model/spec/docs, reproducible benchmark, CI, clean-i
 - EBCJ-1 language-neutral conformance corpus and deterministic property-based trust/graph invariants;
 - trusted-main build checksums, CycloneDX SBOM and GitHub/Sigstore provenance/SBOM attestations.
 
-These capabilities are not retroactively part of the published `v0.3.0` tag.
+These capabilities belong to `v0.4.0` and are not retroactively part of the original `v0.3.0` source release.
 
 ## Next adoption/security work
 
 - maintainer-authored clean-room external-consumer fixture using only public package APIs;
 - independently owned external integration/adoption evidence;
-- explicit future release artifact workflow with exact tag/digest/SBOM/attestation linkage;
+- independently verified consumption of release-artifact provenance;
 - external security audit and remediation process;
 - formal state-machine/model for invalidation/recovery;
 - second independent runtime consuming EBCJ-1 conformance vectors;
