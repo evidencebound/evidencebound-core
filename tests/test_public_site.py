@@ -43,15 +43,16 @@ def test_required_routes_exist() -> None:
     assert not missing, f"missing site files: {missing}"
 
 
-def test_homepage_has_safe_ai_assurance_positioning() -> None:
+def test_homepage_has_bounded_consequential_control_assurance_positioning() -> None:
     html = read("index.html")
     for phrase in [
-        "AI Safety Assurance",
-        "Human Control Plane",
+        "Independent Control Assurance",
+        "Consequential AI Agents",
         "EvidenceBound Core",
-        "Early-stage research",
-        "no production customers claimed",
-        "not a certification",
+        "Founder-led · early-stage",
+        "No certification claim",
+        "EvidenceBound does not claim:",
+        "universal agent safety, legal compliance, certification",
     ]:
         assert phrase.lower() in html.lower(), phrase
     assert "guarantees compliance" not in html.lower()

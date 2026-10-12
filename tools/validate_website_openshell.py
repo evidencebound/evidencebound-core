@@ -15,11 +15,11 @@ nvidia = NVIDIA.read_text(encoding="utf-8")
 home_required = [
     "RAB-1",
     "NVIDIA OpenShell",
-    "12/12 hard gates",
-    "8/8 frozen scenarios",
     "href=\"/rab1/\"",
-    "Tested on / enforced through",
-    "not NVIDIA validation or endorsement",
+    "outcome-aware recovery authority",
+    "operation-lineage enforcement",
+    "not universal agent safety or production certification",
+    "EvidenceBound does not claim:",
 ]
 for marker in home_required:
     assert marker in home, f"homepage missing required RAB-1 marker: {marker}"
@@ -38,6 +38,7 @@ rab1_required = [
     "under the tested benchmark conditions.",
     "not NVIDIA validation or endorsement",
     "independent runtime enforcement substrate",
+    "Tested on / enforced through",
 ]
 for marker in rab1_required:
     assert marker in rab1, f"RAB-1 page missing required marker: {marker}"
