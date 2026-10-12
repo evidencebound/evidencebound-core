@@ -35,10 +35,11 @@ def test_callback_surface_exists_and_never_reflects_query_parameters() -> None:
     assert "window.location" not in lowered
 
 
-def test_home_footer_links_to_privacy_and_linkedin_callback_surface() -> None:
+def test_home_footer_links_to_privacy_and_contact() -> None:
     text = _read("index.html")
     assert 'href="/privacy/"' in text
-    assert 'href="/linkedin/oauth/callback/"' in text
+    assert 'href="mailto:ruslan@evidencebound.org"' in text
+    # Callback route existence and safe rendering are tested separately above.
 
 
 def test_public_onboarding_pages_contain_no_secret_values() -> None:
