@@ -49,3 +49,44 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero-logo{width:220px}.architecture{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.navin{align-items:flex-start;padding:16px 0;flex-direction:column}.navlinks{padding-bottom:8px}.hero{padding-top:58px}.card,.card.wide{grid-column:1/-1}.section{padding:52px 0}.architecture{grid-template-columns:1fr}}
 @media(max-width:600px){.nvidia-strip{align-items:flex-start}.nvidia-strip img{width:32px;height:32px}.hero-logo{width:180px;border-radius:24px}}
+
+
+/* 2026-10-14 commercial stage 1: additive, responsive conversion layer. */
+.brand::before{background-image:url('/assets/evidencebound-icon-primary.png');background-size:contain;background-repeat:no-repeat}
+.sales-logo-surface{background:#f9fbff;border:1px solid #dbe5fa;padding:18px 20px;border-radius:20px;width:min(100%,330px);box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.sales-full-logo{width:100%;height:auto;display:block;object-fit:contain}
+.sales-brand-note{font-size:13px;text-align:center;color:#b7c7f2;letter-spacing:.02em}
+.sales-price-inline{margin:24px 0 5px;display:flex;align-items:center;gap:17px;padding:14px 18px;background:rgba(6,23,54,.7);border:1px solid #365797;border-radius:14px;max-width:590px}
+.sales-price-inline strong{font-size:31px;color:#fff;letter-spacing:-.035em;white-space:nowrap}
+.sales-price-inline span{font-size:13px;color:#cbd8f7;line-height:1.5}
+.sales-qualifier{color:#afbedc;font-size:13px;max-width:600px;margin:15px 0 0}
+.sales-entry{background:radial-gradient(circle at 82% 0%,rgba(42,97,180,.16),transparent 48%)}
+.sales-entry-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(310px,.85fr);align-items:center;gap:42px}
+.sales-impact{margin-top:28px;padding:20px 23px;border-left:3px solid #65c1e3;background:#081b34;color:#d9e4f5;border-radius:0 12px 12px 0;line-height:1.7}
+.sales-price-card{background:linear-gradient(160deg,#10244a,#08172f);border:1px solid #4266a6;border-radius:20px;padding:28px;box-shadow:0 20px 55px rgba(0,0,0,.12)}
+.sales-card-eyebrow{font-size:11px;letter-spacing:.14em;color:#94c9ff;font-weight:790}
+.sales-price-card h3{font-size:24px;margin:7px 0 10px}
+.sales-price{font-size:46px;line-height:1.1;font-weight:790;letter-spacing:-.04em;color:#fff;margin:12px 0 20px}
+.sales-price span{font-size:13px;letter-spacing:normal;color:#aebfdb;font-weight:500;display:block;margin-top:8px}
+.sales-price-card ul{padding:0;margin:20px 0 25px;list-style:none}
+.sales-price-card li{padding:10px 0 10px 26px;position:relative;border-bottom:1px solid rgba(156,186,235,.13);color:#e0e9f9;font-size:14px}
+.sales-price-card li::before{content:"✓";color:#7bd8cb;position:absolute;left:0;top:9px;font-weight:800}
+.sales-price-card .btn{display:inline-block}
+.sales-price-card .small{font-size:12px;line-height:1.6;color:#acbcda;margin-bottom:0}
+.sales-flow-note{color:#acbbdf;font-size:14px}
+.sales-process-section{background:#071126}
+.sales-process-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:30px}
+.sales-step{padding:22px 18px;border-radius:15px;background:#0c1a36;border:1px solid #284578}
+.sales-step>span{font-size:11px;letter-spacing:.16em;color:#8be6df;font-weight:900}
+.sales-step h3{font-size:18px;margin:12px 0 8px}
+.sales-step p{font-size:14px;margin:0}
+.sales-assessment-tagline{color:#d9e5fb;border:1px solid #38568e;background:#071832;display:inline-block;padding:12px 16px;border-radius:10px}
+.sales-assessment-tagline strong{color:#fff}
+.sales-plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:28px}
+.sales-plan-secondary{border-color:#243e70}
+.sales-custom-price{font-size:28px;line-height:1.25;margin-bottom:28px}
+.sales-note{padding:15px 19px;background:#0a1930;border-left:3px solid #8dacdc;border-radius:0 10px 10px 0;color:#c9d9f5;margin-top:24px;font-size:14px;line-height:1.65}
+.sales-plans .sales-price-card p{color:#cad5e9}
+@media(max-width:960px){.sales-entry-grid{grid-template-columns:1fr;gap:26px}.sales-process-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){.sales-price-inline{flex-direction:column;align-items:flex-start;gap:3px}.sales-plan-grid,.sales-process-grid{grid-template-columns:1fr}.sales-price-card{padding:23px}.sales-logo-surface{width:min(100%,310px)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
