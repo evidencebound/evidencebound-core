@@ -313,3 +313,52 @@ def test_visual_qa_fixes_keep_strict_csp() -> None:
     assert len(values) == 1
     assert "style-src 'self'" in values[0]
     assert "'unsafe-inline'" not in values[0]
+
+
+def test_seo_aeo_discovery_and_buyer_answers() -> None:
+    import xml.etree.ElementTree as ET
+
+    sitemap = ET.fromstring(read("sitemap.xml"))
+    locs = {
+        node.text for node in sitemap.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+    }
+    callback = "linkedin/oauth/callback/index.html"
+    for page in SITE.rglob("*.html"):
+        path = str(page.relative_to(SITE)).replace("\\", "/")
+        html = page.read_text(encoding="utf-8")
+        canonical = re.findall(r'<link rel="canonical" href="([^"]+)"', html)
+        assert len(canonical) == 1, path
+        assert '<meta name="description" content="' in html, path
+        assert len(re.findall(r"<h1(?:\s|>)", html)) == 1, path
+        title = re.findall(r"<title>([^<]+)</title>", html)
+        assert len(title) == 1 and len(title[0]) <= 75, path
+        if path == callback:
+            assert '<meta name="robots" content="noindex,follow">' in html
+            assert canonical[0] not in locs
+        else:
+            assert canonical[0] in locs, path
+
+    home = read("index.html")
+    assessment = read("assessment/index.html")
+    for page in (home, assessment):
+        blocks = re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', page, re.S
+        )
+        assert len(blocks) == 1
+        assert json.loads(blocks[0])["@context"] == "https://schema.org"
+    graph = json.loads(re.search(
+        r'<script type="application/ld\+json">(.*?)</script>', home, re.S
+    ).group(1))["@graph"]
+    org = next(item for item in graph if item["@type"] == "Organization")
+    assert org["logo"]["url"].endswith("evidencebound-icon-primary.png")
+    assert org["url"] == "https://evidencebound.org/"
+    offer = json.loads(re.search(
+        r'<script type="application/ld\+json">(.*?)</script>', assessment, re.S
+    ).group(1))["offers"]
+    assert offer["price"] == "1000" and offer["priceCurrency"] == "USD"
+    assert "What is included in the $1,000 price?" in assessment
+    assert "Do you need access to production?" in assessment
+    assert "Does a PASS prove my agent is safe?" in assessment
+    assert 'id="verify-claims"' in read("technology/index.html")
+    for forbidden in ("guaranteed safe", "ontoguard", "emilia"):
+        assert forbidden not in assessment.lower() and forbidden not in home.lower()
