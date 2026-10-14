@@ -90,3 +90,17 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 @media(max-width:960px){.sales-entry-grid{grid-template-columns:1fr;gap:26px}.sales-process-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:660px){.sales-price-inline{flex-direction:column;align-items:flex-start;gap:3px}.sales-plan-grid,.sales-process-grid{grid-template-columns:1fr}.sales-price-card{padding:23px}.sales-logo-surface{width:min(100%,310px)}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* 2026-10-14 commercial stage 2: technical proof and partner landing */
+.sales-cap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:30px}
+.sales-cap-card{padding:28px;border:1px solid #274675;background:#091832;border-radius:18px}
+.sales-cap-card h3{font-size:23px;line-height:1.25;margin:10px 0}
+.sales-status{color:#8de2dc;font-size:11px;font-weight:780;letter-spacing:.1em}
+.sales-cap-card p{color:#c1cfea;font-size:15px;line-height:1.65}
+.sales-cap-card .small{font-size:12px;color:#9fb2d5;border-top:1px solid #29446c;padding-top:13px;margin-top:16px}
+.sales-cap-card a{font-weight:680;color:#c1d5ff;text-underline-offset:3px;text-decoration:underline}
+.sales-limits-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:20px}
+.sales-resource-row{display:flex;align-items:center;justify-content:space-between;gap:30px}
+.sales-partner-banner{margin-top:20px;display:inline-block;padding:14px 20px;border-left:3px solid #76dace;background:rgba(12,35,64,.8);border-radius:0 12px 12px 0;max-width:900px;color:#d5e1f5}
+.sales-partner-banner b{color:#fff}
+@media(max-width:850px){.sales-cap-grid{grid-template-columns:1fr}.sales-resource-row{align-items:start;flex-direction:column;gap:12px}}
