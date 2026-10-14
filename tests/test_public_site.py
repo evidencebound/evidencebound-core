@@ -246,7 +246,7 @@ def test_stage1_commercial_offer_and_brand_assets() -> None:
             assert forbidden.lower() not in content.lower(), forbidden
     for name in ("evidencebound-icon-primary.png", "evidencebound-logo-primary.png"):
         raw = (SITE / "assets" / name).read_bytes()
-        assert raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
+        assert raw.startswith(bytes.fromhex("89504e470d0a1a0a"))
     for marker in ("Scope", "Challenge", "Observe", "Report", "Retest"):
         assert marker in home
     for marker in ("staging or synthetic", "two agreed transitions", "Not included"):
