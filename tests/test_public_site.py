@@ -78,11 +78,10 @@ def test_homepage_has_commercial_control_assurance_positioning() -> None:
 def test_commercial_routes_and_disclosure_boundary() -> None:
     assessment = read("assessment/index.html")
     partner = read("partners/oem/index.html")
-    assert (
-        "Typical pilot: one consequential workflow, approximately 1\u20132 weeks, "
-        "fixed scope, one retest."
-        in assessment
-    )
+    assert "$1,000" in assessment
+    assert "one protected action" in assessment.lower()
+    assert "two scenarios" in assessment.lower()
+    assert "retest" in assessment.lower()
     assert "PASS / FAIL / BLOCKED / UNVERIFIED" in assessment
     assert "A commercially controlled specialist methodology." in partner
     for forbidden in [
@@ -233,3 +232,22 @@ def test_vercel_headers_and_clean_urls_are_declared() -> None:
     assert "Content-Security-Policy" in headers
     assert "X-Content-Type-Options" in headers
     assert "Referrer-Policy" in headers
+
+
+def test_stage1_commercial_offer_and_brand_assets() -> None:
+    home = read("index.html")
+    assessment = read("assessment/index.html")
+    for content in (home, assessment):
+        assert "$1,000" in content
+        assert "mailto:ruslan@evidencebound.org" in content
+        assert "evidencebound-icon-primary.png" in content
+        assert "certification" in content.lower() or "no certification" in content.lower()
+        for forbidden in ("OntoGuard", "EMILIA", "guaranteed safe", "certified compliant"):
+            assert forbidden.lower() not in content.lower(), forbidden
+    for name in ("evidencebound-icon-primary.png", "evidencebound-logo-primary.png"):
+        raw = (SITE / "assets" / name).read_bytes()
+        assert raw.startswith(b"\\x89PNG\\r\\n\\x1a\\n")
+    for marker in ("Scope", "Challenge", "Observe", "Report", "Retest"):
+        assert marker in home
+    for marker in ("staging or synthetic", "two agreed transitions", "Not included"):
+        assert marker.lower() in assessment.lower(), marker
