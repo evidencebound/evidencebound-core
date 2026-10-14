@@ -329,7 +329,7 @@ def test_seo_aeo_discovery_and_buyer_answers() -> None:
         canonical = re.findall(r'<link rel="canonical" href="([^"]+)"', html)
         assert len(canonical) == 1, path
         assert '<meta name="description" content="' in html, path
-        assert len(re.findall(r"<h1(?:\\s|>)", html)) == 1, path
+        assert len(re.findall(r"<h1(?:\s|>)", html)) == 1, path
         title = re.findall(r"<title>([^<]+)</title>", html)
         assert len(title) == 1 and len(title[0]) <= 75, path
         if path == callback:
@@ -342,18 +342,18 @@ def test_seo_aeo_discovery_and_buyer_answers() -> None:
     assessment = read("assessment/index.html")
     for page in (home, assessment):
         blocks = re.findall(
-            r'<script type="application/ld\\+json">(.*?)</script>', page, re.S
+            r'<script type="application/ld\+json">(.*?)</script>', page, re.S
         )
         assert len(blocks) == 1
         assert json.loads(blocks[0])["@context"] == "https://schema.org"
     graph = json.loads(re.search(
-        r'<script type="application/ld\\+json">(.*?)</script>', home, re.S
+        r'<script type="application/ld\+json">(.*?)</script>', home, re.S
     ).group(1))["@graph"]
     org = next(item for item in graph if item["@type"] == "Organization")
     assert org["logo"]["url"].endswith("evidencebound-icon-primary.png")
     assert org["url"] == "https://evidencebound.org/"
     offer = json.loads(re.search(
-        r'<script type="application/ld\\+json">(.*?)</script>', assessment, re.S
+        r'<script type="application/ld\+json">(.*?)</script>', assessment, re.S
     ).group(1))["offers"]
     assert offer["price"] == "1000" and offer["priceCurrency"] == "USD"
     assert "What is included in the $1,000 price?" in assessment
