@@ -286,3 +286,25 @@ def test_stage2_navigation_and_favicon_are_consistent() -> None:
         for path in ("/assessment/", "/technology/", "/partners/oem/", "/rab1/"):
             assert 'href="' + path + '"' in html, (route, path)
         assert "evidencebound-icon-primary.png" in html, route
+
+
+def test_visual_qa_fixes_keep_strict_csp() -> None:
+    import json
+    for page in SITE.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        assert 'style="' not in html, page.relative_to(SITE)
+    assert ".boundary-spaced{margin-top:24px}" in read("styles.css")
+    for route in ("rab1/index.html", "assurance/index.html"):
+        html = read(route)
+        assert '<p class="table-scroll-hint">' in html
+        assert 'role="region" aria-label="Scrollable technical evidence table"' in html
+    for route in ("linkedin/oauth/callback/index.html", "webmcp/index.html"):
+        assert 'href="/assets/evidencebound-icon-primary.png"' in read(route)
+    callback = read("linkedin/oauth/callback/index.html")
+    assert '<a href="/technology/">Technology</a>' in callback
+    assert '<a href="/research/">Research</a>' not in callback
+    config = json.loads(read("vercel.json"))
+    values = [h["value"] for group in config["headers"] for h in group["headers"] if h["key"] == "Content-Security-Policy"]
+    assert len(values) == 1
+    assert "style-src 'self'" in values[0]
+    assert "'unsafe-inline'" not in values[0]

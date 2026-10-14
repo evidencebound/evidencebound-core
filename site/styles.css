@@ -104,3 +104,9 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 .sales-partner-banner{margin-top:20px;display:inline-block;padding:14px 20px;border-left:3px solid #76dace;background:rgba(12,35,64,.8);border-radius:0 12px 12px 0;max-width:900px;color:#d5e1f5}
 .sales-partner-banner b{color:#fff}
 @media(max-width:850px){.sales-cap-grid{grid-template-columns:1fr}.sales-resource-row{align-items:start;flex-direction:column;gap:12px}}
+
+/* QA: spacing is governed by the existing strict style-src self CSP. */
+.boundary-spaced{margin-top:24px}
+.table-scroll-hint{display:none;margin:18px 0 6px;color:var(--muted);font-size:13px}
+.tablewrap:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:760px){.table-scroll-hint{display:block}}
