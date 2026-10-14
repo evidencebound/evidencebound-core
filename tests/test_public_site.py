@@ -98,7 +98,7 @@ def test_primary_navigation_is_five_item_buyer_navigation() -> None:
     nav = re.search(r'<div class="navlinks">(.*?)</div>', html, re.S)
     assert nav
     labels = re.findall(r">([^<]+)</a>", nav.group(1))
-    assert labels == ["Assessment", "Evidence", "Partners", "Research", "Contact"]
+    assert labels == ["Assessment", "Evidence", "Technology", "Partners", "Contact"]
 
 
 def test_corporate_descriptor_is_synchronized() -> None:
@@ -251,3 +251,38 @@ def test_stage1_commercial_offer_and_brand_assets() -> None:
         assert marker in home
     for marker in ("staging or synthetic", "two agreed transitions", "Not included"):
         assert marker.lower() in assessment.lower(), marker
+
+
+def test_stage2_technology_route_and_claim_boundaries() -> None:
+    technology = read("technology/index.html")
+    assert "https://evidencebound.org/technology/" in read("sitemap.xml")
+    assert 'rel="canonical" href="https://evidencebound.org/technology/"' in technology
+    assert "RELEASED OPEN REFERENCE" in technology
+    assert "FROZEN CONTROLLED BENCHMARK" in technology
+    assert "externalSideEffect=false" in technology
+    assert "12/12 hard gates" in technology
+    assert "8/8 frozen scenarios" in technology
+    assert "Not NVIDIA validation" in technology
+    assert "NOT A PUBLIC PRODUCT" in technology
+    assert "not proof of client adoption" in technology.lower()
+    assert "$1,000" in technology
+    partner = read("partners/oem/index.html")
+    assert "not signed partners or customer references" in partner.lower()
+    assert "not an assumed partnership" in partner.lower()
+    for page in SITE.rglob("*.html"):
+        html = page.read_text(encoding="utf-8").lower()
+        for forbidden in ("ontoguard", "emilia"):
+            assert forbidden not in html, (str(page.relative_to(SITE)), forbidden)
+
+
+def test_stage2_navigation_and_favicon_are_consistent() -> None:
+    branded_routes = [
+        "index.html", "assessment/index.html", "partners/oem/index.html",
+        "technology/index.html", "rab1/index.html", "assurance/index.html",
+        "research/index.html", "papers/index.html", "privacy/index.html",
+    ]
+    for route in branded_routes:
+        html = read(route)
+        for path in ("/assessment/", "/technology/", "/partners/oem/", "/rab1/"):
+            assert 'href="' + path + '"' in html, (route, path)
+        assert "evidencebound-icon-primary.png" in html, route
