@@ -304,7 +304,12 @@ def test_visual_qa_fixes_keep_strict_csp() -> None:
     assert '<a href="/technology/">Technology</a>' in callback
     assert '<a href="/research/">Research</a>' not in callback
     config = json.loads(read("vercel.json"))
-    values = [h["value"] for group in config["headers"] for h in group["headers"] if h["key"] == "Content-Security-Policy"]
+    values = [
+        h["value"]
+        for group in config["headers"]
+        for h in group["headers"]
+        if h["key"] == "Content-Security-Policy"
+    ]
     assert len(values) == 1
     assert "style-src 'self'" in values[0]
     assert "'unsafe-inline'" not in values[0]
