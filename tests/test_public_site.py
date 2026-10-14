@@ -271,7 +271,7 @@ def test_stage2_technology_route_and_claim_boundaries() -> None:
     assert "not an assumed partnership" in partner.lower()
     for page in SITE.rglob("*.html"):
         html = page.read_text(encoding="utf-8").lower()
-        for forbidden in ("ontoguard", "emilia protocol"):
+        for forbidden in ("ontoguard", "emilia"):
             assert forbidden not in html, (str(page.relative_to(SITE)), forbidden)
 
 
