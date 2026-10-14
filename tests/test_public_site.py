@@ -257,7 +257,7 @@ def test_stage2_technology_route_and_claim_boundaries() -> None:
     technology = read("technology/index.html")
     assert "https://evidencebound.org/technology/" in read("sitemap.xml")
     assert 'rel="canonical" href="https://evidencebound.org/technology/"' in technology
-    assert "Released open reference" in technology
+    assert "RELEASED OPEN REFERENCE" in technology
     assert "FROZEN CONTROLLED BENCHMARK" in technology
     assert "externalSideEffect=false" in technology
     assert "12/12 hard gates" in technology
