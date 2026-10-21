@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#030a1d">
+<link rel="stylesheet" href="/styles.css"><link rel="icon" href="/assets/evidencebound-icon-primary.png" type="image/png">
+<title>Google ADK Replay Pilot: External Reproduction | EvidenceBound</title>
+<meta name="description" content="An external participant reported two synthetic Google ADK replay-pilot runs. Read the checked evidence summary, CI authority-regression use case, and clear limits.">
+<link rel="canonical" href="https://evidencebound.org/technology/google-adk-external-reproduction/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="EvidenceBound"><meta property="og:title" content="Google ADK Replay Pilot: External Reproduction | EvidenceBound"><meta property="og:description" content="An external participant reported two synthetic Google ADK replay-pilot runs. Read the checked evidence summary, CI authority-regression use case, and clear limits.">
+<meta property="og:url" content="https://evidencebound.org/technology/google-adk-external-reproduction/"><meta property="og:image" content="https://evidencebound.org/assets/evidencebound-social-card.png">
+<meta property="article:published_time" content="2026-10-21">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Google ADK Replay Pilot: External Reproduction | EvidenceBound"><meta name="twitter:description" content="An external participant reported two synthetic Google ADK replay-pilot runs. Read the checked evidence summary, CI authority-regression use case, and clear limits."><meta name="twitter:image" content="https://evidencebound.org/assets/evidencebound-social-card.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Google ADK authority-replay pilot: external reproducibility note","description":"An external participant reported two synthetic Google ADK replay-pilot runs. Read the checked evidence summary, CI authority-regression use case, and clear limits.","url":"https://evidencebound.org/technology/google-adk-external-reproduction/","mainEntityOfPage":"https://evidencebound.org/technology/google-adk-external-reproduction/","datePublished":"2026-10-21","dateModified":"2026-10-21","inLanguage":"en","author":{"@type":"Organization","name":"EvidenceBound","url":"https://evidencebound.org/"},"publisher":{"@type":"Organization","name":"EvidenceBound","url":"https://evidencebound.org/","logo":{"@type":"ImageObject","url":"https://evidencebound.org/assets/evidencebound-icon-primary.png"}},"about":[{"@type":"Thing","name":"Google Agent Development Kit"},{"@type":"Thing","name":"AI agent authorization regression testing"}]}</script>
+</head>
+<body><a class="skip" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Primary"><div class="wrap navin"><a class="brand" href="/">EvidenceBound</a><div class="navlinks"><a href="/assessment/">Assessment</a><a href="/rab1/">Evidence</a><a href="/technology/">Technology</a><a href="/partners/oem/">Partners</a><a href="mailto:ruslan@evidencebound.org">Contact</a></div></div></nav>
+<main id="main"><article class="article">
+<div class="eyebrow">External reproducibility record · Google ADK · 21 October 2026</div>
+<h1>Google ADK authority-replay pilot: external reproducibility note</h1>
+<p class="summary">An external participant reported running EvidenceBound Agent Check P0 twice in isolated cloud containers through an assistant. The submitted synthetic replay evidence summary passed EvidenceBound's deterministic consistency check. This is a bounded technical observation, not production-agent safety validation.</p>
+<div class="meta">EvidenceBound technical note · externally reported execution · participant-approved wording</div>
+<h2>What was evaluated?</h2>
+<p>The synthetic pilot uses a Google ADK Runner and fixed in-memory actions. It checks four defined authority-control cases: an authorized action, a revoked approval, stale authority and a duplicate retry. The procedure repeats each case and adds one authorized execution for the unsigned receipt-binding check, for nine synthetic scenario executions per invocation.</p>
+<p>The participant reported Python 3.13.16, Google ADK 2.7.0 and EvidenceBound Core 0.4.0 at a pinned commit. This describes the reported environment, not an independently authenticated deployment.</p>
+<h2>Participant-approved reproducibility statement</h2>
+<p>An external participant reported that an assistant executed the unchanged EvidenceBound Agent Check P0 synthetic pilot twice in separate, network-disabled cloud containers. Both runs were reported as LOCAL_REPLAY_PASS for the fixed authorized-action, revocation, stale-authority, and duplicate-retry cases, including the additional unsigned receipt-binding check. The participant supplied one JSON evidence file and its SHA-256 checksum. EvidenceBound verified the submitted checksum and deterministic evidence summary (DETERMINISTIC_SUMMARY_PASS). These observations support reproducibility of a bounded synthetic test; they are not independent attestation of both execution environments or evidence of production Google ADK safety.</p>
+<p class="small">The participant approved this exact anonymized wording on 21 October 2026. No name, direct quotation from correspondence or original evidence file is published here.</p>
+<h2>How to read this evidence</h2>
+<ul>
+<li><strong>Execution reported:</strong> two runs initiated by the participant's assistant in separate network-disabled containers; the participant explicitly did not execute the pilot manually.</li>
+<li><strong>Evidence received:</strong> one original JSON summary and its SHA-256 checksum, not independently retained, separately authenticated output packages from both containers.</li>
+<li><strong>Evidence checked by EvidenceBound:</strong> the supplied JSON checksum and deterministic summary passed without mismatches; this checks consistency of the provided record.</li>
+<li><strong>Not demonstrated:</strong> independently authenticated executor identity, complete provenance for both runs, protection of a customer's live tool actions, or production safety.</li>
+</ul>
+<div class="boundary">A matching SHA-256 digest supports byte integrity of the submitted evidence; it does not establish who executed the test or whether the synthetic observations describe a production agent.</div>
+<h2>Why this matters for pre-deployment AI agent testing</h2>
+<p>Authorization may change between approval and a tool's side effect. Revocation, stale authority and repeated non-idempotent tool calls are therefore useful regression targets. A bounded offline CI check can help a team detect changes to these expected behaviors before deployment, but any real workflow requires its own observation and acceptance criteria.</p>
+<h2>What does this external check not establish?</h2>
+<p>It is not an independent security audit, third-party certification, evidence of customer deployment or proof that Google ADK prevents unauthorized effects in production. Google did not validate or endorse this pilot. The report does not disclose the private Agent Check P0 implementation, reviewer correspondence or unpublished assessment methods.</p>
+<div class="actions"><a class="btn primary" href="/assessment/">Explore the bounded Action-Control Check</a><a class="btn" href="/technology/">Technology and evidence boundaries</a><a class="btn ghost" href="https://github.com/evidencebound/evidencebound-core/releases/tag/v0.4.0">Inspect released Core</a></div>
+</article></main>
+<footer class="footer"><div class="wrap footerin"><div>EvidenceBound · reproducible proof within stated limits.</div><div><a href="/">Home</a> · <a href="/assessment/">Assessment</a> · <a href="/technology/">Technology</a> · <a href="/privacy/">Privacy</a> · <a href="mailto:ruslan@evidencebound.org">Contact</a></div></div></footer>
+</body></html>
