@@ -364,12 +364,14 @@ def test_seo_aeo_discovery_and_buyer_answers() -> None:
         assert forbidden not in assessment.lower() and forbidden not in home.lower()
 
 
+
 def test_google_adk_external_reproduction_is_bounded_and_indexable() -> None:
     page = read("technology/google-adk-external-reproduction/index.html")
     technology = read("technology/index.html")
+    url = "https://evidencebound.org/technology/google-adk-external-reproduction/"
     assert 'href="/technology/google-adk-external-reproduction/"' in technology
-    assert 'https://evidencebound.org/technology/google-adk-external-reproduction/' in read("sitemap.xml")
-    assert '<link rel="canonical" href="https://evidencebound.org/technology/google-adk-external-reproduction/">' in page
+    assert url in read("sitemap.xml")
+    assert f'<link rel="canonical" href="{url}">' in page
     assert '<meta name="description" content="' in page
     assert 'application/ld+json' in page
     assert '"@type":"TechArticle"' in page
@@ -378,13 +380,19 @@ def test_google_adk_external_reproduction_is_bounded_and_indexable() -> None:
     assert 'not independently retained' in page
     assert 'not production-agent safety validation' in page
     assert 'Google did not validate or endorse' in page
-    approved = (
-        "An external participant reported that an assistant executed the unchanged EvidenceBound Agent Check P0 synthetic pilot twice in separate, network-disabled cloud containers. "
-        "Both runs were reported as LOCAL_REPLAY_PASS for the fixed authorized-action, revocation, stale-authority, and duplicate-retry cases, including the additional unsigned receipt-binding check. "
-        "The participant supplied one JSON evidence file and its SHA-256 checksum. "
-        "EvidenceBound verified the submitted checksum and deterministic evidence summary (DETERMINISTIC_SUMMARY_PASS). "
-        "These observations support reproducibility of a bounded synthetic test; they are not independent attestation of both execution environments or evidence of production Google ADK safety."
-    )
+    approved = " ".join([
+        "An external participant reported that an assistant executed the",
+        "unchanged EvidenceBound Agent Check P0 synthetic pilot twice in",
+        "separate, network-disabled cloud containers. Both runs were reported as",
+        "LOCAL_REPLAY_PASS for the fixed authorized-action, revocation,",
+        "stale-authority, and duplicate-retry cases, including the additional",
+        "unsigned receipt-binding check. The participant supplied one JSON",
+        "evidence file and its SHA-256 checksum. EvidenceBound verified the",
+        "submitted checksum and deterministic evidence summary",
+        "(DETERMINISTIC_SUMMARY_PASS). These observations support reproducibility",
+        "of a bounded synthetic test; they are not independent attestation of",
+        "both execution environments or evidence of production Google ADK safety.",
+    ])
     assert page.count(approved) == 1, "approved paragraph must remain verbatim"
     for forbidden in ("Utkarsh", "Anvit", "naveen.aifanatic", "PRIVATE_AGENT_CHECK_SOURCE"):
         assert forbidden not in page
