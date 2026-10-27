@@ -11,6 +11,7 @@ const listEntries = [...document.querySelectorAll('.eb-list-group li[data-showro
 const groups = [...document.querySelectorAll('.eb-list-group')];
 const statusButtons = [...document.querySelectorAll('[data-eb-status]')];
 const groupButtons = [...document.querySelectorAll('[data-eb-group]')];
+const nightButtons = [...document.querySelectorAll('[data-eb-night-toggle]')];
 
 if (root && search && counter && stage && sidebar && mobile &&
     screens.length === 30 && listEntries.length === 30 &&
@@ -65,6 +66,16 @@ if (root && search && counter && stage && sidebar && mobile &&
     button.addEventListener('click', () => {
       chosenGroup = button.dataset.ebGroup;
       apply();
+    });
+  }
+  for (const button of nightButtons) {
+    button.addEventListener('click', () => {
+      const next = !document.body.classList.contains('eb-night');
+      document.body.classList.toggle('eb-night', next);
+      for (const peer of nightButtons) {
+        peer.setAttribute('aria-pressed', String(next));
+        peer.textContent = next ? 'Day view' : 'Night view';
+      }
     });
   }
   search.addEventListener('input', apply);
