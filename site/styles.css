@@ -179,3 +179,86 @@ a{color:#aebcff;text-decoration:none}a:hover{text-decoration:underline}
 @media(max-width:930px){.agent-hero-grid,.agent-preview .agent-preview-grid{grid-template-columns:1fr}.agent-spatial-stage{max-width:520px;margin:auto;width:100%}.agent-method{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.agent-challenge-grid,.agent-offer-grid,.agent-method{grid-template-columns:1fr}.agent-page .agent-hero{padding:55px 0}.agent-section{padding:55px 0}.agent-offer p{min-height:0}.agent-floating{transform:none}.agent-preview .agent-preview-panel{transform:none}.agent-preview .agent-preview-grid{gap:24px}}
 @media(prefers-reduced-motion:reduce){.agent-challenge{transition:none}.agent-challenge:hover{transform:none}}
+
+/* 2026-10-27 EvidenceBound Light Spatial Interface.
+   Restyles the shared public informational pages, not the separate WebMCP
+   controlled demo app. Preserve all existing routes, markup and schema data. */
+:root{
+  --bg:#f7fbff;--bg2:#eef6ff;--panel:#fff;--panel2:#e9f3ff;
+  --line:#d5e3f4;--line2:#a9c4e6;--text:#142f58;--muted:#506987;
+  --soft:#6982a0;--accent:#146cc8;--accent2:#2878d0;--good:#148d82;
+  --warning:#ab7821;
+}
+body{background:linear-gradient(180deg,#fff,#f5faff 46%,#f0f7ff);color:var(--text)}
+a{color:#1565b9}
+.nav{background:rgba(251,253,255,.95);border-color:#d8e7f6;box-shadow:0 2px 20px rgba(34,92,165,.04)}
+.brand{color:#124278}.navlinks a{color:#2c598d}
+.hero{background:radial-gradient(circle at 82% 10%,rgba(70,148,226,.19),transparent 40%),linear-gradient(145deg,#fff,#edf6ff);border-bottom-color:#d5e4f4}
+.hero h1{color:#123a70}.eyebrow{color:#155da9}.lead{color:#486584}
+.badge{background:#eaf4ff;border-color:#c3d9f4;color:#245080}
+.btn{background:#f6fbff;border-color:#a5c7ed;color:#1557a0}
+.btn.primary{background:linear-gradient(135deg,#105eae,#2a7cda);border-color:#226bb8;color:#fff}
+.btn.ghost{color:#1b5ca4}
+.section{border-color:#d9e6f6}.section h2,.section h3{color:#123861}.section p{color:#506b89}
+.muted{color:#6882a1}
+.card:not(.rab1-feature){background:linear-gradient(160deg,#fff,#f0f7ff);border-color:#d1e3f6;box-shadow:0 10px 30px rgba(33,89,154,.045)}
+.card:not(.rab1-feature) strong{color:#123b70}
+.architecture .step{background:#fff;border-color:#cbdff5}
+.architecture .step b{color:#184b87}.architecture .step span{color:#4a6889}
+.contract{background:#102c4b;border-color:#5487bd;color:#e8f3ff}
+.boundary{background:#eaf5ff;color:#244b75}
+.warning{border-left-color:#b88940}
+.tablewrap{border-color:#d0e1f3}
+th{color:#265c98;background:#e9f3ff;border-color:#d8e5f3}
+td{color:#435f81;border-color:#d8e5f3}
+.article h1,.article h2{color:#10396e}
+.article p,.article li{color:#425f81}
+.article .summary{color:#224c7b}
+.meta{color:#6582a3}
+.footer{background:#eff7ff;border-top:1px solid #dce9f7;color:#65809e}
+.footer a{color:#2860a1}
+.metric{color:#0d4687}
+.metric-label{color:#536f8b}
+.offer-band{border-color:#b7d5f4;background:linear-gradient(135deg,#ecf6ff,#fff)}
+.offer-band h3{color:#12396c}
+.use-cases span{background:#f4f9ff;border-color:#bfd5ef;color:#32597c}
+.artifact-label{background:#dceeff;border-color:#a5c8ed;color:#20589b}
+.proofline span{color:#527398}
+.rab1-feature{background:linear-gradient(140deg,#073856,#091b33);border-color:#4e92ae;color:#f1f7ff}
+.rab1-feature h3{color:#f5fbff}.rab1-feature p{color:#dcecf8}
+.rab1-feature .proofline span{color:#b9dfeb}
+.rab1hero{background:radial-gradient(circle at 77% 10%,rgba(79,163,205,.2),transparent 42%),linear-gradient(130deg,#f4faff,#deefff)}
+.rab1claim{background:#e4f5fc;color:#214f75;border-left-color:#2ca5ac}
+.nvidia-strip{background:#ecf8fb;border-color:#b5d7e8}
+.nvidia-strip strong{color:#214e68}.nvidia-strip span{color:#526f8b}
+.sales-price-inline{background:#edf6ff;border-color:#bdd5f3}
+.sales-price-inline strong{color:#104785}.sales-price-inline span{color:#4d6991}
+.sales-qualifier{color:#5b7898}
+.sales-brand-note{color:#466e9d}
+.sales-entry{background:#f7fbff}
+.sales-impact{background:#eaf5ff;color:#2b507d}
+.sales-price-card{background:linear-gradient(155deg,#fff,#e8f3ff);border-color:#a8cbf0;box-shadow:0 17px 44px rgba(38,96,167,.09)}
+.sales-price-card h3,.sales-price{color:#123f77}
+.sales-price span,.sales-price-card .small{color:#527293}
+.sales-price-card li{color:#295078;border-bottom-color:#d5e5f7}
+.sales-card-eyebrow{color:#155caa}
+.sales-assessment-tagline{background:#e7f2ff;border-color:#bcd3ef;color:#325c86}
+.sales-assessment-tagline strong{color:#135195}
+.sales-process-section{background:#edf6ff}
+.sales-step{background:#fff;border-color:#d1e2f4}
+.sales-step>span{color:#1d80be}
+.sales-flow-note{color:#567491}
+.sales-plan-secondary{border-color:#d1e2f4}
+.sales-note{background:#eaf5ff;color:#335b82}
+.sales-plans .sales-price-card p{color:#486787}
+.sales-cap-card{background:linear-gradient(155deg,#fff,#f1f7ff);border-color:#d0e1f4}
+.sales-cap-card h3{color:#123b6d}
+.sales-status{color:#176c9b}
+.sales-cap-card p{color:#4d6a89}
+.sales-cap-card .small{color:#54708c;border-color:#dae7f4}
+.sales-cap-card a{color:#125cac}
+.sales-partner-banner{background:#e9f5ff;color:#30587f}
+.sales-partner-banner b{color:#144778}
+.agent-page .agent-button{color:#fff}
+.agent-page .agent-button-quiet{color:#174b94}
+.skip:focus{background:#fff;color:#153d71}
