@@ -217,3 +217,62 @@ body.eb-showroom-homepage .navlinks a:focus-visible{outline:3px solid #eca32a;ou
  .eb-mobile-tabs{position:fixed;bottom:0;left:0;right:0}
  body.eb-showroom-homepage{padding-bottom:56px}
 }
+
+/* SVG floor uses converging lines; HTML screens remain accessible above. */
+.eb-ground{inset:0;left:0;top:0;height:100%;width:100%;transform:none;mask-image:none;
+ background-image:url('/assets/showroom-perspective-grid.svg');
+ background-position:center center;background-size:100% 100%;background-repeat:no-repeat;opacity:.74}
+.eb-stage:before{opacity:.4}
+@media(max-width:700px){
+ .eb-ground{inset:0;left:0;top:0;height:100%;width:100%;transform:none;background-size:100% 100%;opacity:.55}
+ .eb-mobile-actions{display:flex;gap:8px;align-items:center;justify-content:center;width:100%}
+ .eb-mobile-actions button{min-width:0}
+}
+/* Dark cinema is optional, not a replacement for white-blue branding. */
+body.eb-night.eb-showroom-homepage{background:#071321;color:#e5efff}
+body.eb-night.eb-showroom-homepage .nav{background:#060e19;border-color:#274462}
+body.eb-night.eb-showroom-homepage .brand{color:#f6faff}
+body.eb-night.eb-showroom-homepage .navlinks a{color:#acc9e9}
+body.eb-night .eb-side{background:linear-gradient(130deg,#07121e,#0a1a2e);border-color:#26425e}
+body.eb-night .eb-side-search label,body.eb-night .eb-sidebar-heading,body.eb-night .eb-list-group p{color:#8cabc9!important}
+body.eb-night .eb-search-field{background:#081827;border-color:#395574}
+body.eb-night .eb-search-field input{color:#e2f1ff}
+body.eb-night .eb-filterbar button,body.eb-night .eb-lane-filters button{background:#101f30;border-color:#2a435d;color:#b2cee9}
+body.eb-night .eb-filterbar button[aria-pressed="true"],body.eb-night .eb-lane-filters button[aria-pressed="true"]{background:#dcecff;color:#081b35;border-color:#dcecff}
+body.eb-night .eb-list-group{border-color:#1f3b56}
+body.eb-night .eb-list-group h3{color:#cce5ff}
+body.eb-night .eb-list-group h3 span{border-color:#607f9f}
+body.eb-night .eb-list-group li a{color:#a6c5e5}
+body.eb-night .eb-list-group li small{color:#6d91b7}
+body.eb-night .eb-stage{background:radial-gradient(ellipse at 55% 78%,#101d30,#070d18 64%,#040811)}
+body.eb-night .eb-ground{opacity:.64;filter:brightness(1.05) saturate(.9)}
+body.eb-night .eb-far-glow{opacity:.17}
+body.eb-night .eb-stage:before{opacity:.15}
+body.eb-night .eb-display{filter:drop-shadow(0 10px 11px rgba(0,0,0,.55))}
+body.eb-night .eb-depth-0{--screen-opacity:.82}
+body.eb-night .eb-depth-1{--screen-opacity:.45}
+body.eb-night .eb-depth-2{--screen-opacity:.32}
+body.eb-night .eb-depth-3{--screen-opacity:.19}
+body.eb-night .eb-depth-4{--screen-opacity:.11}
+body.eb-night .eb-display.eb-planned{--screen-opacity:.17}
+body.eb-night .eb-display:hover,body.eb-night .eb-display:focus-visible{opacity:1}
+body.eb-night .eb-display-shell{border-color:#406783;background:#06101b;box-shadow:1px 4px 0 #18344e,0 8px 14px rgba(0,0,0,.65)}
+body.eb-night .eb-floor-label{color:#bdd4ef}
+body.eb-night .eb-stage-corner{color:#8caccc}
+body.eb-night .eb-intro{background:rgba(6,15,25,.95);border-color:#436280;box-shadow:0 12px 44px rgba(0,0,0,.49)}
+body.eb-night .eb-intro-mini{color:#88b0d4}
+body.eb-night .eb-intro h1{color:#f1f7ff}
+body.eb-night .eb-intro p{color:#b3cbe5}
+body.eb-night .eb-intro-price{border-color:#2b4663}
+body.eb-night .eb-intro-price b{color:#dfefff}
+body.eb-night .eb-intro-price span{color:#a6c2dd}
+body.eb-night .eb-intro small{color:#8caac5}
+body.eb-night .eb-intro-agent a{color:#a6d2ff}
+body.eb-night .eb-intro-actions a{background:#17334f;border-color:#3a6589;color:#dfefff}
+body.eb-night .eb-intro-actions a.eb-action-main{background:#b9d9ff;border-color:#b9d9ff;color:#0a2b4d}
+body.eb-night .eb-statusline{background:#071322;color:#a9c9e3;border-color:#314d67}
+body.eb-night .eb-statusline strong{color:#e3f3ff}
+body.eb-night .eb-mobile-actions button{background:#0b1b2b;border-color:#47698d;color:#e2efff}
+body.eb-night .eb-mobile-tabs{background:#071421;border-color:#29445e}
+body.eb-night .eb-mobile-tabs a{color:#b8d5ee}
+@media(max-width:700px){body.eb-night .eb-intro{background:#081828}}
