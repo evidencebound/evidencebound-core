@@ -64,7 +64,10 @@ class AgentSitePreviewTest(unittest.TestCase):
     def test_existing_homepage_canonical_and_service_price_unchanged(self):
         home, assessment = read("index.html"), read("assessment/index.html")
         self.assertIn('<link rel="canonical" href="https://evidencebound.org/">', home)
-        self.assertIn('<link rel="canonical" href="https://evidencebound.org/assessment/">', assessment)
+        self.assertIn(
+            '<link rel="canonical" href="https://evidencebound.org/assessment/">',
+            assessment,
+        )
         self.assertIn("$1,000", home)
         self.assertIn("$1,000", assessment)
         self.assertIn("one protected action", assessment.lower())
