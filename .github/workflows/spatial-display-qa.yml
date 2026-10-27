@@ -8,6 +8,7 @@ on:
       - site/**
       - tests/test_spatial_site.py
       - tests/spatial_scene.test.mjs
+      - tests/showroom.test.mjs
       - .github/workflows/spatial-display-qa.yml
   pull_request:
     paths:
@@ -33,9 +34,11 @@ jobs:
       - name: Exact-structure and SEO/AEO regressions
         run: python -m unittest -v tests.test_spatial_site tests.test_agent_site_preview
       - name: Execute spatial scene filter and alternative list controls
-        run: node --test tests/spatial_scene.test.mjs
+        run: node --test tests/spatial_scene.test.mjs tests/showroom.test.mjs
       - name: Syntax-check first-party script
-        run: node --check site/spatial.mjs
+        run: |
+          node --check site/spatial.mjs
+          node --check site/showroom.mjs
       - name: Capture desktop/mobile and buyer-page screenshots
         shell: bash
         run: |
