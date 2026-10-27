@@ -295,3 +295,32 @@ body.spatial-homepage .btn.ghost{background:transparent;color:#17549b}
  .spatial-copy .spatial-offer-note{order:8;margin:9px 0 22px}
  .spatial-world{padding-top:14px}
 }
+
+/* Evidence Agent detail route: four framed challenge screens, not floating UI
+   cards. Each screen is a native anchor to a static proposed task. */
+.agent-monitor-gallery{position:relative;min-width:0;perspective:1050px;padding:38px 0 15px}
+.agent-monitor-gallery:before{content:"";position:absolute;z-index:0;inset:5% 0 11%;
+ background:radial-gradient(ellipse at 50% 60%,rgba(79,150,232,.24),transparent 63%);
+ filter:blur(18px);pointer-events:none}
+.agent-monitor-world{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:37px 23px;transform:rotateY(-8deg) rotateX(6deg) rotateZ(.5deg);transform-style:preserve-3d}
+.agent-monitor-world .spatial-monitor:nth-child(1){--depth:28px}
+.agent-monitor-world .spatial-monitor:nth-child(2){--depth:3px}
+.agent-monitor-world .spatial-monitor:nth-child(3){--depth:10px}
+.agent-monitor-world .spatial-monitor:nth-child(4){--depth:-13px}
+.agent-monitor-world .spatial-screen-title{font-size:clamp(13px,1.15vw,18px)}
+.agent-monitor-caption{text-align:center;color:#557da7!important;font-size:11px!important;font-weight:750;
+ letter-spacing:.08em;text-transform:uppercase;margin:29px 0 0!important}
+@media(max-width:900px){
+ .agent-monitor-gallery{max-width:700px;margin:0 auto;padding-top:15px}
+ .agent-monitor-world{transform:rotateY(-5deg) rotateX(4deg)}
+}
+@media(max-width:640px){
+ .agent-monitor-gallery{max-width:100%;padding:24px 0}
+ .agent-monitor-world{gap:21px 11px;transform:none}
+ .agent-monitor-world .spatial-monitor{transform:none}
+ .agent-monitor-world .spatial-screen-title{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .agent-monitor-world{transform:none}
+}
