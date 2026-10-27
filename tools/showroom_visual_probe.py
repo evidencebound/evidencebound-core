@@ -48,7 +48,7 @@ async def main():
         await mobile.locator("#eb-mobile-list").click()
         assert await mobile.locator(".eb-side.eb-open").count() == 1
         await mobile.screenshot(path=str(ROOT / "home-mobile-list.png"))
-        await mobile.locator("#eb-mobile-list").click()
+        await mobile.locator("#eb-close-list").click()
         assert await mobile.locator(".eb-side.eb-open").count() == 0
         await mobile.locator('[data-eb-night-toggle]:visible').first.click()
         assert await mobile.locator("body.eb-night").count() == 1
