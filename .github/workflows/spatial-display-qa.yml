@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/spatial-display-wall-2026-10-27
+      - feature/xoyk-faithful-showroom-2026-10-27
       - main
     paths:
       - site/**
