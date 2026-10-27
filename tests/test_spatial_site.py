@@ -89,7 +89,7 @@ class SpatialSiteTests(unittest.TestCase):
             'class="eb-mobile-tabs"', 'id="eb-mobile-list"',
         ):
             self.assertIn(marker, html)
-        for pattern in ("perspective:930px", "rotateX(68deg)", "--size:126px",
+        for pattern in ("perspective(930px)", "rotateX(68deg)", "--size:126px",
                         ".eb-display-foot", ".eb-stage-corner", ".eb-list-group"):
             self.assertIn(pattern, css)
         self.assertIn("@media(max-width:700px)", css)
