@@ -6,6 +6,7 @@ const counter = document.querySelector('#eb-total');
 const stage = document.querySelector('#eb-stage');
 const sidebar = document.querySelector('.eb-side');
 const mobile = document.querySelector('#eb-mobile-list');
+const closeList = document.querySelector('#eb-close-list');
 const screens = [...document.querySelectorAll('.eb-display[data-showroom-group]')];
 const listEntries = [...document.querySelectorAll('.eb-list-group li[data-showroom-group]')];
 const groups = [...document.querySelectorAll('.eb-list-group')];
@@ -89,6 +90,7 @@ if (root && search && counter && stage && sidebar && mobile &&
   mobile.addEventListener('click', () => {
     openList(!sidebar.classList.contains('eb-open'));
   });
+  if (closeList) closeList.addEventListener('click', () => openList(false));
   document.addEventListener('keydown', event => {
     const editable = document.activeElement &&
       ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
