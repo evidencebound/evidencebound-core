@@ -1,0 +1,69 @@
+name: Spatial Display Wall Acceptance
+on:
+  push:
+    branches:
+      - feature/spatial-display-wall-2026-10-27
+      - main
+    paths:
+      - site/**
+      - tests/test_spatial_site.py
+      - tests/spatial_scene.test.mjs
+      - .github/workflows/spatial-display-qa.yml
+  pull_request:
+    paths:
+      - site/**
+      - tests/test_spatial_site.py
+      - tests/spatial_scene.test.mjs
+      - .github/workflows/spatial-display-qa.yml
+permissions:
+  contents: read
+jobs:
+  spatial-acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exact-structure and SEO/AEO regressions
+        run: python -m unittest -v tests.test_spatial_site tests.test_agent_site_preview
+      - name: Execute spatial scene filter and alternative list controls
+        run: node --test tests/spatial_scene.test.mjs
+      - name: Syntax-check first-party script
+        run: node --check site/spatial.mjs
+      - name: Capture desktop/mobile and buyer-page screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "No headless Chrome binary available for visual acceptance" >&2
+            exit 1
+          fi
+          python -m http.server 4173 --directory site >/tmp/spatial-http.log 2>&1 &
+          echo $! > /tmp/spatial-http.pid
+          trap 'kill "$(cat /tmp/spatial-http.pid)" || true' EXIT
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent http://localhost:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          mkdir -p spatial-qa
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/home-desktop.png --window-size=1440,900 --virtual-time-budget=1500 http://localhost:4173/
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/home-mobile.png --window-size=390,844 --virtual-time-budget=1500 http://localhost:4173/
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/agent-desktop.png --window-size=1440,900 --virtual-time-budget=1500 http://localhost:4173/agent/
+          "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/assessment-desktop.png --window-size=1440,900 --virtual-time-budget=1500 http://localhost:4173/assessment/
+          sha256sum spatial-qa/*.png > spatial-qa/SHA256SUMS.txt
+          git rev-parse HEAD > spatial-qa/RESEARCH_HEAD.txt
+      - name: Retain exact-head visual artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spatial-display-qa-${{ github.sha }}
+          path: spatial-qa/
+          retention-days: 90
+          if-no-files-found: warn
