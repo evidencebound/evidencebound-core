@@ -204,3 +204,16 @@ body.eb-showroom-homepage .navlinks a:focus-visible{outline:3px solid #eca32a;ou
  .eb-display{transition:none}
  .eb-display:hover,.eb-display:focus-visible{transform:translateX(-50%) translateY(-50%)}
 }
+
+/* The desktop card belongs to the stage composition; on mobile it follows
+   the horizon scene in document flow so the screen wall is first. */
+.eb-showroom .eb-shell{position:relative}
+@media(max-width:700px){
+ .eb-showroom .eb-shell{height:auto;min-height:0;max-height:none;display:flex;flex-direction:column}
+ .eb-stage{height:calc(100svh - 110px);min-height:600px;overflow:hidden;flex:none}
+ .eb-intro{position:relative;inset:auto;order:2;max-width:none;width:100%;margin:0;padding:24px 19px 28px;box-shadow:none}
+ .eb-side{top:0;bottom:0}
+ .eb-mobile-actions{top:calc(100svh - 165px);bottom:auto}
+ .eb-mobile-tabs{position:fixed;bottom:0;left:0;right:0}
+ body.eb-showroom-homepage{padding-bottom:56px}
+}
