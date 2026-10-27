@@ -240,3 +240,24 @@ body.spatial-homepage .btn.ghost{background:transparent;color:#17549b}
  .spatial-monitor:hover,.spatial-monitor:focus-visible{transform:none}
  .spatial-scene:after{opacity:.25}
 }
+
+/* Deliberately varied depth/pool-light positions: a spatial aisle, not cards. */
+.spatial-monitor:nth-child(1){--depth:38px}
+.spatial-monitor:nth-child(2){--depth:11px}
+.spatial-monitor:nth-child(3){--depth:-16px}
+.spatial-monitor:nth-child(4){--depth:18px}
+.spatial-monitor:nth-child(5){--depth:9px}
+.spatial-monitor:nth-child(6){--depth:-11px}
+.spatial-monitor:nth-child(7){--depth:-5px}
+.spatial-monitor:nth-child(8){--depth:-14px}
+.spatial-monitor:nth-child(9){--depth:-32px}
+.spatial-dash .dash-bars i:nth-child(1){--h:32%}
+.spatial-dash .dash-bars i:nth-child(2){--h:57%}
+.spatial-dash .dash-bars i:nth-child(3){--h:86%}
+.spatial-dash .dash-bars i:nth-child(4){--h:100%}
+.spatial-scene[hidden]{display:none}
+.spatial-list-open .spatial-shell{grid-template-columns:1fr;min-height:0;padding-bottom:14px}
+.spatial-list-open .spatial-copy{max-width:920px}
+.spatial-list-open .spatial-copy h1{max-width:750px}
+.spatial-list-open .spatial-directory{display:block}
+@media(max-width:640px){.spatial-monitor{--depth:0px!important}}
