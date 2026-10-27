@@ -276,3 +276,11 @@ body.eb-night .eb-mobile-actions button{background:#0b1b2b;border-color:#47698d;
 body.eb-night .eb-mobile-tabs{background:#071421;border-color:#29445e}
 body.eb-night .eb-mobile-tabs a{color:#b8d5ee}
 @media(max-width:700px){body.eb-night .eb-intro{background:#081828}}
+
+.eb-list-close{display:none}
+@media(max-width:700px){
+ .eb-list-close{display:block;align-self:flex-end;position:sticky;top:0;z-index:5;
+  padding:8px 12px;margin:6px 8px 0;background:#fff;color:#195392;
+  border:1px solid #9fbee1;font:800 12px Inter,system-ui,sans-serif;border-radius:3px}
+ body.eb-night .eb-list-close{background:#17314b;color:#e7f3ff;border-color:#4b6c8c}
+}
