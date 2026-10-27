@@ -1,7 +1,7 @@
-"""Bounded deterministic acceptance for the EvidenceBound spatial website.
+"""Deterministic showroom structure, search preservation and buyer-scope gates.
 
-Tests do not score aesthetic similarity to xoyk.dev. They verify executable
-interactions and preservation of exact search, pricing and product boundaries.
+No aesthetic similarity is asserted by these tests. Visual resemblance requires
+separate retained browser screenshots and a human review.
 """
 from __future__ import annotations
 
@@ -12,156 +12,182 @@ import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-SITE = ROOT / "site"
+SITE = Path(__file__).resolve().parents[1] / "site"
+ORIGINAL_URLS = {
+    "https://evidencebound.org/",
+    "https://evidencebound.org/assessment/",
+    "https://evidencebound.org/agent/",
+    "https://evidencebound.org/technology/",
+    "https://evidencebound.org/technology/google-adk-external-reproduction/",
+    "https://evidencebound.org/rab1/",
+    "https://evidencebound.org/partners/oem/",
+    "https://evidencebound.org/research/",
+    "https://evidencebound.org/research/deterministic-control-plane-for-ai-agents/",
+    "https://evidencebound.org/research/audit-evidence-for-high-stakes-ai/",
+    "https://evidencebound.org/research/verify-the-algorithm-not-the-outcome/",
+    "https://evidencebound.org/assurance/",
+    "https://evidencebound.org/privacy/",
+    "https://evidencebound.org/case-studies/signalreview/",
+    "https://evidencebound.org/papers/",
+    "https://evidencebound.org/webmcp/",
+}
 
 
 def read(path: str) -> str:
     return (SITE / path).read_text(encoding="utf-8")
 
 
-class StageParser(HTMLParser):
-    def __init__(self):
+class Elements(HTMLParser):
+    def __init__(self) -> None:
         super().__init__()
-        self.screens = []
-        self.inline_styles = []
-        self.links = []
-        self.buttons = []
+        self.displays: list[dict[str, str | None]] = []
+        self.links: list[dict[str, str | None]] = []
+        self.buttons: list[dict[str, str | None]] = []
+        self.inline_styles: list[str] = []
 
-    def handle_starttag(self, tag, attributes):
-        data = dict(attributes)
-        if "style" in data:
+    def handle_starttag(self, tag, attrs):
+        d = dict(attrs)
+        if d.get("style") is not None:
             self.inline_styles.append(tag)
         if tag == "a":
-            self.links.append(data.get("href", ""))
-            if "spatial-monitor" in data.get("class", "").split():
-                self.screens.append(data)
+            self.links.append(d)
+            if "eb-display" in (d.get("class") or "").split():
+                self.displays.append(d)
         if tag == "button":
-            self.buttons.append(data)
+            self.buttons.append(d)
 
 
 class SpatialSiteTests(unittest.TestCase):
-    def test_exact_nine_spatial_screens_with_real_canonical_routes(self):
-        root = StageParser()
-        root.feed(read("index.html"))
-        self.assertEqual(len(root.screens), 9)
-        self.assertEqual(len(set(s.get("href") for s in root.screens)), 9)
-        for item in root.screens:
-            url = item["href"]
-            self.assertTrue(url.startswith("/") and url.endswith("/"))
-            self.assertTrue((SITE / url.lstrip("/") / "index.html").is_file(), url)
-            self.assertIn(item.get("data-spatial-category"), {"service", "evidence", "research"})
-            self.assertNotIn("xoyk.dev", item.get("href"))
-
-    def test_three_aisles_three_screens_each(self):
-        root = StageParser()
-        root.feed(read("index.html"))
+    def test_thirty_screens_across_seven_aisles(self):
+        parser = Elements()
+        parser.feed(read("index.html"))
+        self.assertEqual(len(parser.displays), 30)
         self.assertEqual(
-            [x.get("data-spatial-category") for x in root.screens],
-            ["service"] * 3 + ["evidence"] * 3 + ["research"] * 3,
+            [sum(("eb-lane-" + str(lane)) in (screen.get("class") or "").split()
+                 for screen in parser.displays) for lane in range(7)],
+            [5, 5, 5, 4, 4, 4, 3],
         )
+        self.assertEqual(len({
+            d.get("aria-label") for d in parser.displays
+        }), 30)
 
-    def test_every_stage_screen_is_keyboard_accessible_native_link(self):
-        root = StageParser()
-        root.feed(read("index.html"))
-        self.assertTrue(all(x.get("aria-label", "").strip() for x in root.screens))
-        self.assertIn("spatial-monitor:focus-visible", read("spatial.css"))
-        self.assertIn('aria-label="Filter and display EvidenceBound work"', read("index.html"))
+    def test_native_links_resolve_to_real_public_page(self):
+        parser = Elements()
+        parser.feed(read("index.html"))
+        for display in parser.displays:
+            url = display.get("href") or ""
+            self.assertTrue(url.startswith("/") and url.endswith("/"), url)
+            self.assertTrue((SITE / url.lstrip("/") / "index.html").is_file(), url)
+            self.assertNotIn("xoyk", url)
 
-    def test_controls_are_real_and_have_state(self):
-        root = StageParser()
-        root.feed(read("index.html"))
-        filters = [b["data-spatial-filter"] for b in root.buttons
-                   if "data-spatial-filter" in b]
-        self.assertEqual(filters, ["all", "service", "evidence", "research"])
+    def test_theme_sidebar_and_fullscreen_floor(self):
+        html, css = read("index.html"), read("showroom.css")
+        for marker in (
+            'class="eb-side"', 'id="eb-search"', 'id="eb-stage"',
+            'class="eb-ground"', 'id="eb-displays"', 'class="eb-floor-labels"',
+            'class="eb-intro"', 'class="eb-statusline"',
+            'class="eb-mobile-tabs"', 'id="eb-mobile-list"',
+        ):
+            self.assertIn(marker, html)
+        for pattern in ("perspective(930px)", "rotateX(68deg)", "--size:126px",
+                        ".eb-display-foot", ".eb-stage-corner", ".eb-list-group"):
+            self.assertIn(pattern, css)
+        self.assertIn("@media(max-width:700px)", css)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", css)
+
+    def test_search_filter_buttons_are_semantic_and_stateful(self):
+        parser = Elements()
+        parser.feed(read("index.html"))
+        self.assertEqual([b.get("data-eb-status") for b in parser.buttons
+                          if b.get("data-eb-status") is not None],
+                         ["all", "public", "planned"])
+        self.assertEqual([b.get("data-eb-group") for b in parser.buttons
+                          if b.get("data-eb-group") is not None],
+                         ["all", "0", "1", "2", "3", "4", "5", "6"])
         self.assertTrue(all(
-            "aria-pressed" in b for b in root.buttons if "data-spatial-filter" in b
+            b.get("aria-pressed") in {"true", "false"} for b in parser.buttons
+            if b.get("data-eb-group") is not None or b.get("data-eb-status") is not None
         ))
-        self.assertTrue(any(b.get("id") == "spatial-mode" for b in root.buttons))
-        self.assertIn("src=\"/spatial.mjs\"", read("index.html"))
-        self.assertIn('id="spatial-directory" hidden', read("index.html"))
 
-    def test_price_and_future_product_status_were_not_conflated(self):
-        html = read("index.html")
-        self.assertIn("Action-Control Check", html)
-        self.assertIn("Request the $1,000 check", html)
-        self.assertIn('href="/assessment/"', html)
-        self.assertIn("Evidence Agent", html)
-        self.assertIn("in development", html)
-        self.assertIn("no live automated agent service or fixed price", html)
-        self.assertIn('href="/agent/"', html)
+    def test_development_status_remains_explicit(self):
+        home = read("index.html")
+        agent = read("agent/index.html")
+        self.assertIn("no live agent or set price", home.lower())
+        self.assertIn("Agent", home)
+        self.assertIn("In development", agent)
+        self.assertIn("NOT YET AVAILABLE", agent)
+        self.assertIn("Scope &amp; pricing TBD", agent)
+        self.assertIn('href="/agent/"', home)
 
-    def test_inbound_search_surface_and_org_jsonld_unmodified(self):
-        html = read("index.html")
-        self.assertEqual(html.count("<h1"), 1)
-        self.assertIn('<link rel="canonical" href="https://evidencebound.org/">', html)
-        self.assertIn('<meta name="description"', html)
+    def test_buyer_price_and_limits_remain_clear(self):
+        home, scope = read("index.html"), read("assessment/index.html")
+        self.assertIn("Request a check", home)
+        self.assertIn("$1,000", home)
+        self.assertIn("Authorized staging or synthetic only", home)
+        self.assertIn("RAB-1 reproduced a duplicate-consequence failure", home)
+        self.assertIn("one protected action", scope.lower())
+        self.assertIn("two scenarios", scope.lower())
+
+    def test_metadata_canonical_and_org_graph_unchanged(self):
+        home = read("index.html")
+        self.assertEqual(len(re.findall(r"<h1(?:\s|>)", home)), 1)
+        self.assertIn('<link rel="canonical" href="https://evidencebound.org/">', home)
+        self.assertIn('<meta name="description" content="', home)
         blocks = re.findall(
-            r'<script type="application/ld\+json">(.*?)</script>', html, re.S
+            r'<script type="application/ld\+json">(.*?)</script>', home, re.S
         )
         self.assertEqual(len(blocks), 1)
         graph = json.loads(blocks[0])["@graph"]
         self.assertEqual({x["@type"] for x in graph}, {"Organization", "WebSite"})
-        self.assertEqual(
-            next(x for x in graph if x["@type"] == "Organization")["logo"]["url"],
-            "https://evidencebound.org/assets/evidencebound-icon-primary.png",
-        )
+        logo = next(x for x in graph if x["@type"] == "Organization")["logo"]["url"]
+        self.assertEqual(logo, "https://evidencebound.org/assets/evidencebound-icon-primary.png")
 
-    def test_sitemap_preserves_16_urls_no_redirect_changes(self):
-        sitemap = ET.fromstring(read("sitemap.xml"))
-        urls = [x.text for x in sitemap.findall(
+    def test_sitemap_robots_and_routing_untouched(self):
+        tree = ET.fromstring(read("sitemap.xml"))
+        urls = [loc.text for loc in tree.findall(
             ".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc"
         )]
+        self.assertEqual(set(urls), ORIGINAL_URLS)
         self.assertEqual(len(urls), 16)
-        self.assertEqual(len(set(urls)), 16)
-        self.assertIn("https://evidencebound.org/agent/", urls)
-        self.assertEqual(
-            read("robots.txt"),
-            "User-agent: *\nAllow: /\n\nSitemap: https://evidencebound.org/sitemap.xml\n",
-        )
-        self.assertTrue(json.loads(read("vercel.json"))["trailingSlash"])
+        self.assertEqual(read("robots.txt"),
+                         "User-agent: *\nAllow: /\n\n"
+                         "Sitemap: https://evidencebound.org/sitemap.xml\n")
+        config = json.loads(read("vercel.json"))
+        self.assertTrue(config["trailingSlash"])
+        self.assertTrue(config["cleanUrls"])
+        self.assertTrue(any(r.get("permanent") for r in config["redirects"]))
 
-    def test_no_inline_styles_or_network_scripting(self):
-        parser = StageParser()
+    def test_no_inline_style_or_external_script(self):
+        parser = Elements()
         parser.feed(read("index.html"))
         self.assertEqual(parser.inline_styles, [])
-        script = read("spatial.mjs")
-        self.assertNotIn("fetch(", script)
-        self.assertNotIn("XMLHttpRequest", script)
-        self.assertNotIn("WebSocket", script)
-        self.assertNotIn("localStorage", script)
-        self.assertNotIn("innerHTML", script)
-        self.assertNotIn("style.", script)
-        self.assertNotIn("eval(", script)
+        self.assertIn('<script type="module" src="/showroom.mjs"></script>', read("index.html"))
+        self.assertNotIn("xoyk.dev", read("index.html"))
+        js = read("showroom.mjs")
+        for prohibited in ("fetch(", "XMLHttpRequest", "WebSocket", "eval(",
+                           "localStorage", "innerHTML"):
+            self.assertNotIn(prohibited, js)
 
-    def test_spatial_depth_and_2d_accessibility_fallback(self):
-        css = read("spatial.css")
-        self.assertIn("perspective:1300px", css)
-        self.assertIn("rotateY(-12deg)", css)
-        self.assertIn(".spatial-screen", css)
-        self.assertIn(".spatial-floor-light", css)
-        self.assertIn(".spatial-lane", css)
-        self.assertIn("@media(max-width:640px)", css)
-        self.assertIn("@media(prefers-reduced-motion:reduce)", css)
+    def test_fallback_indexable_beneath_spatial_stage(self):
+        html = read("index.html")
+        self.assertLess(html.index("eb-showroom"), html.index('id="pricing"'))
+        self.assertIn("What we test", html)
+        self.assertIn("Five steps from scope to evidence-backed findings.", html)
+        self.assertIn("Prove your AI agent is still authorized", html)
+        self.assertIn('href="/assessment/"', html)
 
-    def test_global_palette_is_brand_blue_and_light(self):
-        css = read("styles.css")
-        self.assertIn("2026-10-27 EvidenceBound Light Spatial Interface", css)
-        self.assertIn("--bg:#f7fbff", css)
-        self.assertIn("--text:#142f58", css)
-        self.assertIn("body{background:linear-gradient(180deg,#fff", css)
-        self.assertIn("/assets/evidencebound-icon-primary.png", css)
+    def test_unmodified_webmcp_and_agent_pages_still_exist(self):
+        self.assertTrue((SITE / "webmcp/control-core.mjs").is_file())
+        self.assertTrue((SITE / "agent/index.html").is_file())
+        self.assertTrue((SITE / "technology/index.html").is_file())
 
-    def test_old_commercial_evidence_and_research_text_remain(self):
-        home = read("index.html")
-        for phrase in (
-            "DevSecOps agents", "Cyber-remediation agents",
-            "One workflow. Two control transitions.",
-            "RAB-1 reproduced a duplicate-consequence failure",
-            "Fixed scope", "Retained test artifacts",
-            "Scope", "Challenge", "Observe", "Report", "Retest",
-        ):
-            self.assertIn(phrase, home)
+    def test_light_branding_and_30_screen_inventory(self):
+        css = read("showroom.css")
+        self.assertIn("background:#f6faff", css)
+        self.assertIn("background:#f7fbff", css)
+        self.assertIn("30 screens", read("index.html"))
+        self.assertIn("PUBLISHED 25", read("index.html"))
+        self.assertIn("PLANNED 5", read("index.html"))
 
 
 if __name__ == "__main__":

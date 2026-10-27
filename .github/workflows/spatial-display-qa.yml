@@ -3,11 +3,14 @@ on:
   push:
     branches:
       - feature/spatial-display-wall-2026-10-27
+      - feature/xoyk-faithful-showroom-2026-10-27
       - main
     paths:
       - site/**
       - tests/test_spatial_site.py
       - tests/spatial_scene.test.mjs
+      - tests/showroom.test.mjs
+      - tools/showroom_visual_probe.py
       - .github/workflows/spatial-display-qa.yml
   pull_request:
     paths:
@@ -33,9 +36,13 @@ jobs:
       - name: Exact-structure and SEO/AEO regressions
         run: python -m unittest -v tests.test_spatial_site tests.test_agent_site_preview
       - name: Execute spatial scene filter and alternative list controls
-        run: node --test tests/spatial_scene.test.mjs
+        run: node --test tests/spatial_scene.test.mjs tests/showroom.test.mjs
       - name: Syntax-check first-party script
-        run: node --check site/spatial.mjs
+        run: |
+          node --check site/spatial.mjs
+          node --check site/showroom.mjs
+      - name: Install browser interaction checker
+        run: python -m pip install playwright==1.57.0
       - name: Capture desktop/mobile and buyer-page screenshots
         shell: bash
         run: |
@@ -57,6 +64,7 @@ jobs:
           "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/home-mobile.png --window-size=390,844 --virtual-time-budget=1500 http://localhost:4173/
           "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/agent-desktop.png --window-size=1440,900 --virtual-time-budget=1500 http://localhost:4173/agent/
           "$BROWSER" --headless --no-sandbox --disable-gpu --hide-scrollbars --screenshot=spatial-qa/assessment-desktop.png --window-size=1440,900 --virtual-time-budget=1500 http://localhost:4173/assessment/
+          BROWSER="$BROWSER" python tools/showroom_visual_probe.py
           sha256sum spatial-qa/*.png > spatial-qa/SHA256SUMS.txt
           git rev-parse HEAD > spatial-qa/RESEARCH_HEAD.txt
       - name: Retain exact-head visual artifacts
