@@ -261,3 +261,37 @@ body.spatial-homepage .btn.ghost{background:transparent;color:#17549b}
 .spatial-list-open .spatial-copy h1{max-width:750px}
 .spatial-list-open .spatial-directory{display:block}
 @media(max-width:640px){.spatial-monitor{--depth:0px!important}}
+
+/* Screenshot QA: keep offer/CTA above desktop fold; gallery visible on mobile. */
+@media(min-width:981px){
+ .spatial-copy h1{font-size:clamp(43px,3.65vw,55px);line-height:1.07;max-width:560px;margin:19px 0 18px}
+ .spatial-copy .spatial-lead{font-size:16px;line-height:1.54}
+ .spatial-copy{padding-bottom:18px}
+ .spatial-price{margin-top:17px;padding-top:14px}
+ .spatial-cta{margin-top:16px}
+ .spatial-scene{transform:translateY(-95px)}
+}
+.spatial-lane{z-index:0}
+.spatial-lane.second{top:263px}
+.spatial-lane.third{top:504px}
+.spatial-world{z-index:1}
+@media(max-width:980px) and (min-width:641px){
+ .spatial-copy h1{font-size:clamp(38px,5.5vw,56px)}
+ .spatial-scene{transform:translateY(0)}
+}
+@media(max-width:640px){
+ .spatial-shell{display:flex;flex-direction:column;align-items:stretch}
+ .spatial-copy{display:contents}
+ .spatial-overline{order:1}
+ .spatial-copy h1{order:2;font-size:clamp(36px,9.1vw,43px);margin:13px 0 15px}
+ .spatial-price{order:3;margin-top:0;padding-top:10px}
+ .spatial-price strong{font-size:29px}
+ .spatial-cta{order:4;display:flex;gap:8px;margin-top:13px}
+ .spatial-cta a{width:auto;min-width:0;flex:1;padding:10px 9px;font-size:12px}
+ .spatial-cta a:nth-child(3){display:none}
+ .spatial-scene{order:5;transform:none;margin-top:11px}
+ .spatial-copy .spatial-lead{order:6;margin:18px 0 0}
+ .spatial-copy .spatial-qualifier{order:7;margin-top:10px}
+ .spatial-copy .spatial-offer-note{order:8;margin:9px 0 22px}
+ .spatial-world{padding-top:14px}
+}
