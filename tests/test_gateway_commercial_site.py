@@ -1,4 +1,5 @@
 """Commercial-site claim constraints for the November 2026 gateway research preview."""
+
 from __future__ import annotations
 
 import json
@@ -15,6 +16,7 @@ class Links(HTMLParser):
         super().__init__()
         self.hrefs: list[str] = []
         self.ids: set[str] = set()
+
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         p = dict(attrs)
         if tag == "a" and p.get("href"):
@@ -34,7 +36,10 @@ def test_existing_offer_price_scope_and_cta_unchanged() -> None:
     assert '"priceCurrency":"USD"' in assessment
     assert "one protected action" in assessment.lower()
     assert "two scenarios" in assessment.lower()
-    assert "mailto:ruslan@evidencebound.org?subject=EvidenceBound%20%241000%20Action-Control%20Check" in assessment
+    assert (
+        "mailto:ruslan@evidencebound.org?subject=EvidenceBound%20%241000%20Action-Control%20Check"
+        in assessment
+    )
     assert "No payment is taken on this website." in assessment
 
 
@@ -52,13 +57,18 @@ def test_cost_exposure_is_measurable_not_guaranteed() -> None:
 def test_protocol_evidence_is_explicitly_local_and_bounded() -> None:
     tech = page("technology/index.html")
     partner = page("partners/oem/index.html")
-    note = (ROOT / "docs/research/2026-11-03-envoy-extproc-local-acceptance.md").read_text(encoding="utf-8")
+    note = (ROOT / "docs/research/2026-11-03-envoy-extproc-local-acceptance.md").read_text(
+        encoding="utf-8"
+    )
     assert 'id="gateway-research"' in tech
     assert "19/19" in tech and "400 sequential localhost" in tech
     assert "GOOGLE-MANAGED COMPATIBILITY · NOT VERIFIED" in tech
     assert "not been tested against the managed Google service" in tech
     assert "separately priced pilot" in partner
-    assert "Pricing, connectivity and acceptance criteria" in partner or "price and acceptance criteria" in partner
+    assert (
+        "Pricing, connectivity and acceptance criteria" in partner
+        or "price and acceptance criteria" in partner
+    )
     assert "8073a818fe1ccfa417544e7db6d492c9926077295bf1bc74d920ff3c9ec0ab97" in note
     assert "not a downloadable public reproduction bundle" in note
     assert "not third-party verification" in note
@@ -66,7 +76,12 @@ def test_protocol_evidence_is_explicitly_local_and_bounded() -> None:
 
 
 def test_local_navigation_and_anchors() -> None:
-    for path in ("index.html", "assessment/index.html", "partners/oem/index.html", "technology/index.html"):
+    for path in (
+        "index.html",
+        "assessment/index.html",
+        "partners/oem/index.html",
+        "technology/index.html",
+    ):
         html = page(path)
         parse = Links()
         parse.feed(html)
@@ -88,11 +103,22 @@ def test_local_navigation_and_anchors() -> None:
 
 
 def test_metadata_and_single_h1_preserved() -> None:
-    for path in ("index.html", "assessment/index.html", "partners/oem/index.html", "technology/index.html"):
+    for path in (
+        "index.html",
+        "assessment/index.html",
+        "partners/oem/index.html",
+        "technology/index.html",
+    ):
         html = page(path)
         assert len(re.findall(r"<h1(?:\s|>)", html)) == 1, path
         assert html.count('rel="canonical"') == 1, path
-        for key in ('name="description"', 'property="og:description"', 'name="twitter:description"'):
+        for key in (
+            'name="description"',
+            'property="og:description"',
+            'name="twitter:description"',
+        ):
             assert key in html, (path, key)
-        for js in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, flags=re.S):
+        for js in re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', html, flags=re.S
+        ):
             assert json.loads(js)["@context"] == "https://schema.org"
